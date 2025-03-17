@@ -24,7 +24,7 @@
 } 
 
 video {
-    will-change: filter;
+    will-change: filter,  transform;
     transition: filter ease-out .2s;
 }
 
