@@ -2435,7 +2435,7 @@ function abstractVideoInfo() {
       videoInfoElm.keywords.appendChild(d);
 
       if (videoDetails.keywords.length > 10) {
-        gradientButtons(".info .keywordsBtn");
+        // gradientButtons(".info .keywordsBtn");
       }
     }
   } else {

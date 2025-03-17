@@ -521,7 +521,7 @@
         }
 
         if (ref.length > 10) {
-          gradientButtons(".refinements .keywordsBtn");
+          // gradientButtons(".refinements .keywordsBtn");
         }
       }
 
