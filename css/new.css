@@ -149,21 +149,21 @@ video.seeking {
 }
 
 #playPauseButton .img { /* play button */
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/play.svg");
+    background-image: url("svg/play.svg");
     width: 2rem;
     height: 2rem;
 }
 
 #playPauseButton.playing .img { /* pause button */
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/pause.svg");
+    background-image: url("svg/pause.svg");
 }
 
 #playPauseButton.repeat .img, .replay .img { /* replay button */
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/replay.svg");
+    background-image: url("svg/replay.svg");
 }
 
 .radio .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/radio.svg");
+    background-image: url("svg/radio.svg");
 }
 
 .nextSpan {
@@ -198,11 +198,11 @@ video.seeking {
 }
 
 .cast .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/cast.svg");
+    background-image: url("svg/cast.svg");
 }
 
 .cast_connected .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/cast_connected.svg") !important;
+    background-image: url("svg/cast_connected.svg") !important;
 }
 
 google-cast-launcher.disabled, .disabled {
@@ -305,7 +305,7 @@ a.url {
 }
 
 a.url .img {
-    /*background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/open.svg");*/
+    /*background-image: url("svg/open.svg");*/
     width: 1.25rem;
     height: 1.25rem;
     position: relative;
@@ -313,7 +313,7 @@ a.url .img {
 }
 
 a.url .img.link {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/link.svg");
+    background-image: url("svg/link.svg");
     margin-left: 0.5rem;
 }
 
@@ -359,7 +359,7 @@ a.noUnderline {
 }
 
 #videoInfo .infoOpener .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/chevron.svg");
+    background-image: url("svg/chevron.svg");
     width: 2rem;
     height: 2rem;
     margin: 0.75rem 0.35rem;
@@ -387,35 +387,35 @@ a.noUnderline {
 }
 
 #skipPreviousButton .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/skip_previous.svg");
+    background-image: url("svg/skip_previous.svg");
 }
 
 #fitscreenButton .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/fitscreen.svg");
+    background-image: url("svg/fitscreen.svg");
 }
 
 #settingsButton .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/settings.svg");
+    background-image: url("svg/settings.svg");
 }
 
 #searchButton .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/search.svg");
+    background-image: url("svg/search.svg");
 }
 
 #fullscreenButton .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/fullscreen.svg");
+    background-image: url("svg/fullscreen.svg");
 }
 
 #fullscreenButton .img.exit {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/fullscreen_exit.svg");
+    background-image: url("svg/fullscreen_exit.svg");
 }
 
 #pipButton .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/pip.svg");
+    background-image: url("svg/pip.svg");
 }
 
 #pipButton .img.exit {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/pip_exit.svg");
+    background-image: url("svg/pip_exit.svg");
 }
 
 #statusIndicator div {
@@ -491,11 +491,11 @@ a.noUnderline {
 }
 
 #seekForwardButton .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/seek.svg");
+    background-image: url("svg/seek.svg");
 }
 
 #seekBackwardButton .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/rewind.svg");
+    background-image: url("svg/rewind.svg");
 }
 
 #seekForwardButton, #seekBackwardButton, #skipPreviousButton, #skipForwardButton {
@@ -707,20 +707,20 @@ div.badge {
 }
 
 #infoContainer .homeBtn .img { 
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/home.svg");
+    background-image: url("svg/home.svg");
     margin-left: calc(env(safe-area-inset-left));
 }
 
 #infoContainer .trendingBtn .img { 
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/trending.svg");
+    background-image: url("svg/trending.svg");
 }
 
 #infoContainer .searchBtn .img { 
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/search.svg");
+    background-image: url("svg/search.svg");
 }
 
 #infoContainer .infoBtn .img { 
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/info.svg");
+    background-image: url("svg/info.svg");
 }
 
 #infoContainer .head .cursor .img {
@@ -733,7 +733,7 @@ div.badge {
 }
 
 #infoContainer .closeBtn .img {
-    background-image: url("https://ivansojivarghese.github.io/media-sphere/svg/close.svg");
+    background-image: url("svg/close.svg");
     margin-right: calc(env(safe-area-inset-right));
 }
 
