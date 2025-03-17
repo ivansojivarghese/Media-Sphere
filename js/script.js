@@ -2102,8 +2102,8 @@
         if (networkError && !offlineNotif) {
           var ntfTitle = "You're offline",
               ntfBody = "Check your connection.",
-              ntfBadge = "https://ivansojivarghese.github.io/media-sphere/play_maskable_monochrome_409.png",
-              ntfIcon = "https://ivansojivarghese.github.io/media-sphere/png/error.png";
+              ntfBadge = "../play_maskable_monochrome_409.png",
+              ntfIcon = "../png/error.png";
 
           offlineNotif = true;
 
@@ -2117,7 +2117,7 @@
                   tag: "offline",
                   requireInteraction: false, // Dismiss after default timeout
                   data : {
-                    url :  "https://ivansojivarghese.github.io/media-sphere/"
+                    url :  "/"
                   }
                 });
               });
@@ -2129,7 +2129,7 @@
                 tag: "offline",
                 requireInteraction: false, // Dismiss after default timeout
                 data : {
-                  url :  "https://ivansojivarghese.github.io/media-sphere/"
+                  url :  "/"
                 }
               });
     
@@ -2159,8 +2159,8 @@
         if ((networkQuality === "Bad" || networkQuality === "Very Bad") && !slowNotif) {
           var ntfTitle = "Slow network detected",
               ntfBody = "Check your connection.",
-              ntfBadge = "https://ivansojivarghese.github.io/media-sphere/play_maskable_monochrome_409.png",
-              ntfIcon = "https://ivansojivarghese.github.io/media-sphere/png/warning.png";
+              ntfBadge = "../play_maskable_monochrome_409.png",
+              ntfIcon = "../png/warning.png";
 
           slowNotif = true;
 
@@ -2174,7 +2174,7 @@
                   tag: "slow",
                   requireInteraction: false, // Dismiss after default timeout
                   data : {
-                    url :  "https://ivansojivarghese.github.io/media-sphere/"
+                    url :  "/"
                   }
                 });
               }).then(() => {
@@ -2193,7 +2193,7 @@
                 tag: "slow",
                 requireInteraction: false, // Dismiss after default timeout
                 data : {
-                  url :  "https://ivansojivarghese.github.io/media-sphere/"
+                  url :  "/"
                 }
               });
 
@@ -2895,8 +2895,8 @@
     audio.addEventListener("error", async () => {
       var ntfTitle = "",
           ntfBody = "",
-          ntfBadge = "https://ivansojivarghese.github.io/media-sphere/play_maskable_monochrome_409.png",
-          ntfIcon = "https://ivansojivarghese.github.io/media-sphere/png/error.png";
+          ntfBadge = "../play_maskable_monochrome_409.png",
+          ntfIcon = "../png/error.png";
 
       // var player = new cast.framework.RemotePlayer();
 
@@ -2970,7 +2970,7 @@
                 tag: "playbackError",
                 requireInteraction: false, // Dismiss after default timeout
                 data : {
-                  url :  "https://ivansojivarghese.github.io/media-sphere/"
+                  url :  "/"
                 }
               });
             });
@@ -2982,7 +2982,7 @@
               tag: "playbackError",
               requireInteraction: false, // Dismiss after default timeout
               data : {
-                url :  "https://ivansojivarghese.github.io/media-sphere/"
+                url :  "/"
               }
             });
 
@@ -3008,8 +3008,8 @@
     video.addEventListener("error", async () => {
       var ntfTitle = "",
           ntfBody = "",
-          ntfBadge = "https://ivansojivarghese.github.io/media-sphere/play_maskable_monochrome_409.png",
-          ntfIcon = "https://ivansojivarghese.github.io/media-sphere/png/error.png";
+          ntfBadge = "../play_maskable_monochrome_409.png",
+          ntfIcon = "../png/error.png";
 
       // var player = new cast.framework.RemotePlayer();
 
@@ -3084,7 +3084,7 @@
                 tag: "playbackError",
                 requireInteraction: false, // Dismiss after default timeout
                 data : {
-                  url :  "https://ivansojivarghese.github.io/media-sphere/"
+                  url :  "/"
                 }
               });
             });
@@ -3096,7 +3096,7 @@
               tag: "playbackError",
               requireInteraction: false, // Dismiss after default timeout
               data : {
-                url :  "https://ivansojivarghese.github.io/media-sphere/"
+                url :  "/"
               }
             });
 
