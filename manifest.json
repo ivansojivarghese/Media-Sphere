@@ -11,19 +11,19 @@
     }, 
   "icons": [
     {
-      "src": "https://ivansojivarghese.github.io/media-sphere/play_small.png",
+      "src": "play_small.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://ivansojivarghese.github.io/media-sphere/play.png",
+      "src": "play.png",
       "sizes": "1080x1080",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://ivansojivarghese.github.io/media-sphere/play_maskable.png",
+      "src": "play_maskable.png",
       "sizes": "1620x1620",
       "type": "image/png",
       "purpose": "maskable"
