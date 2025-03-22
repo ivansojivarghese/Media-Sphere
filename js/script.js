@@ -1573,8 +1573,31 @@
       return doc.documentElement.textContent;
     }
 
+    function isLandscape() {
+      return window.matchMedia("(orientation: landscape)").matches;
+    }
+
+    // You can also listen for changes
+    window.matchMedia("(orientation: landscape)").addEventListener("change", (e) => {
+      console.log(e.matches ? "Switched to Landscape" : "Switched to Portrait");
+
+      if (e.matches) { // landscape
+
+      } else { // portrait
+        video.classList.remove("side-by-side");
+        videoSec.classList.remove("side-by-side");
+        videoControls.classList.remove("side-by-side");
+      }
+    });
+
     function openSearch(v, i, e) {
       event.stopPropagation();
+
+      if (isLandscape()) {
+        video.classList.add("side-by-side");
+        videoSec.classList.add("side-by-side");
+        videoControls.classList.add("side-by-side");
+      }
 
       const b = document.querySelector("#infoContainer .head .searchBtn");
       if (b.classList.contains("active")) {
@@ -1641,6 +1664,12 @@
     function openVideoInfo() {
       event.stopPropagation();
 
+      if (isLandscape()) {
+        video.classList.add("side-by-side");
+        videoSec.classList.add("side-by-side");
+        videoControls.classList.add("side-by-side");
+      }
+
       const b = document.querySelector("#infoContainer .head .infoBtn");
       if (b.classList.contains("active")) {
         videoInfoElm.info.scrollTo(0,0);
@@ -1683,6 +1712,13 @@
     }
 
     function closeVideoInfo() {
+
+      if (isLandscape()) {
+        video.classList.remove("side-by-side");
+        videoSec.classList.remove("side-by-side");
+        videoControls.classList.remove("side-by-side");
+      }
+
       videoInfoElm.info.style.transform = "";
       videoInfoOpen = false;
 
