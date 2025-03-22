@@ -99,6 +99,10 @@ video.seeking {
     width: calc(100% - calc(21rem + calc(env(safe-area-inset-left)) + calc(env(safe-area-inset-right)))) !important;
 }
 
+.side-by-side.nr { /*right inset*/
+    width: calc(100% - calc(21rem + calc(env(safe-area-inset-left)))) !important;
+}
+
 /* calc(100% - calc(21rem + calc(env(safe-area-inset-left)) + calc(env(safe-area-inset-right)))) */
 
 #videoControls {

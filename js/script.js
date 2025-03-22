@@ -1334,7 +1334,7 @@
           controlsHideInt = null;
 
           if (videoInfoOpen) {
-            closeVideoInfo();
+            // closeVideoInfo();
             if (controlsHideInt === null) {
               controlsHideInt = setTimeout(function() {
                 if (!loading && !video.paused && !seekingLoad && !longTap && !seeking) {
@@ -4915,7 +4915,7 @@
     fastSeekInt = setInterval(fastSeekIteration, fastSeekSpeeds[0]); // speed 1 seeking
 
     function tapHandler(event) {
-      if (!event.target.classList.contains("no-tap")) {
+      if (!event.target.classList.contains("no-tap") && !videoInfoOpen) {
         if(!tapedTwice) {
             tapedTwice = true;
             if (event.target === playPauseButton || event.target === playPauseButtonImg) {
@@ -5106,7 +5106,7 @@
             }
             backgroundPlay = false;
           }
-          if (!video.paused && !videoInfoOpen) {
+          if (!video.paused /*&& !videoInfoOpen*/) {
               getScreenLock();
               document.exitPictureInPicture().then(function() {
                 pipEnabled = false;
@@ -5312,6 +5312,13 @@
           getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
         }
       }
+
+      if (videoInfoOpen && isLandscape() && parseFloat(getComputedStyle($0).getPropertyValue('padding-right'))) {
+        videoInfoElm.infoHeadSec.classList.add("nr");
+      } else {
+        videoInfoElm.infoHeadSec.classList.remove("nr");
+      }
+
     }, 1000/60);
     
     setInterval(() => { // CLEAN UP notifications frequently
