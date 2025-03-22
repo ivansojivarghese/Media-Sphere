@@ -1330,12 +1330,17 @@
     videoControls.addEventListener('click', function(event) {
       if ((player && !player.isConnected) || !player) {
         if ((interactiveType === "touch" || interactiveType === "pen") && !event.target.classList.contains("no-tap")) {
+          var hide = false;
+          if (controlsHideInt !== null) {
+              hide = true;
+          }
+          
           clearTimeout(controlsHideInt);
           controlsHideInt = null;
 
           if (videoInfoOpen) {
-            // closeVideoInfo();
-            if (controlsHideInt === null) {
+            if (controlsHideInt === null && !hide) {
+              showVideoControls();
               controlsHideInt = setTimeout(function() {
                 if (!loading && !video.paused && !seekingLoad && !longTap && !seeking) {
                   hideVideoControls();
@@ -1353,6 +1358,8 @@
                   }, 100);
                 }
               }, 3000); // hide controls after 3 sec. if no activity
+            } else {
+              hideVideoControls();
             }
           } else {
             if (videoControls.classList.contains('visible') && !seeking && !seekingLoad && !video.paused && !loading) {
