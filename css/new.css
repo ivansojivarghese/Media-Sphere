@@ -693,7 +693,8 @@ div.thumbnailIcon {
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-evenly;
-    padding-top: 1.75rem;
+    /*padding-top: 1.75rem;*/
+    padding-top: 1rem;
     padding-bottom: 1rem;
     padding-right: calc(env(safe-area-inset-right));
 }
@@ -751,7 +752,7 @@ div.badge {
 #infoContainer .wrapper {
     width: calc(100% - 1.2rem - 1.2rem - calc(env(safe-area-inset-right)));
     padding: 0 1.2rem;
-    margin-top: calc(7rem + calc(env(safe-area-inset-top)));
+    margin-top: calc(5rem + calc(env(safe-area-inset-top)));
     display: none;
 }
 
