@@ -606,7 +606,7 @@
         // videoSec.currentTime = video.currentTime;
 
         if (autoInfoClose && (!pipEnabled && !clickedWithin5Sec)) {
-          closeVideoInfo();
+          // closeVideoInfo();
           autoInfoClose = false;
         } else if (pipEnabled || clickedWithin5Sec) {
           autoInfoClose = false;
@@ -1694,7 +1694,7 @@
 
       var ori = screen.orientation.type;
 
-      if (videoControls.classList.contains('visible') && ((!loading || loading) || initialVideoLoad) /*&& (!videoErr && !audioErr)*/) {
+      if (/*videoControls.classList.contains('visible') &&*/ ((!loading || loading) || initialVideoLoad) /*&& (!videoErr && !audioErr)*/) {
         videoInfoElm.info.style.transform = "none";
         videoInfoOpen = true;
 
