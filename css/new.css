@@ -243,11 +243,11 @@ google-cast-launcher.disabled, .disabled {
 }
 
 #skipPreviousButton {
-    left: calc(5.45rem + calc(env(safe-area-inset-left)));
+    left: calc(5.45rem + (calc(env(safe-area-inset-left)) / 2));
 }
 
 #skipForwardButton {
-    right: calc(5.45rem + calc(env(safe-area-inset-right)));
+    right: calc(5.45rem + (calc(env(safe-area-inset-right)) / 2));
 }
 
 #seekControls {
