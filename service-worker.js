@@ -81,6 +81,7 @@ const assets = [
   'svg/fitscreen.svg',
   'svg/settings.svg',
   'svg/skip_previous.svg',
+  'svg/skip_forward.svg',
   'svg/replay.svg',
   'svg/error.svg',
   'svg/chevron.svg',

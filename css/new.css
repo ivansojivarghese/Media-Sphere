@@ -405,6 +405,10 @@ a.noUnderline {
     background-image: url("../svg/skip_previous.svg");
 }
 
+#skipForwardButton .img {
+    background-image: url("../svg/skip_forward.svg");
+}
+
 #fitscreenButton .img {
     background-image: url("../svg/fitscreen.svg");
 }
