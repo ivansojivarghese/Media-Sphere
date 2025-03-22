@@ -1582,7 +1582,11 @@
       console.log(e.matches ? "Switched to Landscape" : "Switched to Portrait");
 
       if (e.matches) { // landscape
-
+        if (videoInfoOpen) {
+          video.classList.add("side-by-side");
+          videoSec.classList.add("side-by-side");
+          videoControls.classList.add("side-by-side");
+        }
       } else { // portrait
         video.classList.remove("side-by-side");
         videoSec.classList.remove("side-by-side");
