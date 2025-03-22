@@ -117,8 +117,8 @@ self.addEventListener('install', (evt) => {
           console.log('Caching shell assets...');
           return Promise.all(
               cacheItems.map((url) =>
-                  cache.add(domain + url).catch((err) => {
-                      console.error(`Failed to cache ${domain + url}:`, err);
+                  cache.add(url).catch((err) => {
+                      console.error(`Failed to cache ${url}:`, err);
                   })
               )
           );
