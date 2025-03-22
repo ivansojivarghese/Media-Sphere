@@ -606,7 +606,9 @@
         // videoSec.currentTime = video.currentTime;
 
         if (autoInfoClose && (!pipEnabled && !clickedWithin5Sec)) {
-          // closeVideoInfo();
+          if (!isLandscape()) {
+            closeVideoInfo();
+          }
           autoInfoClose = false;
         } else if (pipEnabled || clickedWithin5Sec) {
           autoInfoClose = false;
