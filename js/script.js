@@ -5313,10 +5313,10 @@
         }
       }
 
-      if (videoInfoOpen && isLandscape() && parseFloat(getComputedStyle($0).getPropertyValue('padding-right'))) {
-        videoInfoElm.infoHeadSec.classList.add("nr");
+      if (videoInfoOpen && isLandscape() && parseFloat(getComputedStyle(videoInfoElm.infoHeadSec).getPropertyValue('padding-right'))) {
+        videoControls.classList.add("nr");
       } else {
-        videoInfoElm.infoHeadSec.classList.remove("nr");
+        videoControls.classList.remove("nr");
       }
 
     }, 1000/60);
