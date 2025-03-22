@@ -13,6 +13,8 @@ var developer = true, // // toggle between develop(er/ing) mode: FOR DEVELOPER P
     devForm = true,
     timeout = 20000; // default timeout (.ms)
 
+var domain = window.location.href;
+
 let hasBeenInStandaloneMode;
 let hasPlayStoreTwaHash;
 

@@ -6,7 +6,7 @@
 
 
 
-const staticCacheName = 'media-sphere-v2.81';
+const staticCacheName = 'media-sphere-v2.9';
 
 const fonts = [
   'https://cdn.glitch.global/4604ff4b-6eb8-48c8-899f-321d23359af1/Poppins-Regular.woff2?v=1720415271771',
@@ -117,8 +117,8 @@ self.addEventListener('install', (evt) => {
           console.log('Caching shell assets...');
           return Promise.all(
               cacheItems.map((url) =>
-                  cache.add(url).catch((err) => {
-                      console.error(`Failed to cache ${url}:`, err);
+                  cache.add(domain + url).catch((err) => {
+                      console.error(`Failed to cache ${domain + url}:`, err);
                   })
               )
           );
