@@ -958,6 +958,12 @@ div.badge, div.resultText {
     height: 1rem;
 }
 
+div.badge p {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 div.thumbnail {
     height: 11rem;
     border-radius: 0.5rem;
