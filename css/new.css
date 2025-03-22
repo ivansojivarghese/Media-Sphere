@@ -686,6 +686,7 @@ div.thumbnailIcon {
     z-index: 100;
     backdrop-filter: blur(0.53rem);
     background: rgba(48, 48, 48, 0.7);
+    padding-top: calc(env(safe-area-inset-top));
 }
 
 #infoContainer .headSec {
