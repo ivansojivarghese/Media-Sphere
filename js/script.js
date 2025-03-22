@@ -2117,7 +2117,7 @@
                   tag: "offline",
                   requireInteraction: false, // Dismiss after default timeout
                   data : {
-                    url :  "/"
+                    url :  "https://media-sphere.vercel.app/"
                   }
                 });
               });
@@ -2129,7 +2129,7 @@
                 tag: "offline",
                 requireInteraction: false, // Dismiss after default timeout
                 data : {
-                  url :  "/"
+                  url :  "https://media-sphere.vercel.app/"
                 }
               });
     
@@ -2174,7 +2174,7 @@
                   tag: "slow",
                   requireInteraction: false, // Dismiss after default timeout
                   data : {
-                    url :  "/"
+                    url :  "https://media-sphere.vercel.app/"
                   }
                 });
               }).then(() => {
@@ -2193,7 +2193,7 @@
                 tag: "slow",
                 requireInteraction: false, // Dismiss after default timeout
                 data : {
-                  url :  "/"
+                  url :  "https://media-sphere.vercel.app/"
                 }
               });
 
@@ -2970,7 +2970,7 @@
                 tag: "playbackError",
                 requireInteraction: false, // Dismiss after default timeout
                 data : {
-                  url :  "/"
+                  url :  "https://media-sphere.vercel.app/"
                 }
               });
             });
@@ -2982,7 +2982,7 @@
               tag: "playbackError",
               requireInteraction: false, // Dismiss after default timeout
               data : {
-                url :  "/"
+                url :  "https://media-sphere.vercel.app/"
               }
             });
 
@@ -3084,7 +3084,7 @@
                 tag: "playbackError",
                 requireInteraction: false, // Dismiss after default timeout
                 data : {
-                  url :  "/"
+                  url :  "https://media-sphere.vercel.app/"
                 }
               });
             });
@@ -3096,7 +3096,7 @@
               tag: "playbackError",
               requireInteraction: false, // Dismiss after default timeout
               data : {
-                url :  "/"
+                url :  "https://media-sphere.vercel.app/"
               }
             });
 

@@ -784,7 +784,7 @@ async function getParams(id, time, a, b) {
                     tag: "playbackError",
                     requireInteraction: false, // Dismiss after default timeout
                     data : {
-                      url :  "/"
+                      url :  "https://media-sphere.vercel.app/"
                     }
                   });
                 });
@@ -796,7 +796,7 @@ async function getParams(id, time, a, b) {
                   tag: "playbackError",
                   requireInteraction: false, // Dismiss after default timeout
                   data : {
-                    url :  "/"
+                    url :  "https://media-sphere.vercel.app/"
                   }
                 });
     
