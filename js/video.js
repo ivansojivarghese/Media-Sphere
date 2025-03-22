@@ -2717,7 +2717,14 @@ function formatPhoneNumbers(text) {
 
 function formatMentions(text) {
   // Match mentions that start with a space, newline, or are at the beginning of the string
-  const mentionRegex = /(?:\s|\n|^)@([a-zA-Z0-9_]+)/g;
+  // const mentionRegex = /(?:\s|\n|^)@([a-zA-Z0-9_]+)/g;
+
+  // Match potential YouTube handles:
+  // - Must start with '@' and be preceded by a space, newline, or the beginning of the string
+  // - Contains letters, numbers, underscores (_), hyphens (-), periods (.), and middle dots (·)
+  // - Length: 3 to 30 characters
+  // - Cannot start or end with a separator (_ - . ·)
+  const mentionRegex = /(^|\s|\n)(@([a-zA-Z0-9][a-zA-Z0-9_\-.\·]{1,28}[a-zA-Z0-9]))/g;
 
   return text.replace(mentionRegex, (match, username, offset, originalText) => {
     // Check if it is part of an email by looking ahead for a dot (e.g., @domain.com)
