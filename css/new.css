@@ -58,6 +58,7 @@ video.primary {
 video.secondary {
     position: absolute;
     z-index: -1;
+    transition-duration: 3s;
 }
 
 @media screen and (orientation: landscape) {
