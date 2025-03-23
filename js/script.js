@@ -1609,7 +1609,7 @@
 
     function openPanel() {
       event.stopPropagation();
-      
+
       if (!videoInfoOpen) {
         videoInfoElm.info.style.transform = "none";
         videoInfoOpen = true;
@@ -1689,6 +1689,8 @@
 
       const searchPathBtn = document.querySelector("#infoContainer .wrapper.search ." + searchPath); 
       searchPathBtn.classList.add("active");
+
+      var ori = screen.orientation.type;
 
       if (/*videoControls.classList.contains('visible') &&*/ ((!loading || loading) || initialVideoLoad) /*&& (!videoErr && !audioErr)*/) {
         /*
