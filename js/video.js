@@ -2247,7 +2247,7 @@ function resetVideoInfo() {
   videoInfoElm.likes.innerHTML = "";
   videoInfoElm.views.innerHTML = "";
 
-  videoInfoElm.main.setAttribute("onclick", "openSearch()");
+  videoInfoElm.main.setAttribute("onclick", "openSearch(false, true, event)");
 }
 
 function abstractVideoInfo() {
