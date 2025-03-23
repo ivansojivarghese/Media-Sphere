@@ -29,7 +29,7 @@ video {
 }
 
 video.secondary, video.primary {
-    transition-duration: 0.2s;
+    transition-duration: 3s;
 }
 
 /* calc(100% - calc(21rem + calc(env(safe-area-inset-left)) + calc(env(safe-area-inset-right)))) */

@@ -180,7 +180,7 @@
 
             // audio.currentTime = video.currentTime;
 
-            video.style.transitionDuration = "0.2s";
+            video.style.transitionDuration = "3s";
             video.style.background = "";
 
             statusIndicator.classList.remove("error");
@@ -619,7 +619,7 @@
           }
         }
 
-        video.style.transitionDuration = "0.2s";
+        video.style.transitionDuration = "3s";
         video.style.background = "";
 
         videoErr = false;
@@ -2709,7 +2709,7 @@
 
           videoRun = true;
 
-          video.style.transitionDuration = "0.2s";
+          video.style.transitionDuration = "3s";
           video.style.background = "";
 
           if (!networkError) {
@@ -2752,7 +2752,7 @@
         seekingLoad = false;
         // hideVideoControls();
 
-        video.style.transitionDuration = "0.2s";
+        video.style.transitionDuration = "3s";
         video.style.background = "";
 
         if (resumeInterval === null) {
@@ -4005,7 +4005,7 @@
       
       // videoSec.currentTime = video.currentTime;
 
-      video.style.transitionDuration = "0.2s";
+      video.style.transitionDuration = "3s";
       video.style.background = "";
 
       clearTimeout(offsetInt);
@@ -4382,7 +4382,7 @@
       
       videoRun = false;
 
-      video.style.transitionDuration = "0.2s";
+      video.style.transitionDuration = "3s";
       video.style.background = "";
 
       if (!autoLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad))))) {
