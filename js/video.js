@@ -2354,7 +2354,7 @@ function abstractVideoInfo() {
     }
   }
 
-  videoInfoElm.main.setAttribute("onclick", "openPanel()");
+  videoInfoElm.main.setAttribute("onclick", "openVideoInfo()");
 
   for (var j = 0; j < supportedVideoSources.length; j++) {
     var d = document.createElement("div");
