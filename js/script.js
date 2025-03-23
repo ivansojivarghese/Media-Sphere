@@ -1595,11 +1595,15 @@
           video.classList.add("side-by-side");
           videoSec.classList.add("side-by-side");
           videoControls.classList.add("side-by-side");
+          videoInfoElm.main.classList.add("side");
+          videoInfoElm.textStuff.classList.add("side");
         }
       } else { // portrait
         video.classList.remove("side-by-side");
         videoSec.classList.remove("side-by-side");
         videoControls.classList.remove("side-by-side");
+        videoInfoElm.main.classList.remove("side");
+        videoInfoElm.textStuff.classList.remove("side");
       }
     });
 
@@ -1610,6 +1614,8 @@
         video.classList.add("side-by-side");
         videoSec.classList.add("side-by-side");
         videoControls.classList.add("side-by-side");
+        videoInfoElm.main.classList.add("side");
+        videoInfoElm.textStuff.classList.add("side");
       }
 
       const b = document.querySelector("#infoContainer .head .searchBtn");
@@ -1681,6 +1687,8 @@
         video.classList.add("side-by-side");
         videoSec.classList.add("side-by-side");
         videoControls.classList.add("side-by-side");
+        videoInfoElm.main.classList.add("side");
+        videoInfoElm.textStuff.classList.add("side");
       }
 
       const b = document.querySelector("#infoContainer .head .infoBtn");
@@ -1730,6 +1738,8 @@
         video.classList.remove("side-by-side");
         videoSec.classList.remove("side-by-side");
         videoControls.classList.remove("side-by-side");
+        videoInfoElm.main.classList.remove("side");
+        videoInfoElm.textStuff.classList.remove("side");
       }
 
       videoInfoElm.info.style.transform = "";

@@ -103,6 +103,14 @@ video.seeking {
     width: calc(100% - calc(21rem + calc(env(safe-area-inset-left)))) !important;
 }
 
+#videoInfo.side {
+    width: 100%;
+}
+
+#videoInfo .textStuff.side {
+    width: calc(100% - 1.2rem - 1.2rem - 2.5rem - calc(env(safe-area-inset-left)) - calc(env(safe-area-inset-right)));
+}
+
 /* calc(100% - calc(21rem + calc(env(safe-area-inset-left)) + calc(env(safe-area-inset-right)))) */
 
 #videoControls {
@@ -259,7 +267,7 @@ google-cast-launcher.disabled, .disabled {
 }
 
 #videoInfo {
-    width: 100%;
+    /*width: 100%;*/
     position: absolute;
     top: 0;
     left: 0;
@@ -362,7 +370,7 @@ a.noUnderline {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;*/
-    width: calc(100% - 1.2rem - 1.2rem - 2.5rem - calc(env(safe-area-inset-left)) - calc(env(safe-area-inset-right)));
+    width: calc(100vw - 1.2rem - 1.2rem - 2.5rem - calc(env(safe-area-inset-left)) - calc(env(safe-area-inset-right)));
     height: 3.5rem;
     display: inline-block;
 }

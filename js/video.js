@@ -3,6 +3,7 @@ var videoInfoElm = {
   main: document.querySelector("#videoInfo"),
   title : document.querySelector("#videoInfo h5"),
   channelTitle : document.querySelector("#videoInfo p"),
+  textStuff : document.querySelector("#videoInfo .textStuff"),
 
   info : document.querySelector("#infoContainer"),
   infoHead : document.querySelector("#infoContainer .head"),
