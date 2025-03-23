@@ -1607,6 +1607,15 @@
       }
     });
 
+    function openPanel() {
+      if (!videoInfoOpen) {
+        videoInfoElm.info.style.transform = "none";
+        videoInfoOpen = true;
+
+        videoInfoElm.info.classList.add("openInfo");
+      }
+    }
+
     function openSearch(v, i, e) {
       event.stopPropagation();
 
@@ -1678,6 +1687,27 @@
 
       const searchPathBtn = document.querySelector("#infoContainer .wrapper.search ." + searchPath); 
       searchPathBtn.classList.add("active");
+
+      if (/*videoControls.classList.contains('visible') &&*/ ((!loading || loading) || initialVideoLoad) /*&& (!videoErr && !audioErr)*/) {
+        /*
+        videoInfoElm.info.style.transform = "none";
+        videoInfoOpen = true;
+
+        videoInfoElm.info.classList.add("openInfo");
+
+        if (ori === "landscape-primary" || ori === "landscape-secondary") {
+          // mainContent.style.backgroundColor = "#000";
+          // videoContainer.style.opacity = 0.5;
+        }*/
+
+        if (!videoEnd && !video.paused && (!isMusic || (isMusic && CVactivityScore > 0.2)) && (ori === "portrait-primary" || ori === "portrait-secondary")) {
+          video.requestPictureInPicture().then(function() {
+            getScreenLock();
+            pipEnabled = true;
+            backgroundPlayManual = false;
+          });
+        }
+      }
     }
 
     function openVideoInfo() {

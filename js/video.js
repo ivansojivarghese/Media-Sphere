@@ -2246,6 +2246,8 @@ function resetVideoInfo() {
   videoInfoElm.expires.innerHTML = "";
   videoInfoElm.likes.innerHTML = "";
   videoInfoElm.views.innerHTML = "";
+
+  videoInfoElm.main.setAttribute("onclick", "openSearch()");
 }
 
 function abstractVideoInfo() {
@@ -2351,6 +2353,8 @@ function abstractVideoInfo() {
       otherResBtn[k].remove();
     }
   }
+
+  videoInfoElm.main.setAttribute("onclick", "openPanel()");
 
   for (var j = 0; j < supportedVideoSources.length; j++) {
     var d = document.createElement("div");
