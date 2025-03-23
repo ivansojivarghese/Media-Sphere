@@ -1608,6 +1608,8 @@
     });
 
     function openPanel() {
+      event.stopPropagation();
+      
       if (!videoInfoOpen) {
         videoInfoElm.info.style.transform = "none";
         videoInfoOpen = true;
