@@ -1607,6 +1607,8 @@
       }
     });
 
+    var curTab = "";
+
     function openPanel() {
       event.stopPropagation();
 
@@ -1620,6 +1622,8 @@
 
     function openSearch(v, i, e) {
       event.stopPropagation();
+
+      curTab = "search";
 
       if (isLandscape()) {
         video.classList.add("side-by-side");
@@ -1717,6 +1721,8 @@
     function openVideoInfo() {
       event.stopPropagation();
 
+      curTab = "info";
+
       if (isLandscape()) {
         video.classList.add("side-by-side");
         videoSec.classList.add("side-by-side");
@@ -1767,6 +1773,21 @@
     }
 
     function closeVideoInfo() {
+
+      var preTab = "";
+
+      switch (curTab) {
+        case "search":
+          preTab = "openSearch(false, true, event)";
+        break;
+        case "info":
+          preTab = "openVideoInfo()";
+        break;
+      }
+
+      videoInfoElm.main.setAttribute("onclick", preTab);
+
+      curTab = "";
 
       if (isLandscape()) {
         video.classList.remove("side-by-side");
