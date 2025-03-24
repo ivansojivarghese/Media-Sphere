@@ -4685,6 +4685,12 @@
     var readyForNext = false;
 
     video.addEventListener('timeupdate', function() {
+
+        if (!searchQueried) { 
+          loadingSpace.style.display = "";
+          videoInfoElm.info.style.overflow = "";
+        }
+
         // audio.currentTime = video.currentTime;
         if ((player && !player.isConnected) || !player) {
           // if (video.currentTime > Number(localStorage.getItem("timestamp"))) {
