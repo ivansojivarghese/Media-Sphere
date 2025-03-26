@@ -35,6 +35,8 @@ var videoInfoElm = {
   relatedResults : document.querySelector("#infoContainer div.wrapper.info div.results"),
   refinements : document.querySelector("#infoContainer div.wrapper.search div.refinements")
 };
+
+var searchSuggestions = [];
     
 var preVideoDetails = null;
 var videoDetails = null;
@@ -435,6 +437,19 @@ function videoReset() {
     targetVideoIndex = 0;
     videoStreamScore = 0;
 }
+
+// Call Vercel endpoint to fetch search suggestions
+const getSuggestions = async (term) => {
+  try {
+    const response = await fetch(`https://search-suggestions-vert.vercel.app/api/suggestions?term=${term}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch suggestions');
+    }
+    searchSuggestions = await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 async function getParams(id, time, a, b) {
 
