@@ -405,11 +405,25 @@
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
 
+          videoInfoElm.suggestions.innerHTML = "";
+          searchSuggestions = [];
+
+          videoInfoElm.suggestions.style.display = "";
+
+          inpBlock = false;
+
         } catch (error) {
           console.error(error);
 
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
+
+          videoInfoElm.suggestions.innerHTML = "";
+          searchSuggestions = [];
+
+          videoInfoElm.suggestions.style.display = "";
+
+          inpBlock = false;
 
           // INPUT ERROR
 
@@ -449,11 +463,25 @@
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
 
+          videoInfoElm.suggestions.innerHTML = "";
+          searchSuggestions = [];
+
+          videoInfoElm.suggestions.style.display = "";
+
+          inpBlock = false;
+
         } catch (error) {
           console.error(error);
 
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
+
+          videoInfoElm.suggestions.innerHTML = "";
+          searchSuggestions = [];
+
+          videoInfoElm.suggestions.style.display = "";
+
+          inpBlock = false;
 
           // INPUT ERROR
 
