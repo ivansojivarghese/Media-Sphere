@@ -896,6 +896,13 @@ async function getParams(id, time, a, b) {
           if (!searchQueried) { // if not query/url searching
             loadingSpace.style.display = "";
             videoInfoElm.info.style.overflow = "";
+
+            videoInfoElm.suggestions.innerHTML = "";
+            searchSuggestions = [];
+
+            videoInfoElm.suggestions.style.display = "";
+
+            inpBlock = false;
           }
 
           if (videoDetails.error !== undefined) {

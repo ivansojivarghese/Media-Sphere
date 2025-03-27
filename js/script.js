@@ -616,6 +616,13 @@
           if (!searchQueried) { // if not query/url searching
             loadingSpace.style.display = "";
             videoInfoElm.info.style.overflow = "";
+
+            videoInfoElm.suggestions.innerHTML = "";
+            searchSuggestions = [];
+
+            videoInfoElm.suggestions.style.display = "";
+
+            inpBlock = false;
           }
         }
 
@@ -1815,6 +1822,13 @@
 
       loadingSpace.style.display = "";
       videoInfoElm.info.style.overflow = "";
+
+      videoInfoElm.suggestions.innerHTML = "";
+      searchSuggestions = [];
+
+      videoInfoElm.suggestions.style.display = "";
+
+      inpBlock = false;
 
       if (ori === "landscape-primary" || ori === "landscape-secondary") {
         // mainContent.style.backgroundColor = "";
@@ -4693,6 +4707,13 @@
         if (!searchQueried) { 
           loadingSpace.style.display = "";
           videoInfoElm.info.style.overflow = "";
+
+          videoInfoElm.suggestions.innerHTML = "";
+          searchSuggestions = [];
+
+          videoInfoElm.suggestions.style.display = "";
+
+          inpBlock = false;
         }
 
         // audio.currentTime = video.currentTime;
