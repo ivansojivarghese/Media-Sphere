@@ -28,6 +28,7 @@
     // getScreenLock();
 
 function hardReload() {
+    event.stopPropagation();
 
     $.ajax({
         url: window.location.pathname + "?refresh=" + new Date().getTime(),
