@@ -30,16 +30,20 @@
 function hardReload() {
     event.stopPropagation();
 
-    $.ajax({
-        url: window.location.pathname + "?refresh=" + new Date().getTime(),
-        headers: {
-            "Pragma": "no-cache",
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Expires": "0"
-        }
-    }).done(function () {
-        window.location.reload(true);
-    });
+    if (videoControls.classList.contains('visible')) {
+
+        $.ajax({
+            url: window.location.pathname + "?refresh=" + new Date().getTime(),
+            headers: {
+                "Pragma": "no-cache",
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Expires": "0"
+            }
+        }).done(function () {
+            window.location.reload(true);
+        });
+
+    }
 }
 
 const PROJECT_ID = "prj_zWXe0vOldJ8rnwrhBTxKawnXXBKU";
