@@ -1080,7 +1080,7 @@ div.thumbnail {
     background: #007000;
     border-radius: 0.5rem;
     bottom: 4rem;
-    left: calc(1rem + env(safe-inset-area-left));
+    left: calc(1rem + calc(env(safe-area-inset-left)));
     display: none;
 }
 
