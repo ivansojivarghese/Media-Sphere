@@ -1009,7 +1009,8 @@ select:focus-visible {
 }
 
 div.results div.result_wrapper {
-    width: calc(100% + 2.4rem);
+    /*width: calc(100% + 2.4rem);*/
+    width: calc(100% + env(safe-area-inset-right) + 2.4rem);
     margin-bottom: 3rem;
     position: relative;
     left: -1.2rem;
@@ -1017,7 +1018,8 @@ div.results div.result_wrapper {
 
 #infoContainer h5.resultTitle {
     padding-left: 1.2rem;
-    padding-right: 1.2rem;
+    /*padding-right: 1.2rem;*/
+    padding-right: calc(1.2rem + env(safe-area-inset-right));
 }
 
 div.result_wrapper div.badges_row {
@@ -1050,7 +1052,8 @@ div.thumbnail {
 .resultChannelTitle {
     font-size: 1rem !important;
     padding-left: 1.2rem;
-    padding-right: 1.2rem;
+    /*padding-right: 1.2rem;*/
+    padding-right: calc(1.2rem + env(safe-area-inset-right));
 }
 
 .wrapper .resultDuration, .wrapper .resultDate {
@@ -1065,6 +1068,7 @@ div.thumbnail {
 
 .wrapper .resultDate {
     float: right;
+    padding-right: calc(1em + env(safe-area-inset-right));
 }
 
 .searchOptions div {
