@@ -5411,6 +5411,8 @@
       } /*else if (searchPath === "query") {
         videoInfoElm.suggestions.style.display = "block";
       }*/
+     
+      updateSuggestionsList();
     }, 1000);
     
     setInterval(() => { // CLEAN UP notifications frequently
