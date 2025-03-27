@@ -804,8 +804,8 @@
         /*if (searchPath === "query") {
           videoInfoElm.suggestions.style.display = "block";
         }*/
-        setTimeout(function() {
-          updateSuggestionsList();
-        }, 1000);
+        // setTimeout(function() {
+        updateSuggestionsList();
+        // }, 1000);
       }
      });

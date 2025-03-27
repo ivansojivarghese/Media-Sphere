@@ -5397,6 +5397,12 @@
         videoControls.classList.remove("nr");
       }
 
+      if (inp.value.trim() === "") {
+        videoInfoElm.suggestions.style.display = "";
+      } else {
+        updateSuggestionsList();
+      }
+
     }, 1000/60);
 
     setInterval(function() {
