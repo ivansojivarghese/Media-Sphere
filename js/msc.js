@@ -66,6 +66,7 @@ async function checkNewDeployment() {
                 console.log("New deployment detected!");
                 // window.location.reload(); // Reload to get the latest version
                 updateBtn.style.display = "block";
+                showVideoControls();
             }
         }
     } catch (error) {
