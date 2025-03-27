@@ -90,6 +90,10 @@ video.secondary {
     div.thumbnailIconWrap {
         padding: 2.5rem 0 !important;
     }
+
+    #infoContainer .suggestions {
+        height: 7rem !important;
+    }
 }
 
 video.seeking {

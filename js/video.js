@@ -506,8 +506,14 @@ const updateSuggestionsList = () => {
       totalHeight += t;
     });
     r = totalHeight / rootFontSize;
-    if (r > 13.5) {
-      r = 13.5;
+    if (!isLandscape()) {
+      if (r > 13.5) {
+        r = 13.5;
+      }
+    } else {
+      if (r > 7.5) {
+        r = 7.5;
+      }
     }
     videoInfoElm.suggestions.style.height = r + "rem";
     videoInfoElm.suggestions.style.display = "block";

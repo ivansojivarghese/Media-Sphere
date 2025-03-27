@@ -5400,7 +5400,7 @@
       if (inp.value.trim() === "") {
         videoInfoElm.suggestions.style.display = "";
       } else {
-        updateSuggestionsList();
+        // updateSuggestionsList();
       }
 
     }, 1000/60);
