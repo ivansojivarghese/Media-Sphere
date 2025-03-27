@@ -3,6 +3,8 @@
   <head>
     <title>Media Sphere</title>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
     <!-- FFMpeg -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.1/dist/ffmpeg.min.js"></script> -->
 
@@ -514,6 +516,10 @@
               <div id="videoProgressBar" class="cursor bar" title=""></div>
               <div id="videoLoadProgressBar" class="cursor bar" title=""></div>
               <div id="videoBarPlaceholder" class="cursor bar" title=""></div>
+              <div id="updateBtn" class="trsButtons trs" onclick="hardReload()">
+                <p>update available</p>
+                <div class="img"></div>
+              </div>
           </div>
           <div id="infoContainer" class="trs no-tap">
             <div class="loadingSpace">

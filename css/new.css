@@ -1071,6 +1071,33 @@ div.thumbnail {
     padding-right: calc(1em + env(safe-area-inset-right));
 }
 
+#updateBtn {
+    position: absolute;
+    background: #007000;
+    border-radius: 0.5rem;
+    bottom: 4rem;
+    left: 1rem;
+    display: none;
+}
+
+#updateBtn p {
+    color: #FFF;
+    padding: 0.75rem 0.75rem;
+    font-weight: bold;
+    display: inline-block;
+    padding-right: 0.5rem;
+}
+
+#updateBtn .img {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-block;
+    background-image: url("../svg/replay.svg");
+    margin-right: 0.75rem;
+    position: relative;
+    top: 0.4rem;
+}
+
 .searchOptions div {
     display: flex;
     flex-direction: row;
