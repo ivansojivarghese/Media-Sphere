@@ -792,6 +792,7 @@ div.badge:first-child {
     overflow: hidden;
     overflow-y: scroll;
     display: none;
+    z-index: 50;
 }
 
 #infoContainer .suggestions .suggestionBox {
