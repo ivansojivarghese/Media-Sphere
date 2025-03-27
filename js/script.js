@@ -5398,6 +5398,14 @@
       }
 
     }, 1000/60);
+
+    setInterval(function() {
+      if (inp.value.trim() === "") {
+        videoInfoElm.suggestions.innerHTML = "";
+      } /*else if (searchPath === "query") {
+        videoInfoElm.suggestions.style.display = "block";
+      }*/
+    }, 1000);
     
     setInterval(() => { // CLEAN UP notifications frequently
       navigator.serviceWorker.getRegistration().then((registration) => {

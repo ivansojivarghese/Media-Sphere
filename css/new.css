@@ -774,6 +774,34 @@ div.badge {
     display: none;
 }
 
+#infoContainer .suggestions {
+    background: #e4e4e4;
+    width: calc(100% - 1.2rem - 1.2rem - 1.4rem);
+    height: 13.5rem;
+    position: absolute;
+    border-radius: 0.5rem;
+    color: #303030;
+    overflow: hidden;
+    overflow-y: scroll;
+    display: none;
+}
+
+#infoContainer .suggestions .suggestionBox {
+    background: #FFF;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+#infoContainer .suggestions .suggestionBox p {
+    font-weight: bold;
+    height: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1rem;
+    padding-right: 3rem;
+    line-height: 1.5rem;
+}
+
 #infoContainer h5.videoTitle {
     line-height: 1.5em;
 }

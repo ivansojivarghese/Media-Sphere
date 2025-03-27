@@ -9,6 +9,8 @@ var videoInfoElm = {
   infoHead : document.querySelector("#infoContainer .head"),
   infoHeadSec : document.querySelector("#infoContainer .headSec"),
 
+  suggestions : document.querySelector("#infoContainer .suggestions"),
+
   videoTitle : document.querySelector("#infoContainer h5.videoTitle"),
   channelTitle2 : document.querySelector("#infoContainer p.channelTitle"),
   category : document.querySelector("#infoContainer p.category"),
@@ -35,8 +37,24 @@ var videoInfoElm = {
   relatedResults : document.querySelector("#infoContainer div.wrapper.info div.results"),
   refinements : document.querySelector("#infoContainer div.wrapper.search div.refinements")
 };
+/*
+const suggestionsHandler = {
+  set(target, property, value) {
+      console.log(`Array element at index ${property} changed to ${value}`);
+      target[property] = value;
+      return true; // Return true to indicate success
+  }
+};*/
 
-var searchSuggestions = [];
+// var searchSuggestions = [];
+// let searchSuggestions = new Proxy([], suggestionsHandler);
+let searchSuggestions = new Proxy([], {
+  set(target, property, value) {
+      // console.log(`Array element at index ${property} changed to ${value}`);
+      updateSuggestionsList();
+      return Reflect.set(target, property, value);
+  }
+});
     
 var preVideoDetails = null;
 var videoDetails = null;
@@ -445,10 +463,65 @@ const getSuggestions = async (term) => {
     if (!response.ok) {
         throw new Error('Failed to fetch suggestions');
     }
-    searchSuggestions = await response.json();
+    // searchSuggestions = await response.json();
+
+    const newData = await response.json();
+
+    // Modify the existing proxy array instead of replacing it
+    searchSuggestions.length = 0; // Clear old data
+    newData.forEach((item, index) => searchSuggestions[index] = item);
+
   } catch (error) {
     console.error(error);
   }
+};
+
+// Function to update the DOM
+const updateSuggestionsList = () => {
+  videoInfoElm.suggestions.innerHTML = ""; // Clear existing items
+  searchSuggestions.forEach(suggestion => {
+      const div = document.createElement("div");
+      const p = document.createElement("p");
+      p.textContent = suggestion;
+
+      div.classList.add("suggestionBox");
+      div.appendChild(p);
+
+      videoInfoElm.suggestions.appendChild(div);
+
+      if (checkOverflow(p)) {
+        const buffer = getOverflowLines(p);
+        p.style.height = buffer + "rem";
+      }
+  });
+  setTimeout(function() {
+    const suggestElements = document.querySelectorAll("#infoContainer .suggestions .suggestionBox");
+    var totalHeight = 0;
+    const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    var r = 0;
+    suggestElements.forEach(element => {
+      var h = parseFloat(getComputedStyle(element).height);
+      var m = parseFloat(getComputedStyle(element).marginBottom);
+      var t = h + m;
+      totalHeight += t;
+    });
+    r = totalHeight / rootFontSize;
+    if (r > 13.5) {
+      r = 13.5;
+    }
+    videoInfoElm.suggestions.style.height = r + "rem";
+    videoInfoElm.suggestions.style.display = "block";
+  }, 1000);
+};
+
+const checkOverflow = (element) => {
+  return element.scrollHeight > element.clientHeight; // If true, text has wrapped
+};
+
+const getOverflowLines = (element) => {
+  const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
+  const lines = Math.round(element.scrollHeight / lineHeight);
+  return lines > 1 ? lines : 0; // Returns number of lines if overflow occurs
 };
 
 async function getParams(id, time, a, b) {

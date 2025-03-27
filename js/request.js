@@ -348,11 +348,17 @@
     const clearBtn = document.querySelector(".clear-btn");
 
     function clearInput(m) {
+
       inp.value = "";
       clearBtn.style.display = "none";
       if (m) {
         inp.focus();
       }
+
+      videoInfoElm.suggestions.innerHTML = "";
+      searchSuggestions = [];
+
+      videoInfoElm.suggestions.style.display = "";
     }
 
     var searchQueried = false;
@@ -623,6 +629,14 @@
 
       searchQueried = false;
     }
+
+    inp.addEventListener("keypress", function(event) {
+      if (inp.value.trim() === "") {
+        videoInfoElm.suggestions.innerHTML = "";
+      } /*else if (searchPath === "query") {
+        videoInfoElm.suggestions.style.display = "block";
+      }*/
+    });
     
     /*
     inp.addEventListener("keypress", function(event) {
@@ -771,4 +785,27 @@
       if (event.key === "Enter") {
         this.blur(); // Hides the keyboard
       }
+
+      // show search suggestions
+      if (searchPath === "query") {
+        setTimeout(function () {
+          if (inp.value !== "") {
+            getSuggestions(inp.value);  
+          }
+        }, 10);
+      }
+
     });
+
+    inp.addEventListener("input", () => {
+      if (inp.value.trim() === "") {
+        videoInfoElm.suggestions.innerHTML = "";
+      } else {
+        /*if (searchPath === "query") {
+          videoInfoElm.suggestions.style.display = "block";
+        }*/
+        setTimeout(function() {
+          updateSuggestionsList();
+        }, 1000);
+      }
+     });
