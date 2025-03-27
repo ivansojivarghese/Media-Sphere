@@ -5301,6 +5301,7 @@
     });
 
     var checkAudioReady = null;
+    var inpBlock = false;
 
     setInterval(function() {
       if (!networkError || true) {
@@ -5399,8 +5400,9 @@
 
       if (inp.value.trim() === "") {
         videoInfoElm.suggestions.style.display = "";
-      } else {
-        // updateSuggestionsList();
+      } else if (!inpBlock) {
+        updateSuggestionsList();
+        inpBlock = true;
       }
 
     }, 1000/60);

@@ -359,6 +359,8 @@
       searchSuggestions = [];
 
       videoInfoElm.suggestions.style.display = "";
+
+      inpBlock = false;
     }
 
     var searchQueried = false;
@@ -798,6 +800,8 @@
     });
 
     inp.addEventListener("input", () => {
+      inpBlock = false;
+      
       if (inp.value.trim() === "") {
         videoInfoElm.suggestions.innerHTML = "";
       } else {

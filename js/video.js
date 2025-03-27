@@ -51,6 +51,8 @@ const suggestionsHandler = {
 let searchSuggestions = new Proxy([], {
   set(target, property, value) {
       // console.log(`Array element at index ${property} changed to ${value}`);
+      inpBlock = false;
+
       updateSuggestionsList();
       return Reflect.set(target, property, value);
   }
