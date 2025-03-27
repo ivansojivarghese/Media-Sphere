@@ -2461,7 +2461,7 @@ function abstractVideoInfo() {
   } else {
     videoInfoElm.likes.style.display = "none";
   }
-  if (meta.views !== 'NaN') {
+  if (meta.views !== 'NaN' && viewsTxt !== " watching now") {
     videoInfoElm.views.innerHTML = meta.views + viewsTxt;
   } else {
     videoInfoElm.views.style.display = "none";
