@@ -12,14 +12,36 @@ navigator.serviceWorker.getRegistrations().then(function(registrations) {
    });
 });*/
 
-// handle the service worker registration
+// Handle the service worker registration
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("service-worker.js", {
       scope: '/'
     })
-    .then((reg) => console.log("Service Worker registered", reg))
-    .catch((err) => console.error("Service Worker **not** registered", err));
+    .then((reg) => {
+      console.log("Service Worker registered", reg);
+
+      // If there's a waiting service worker, send the SKIP_WAITING message to activate it immediately
+      if (reg.waiting) {
+        reg.waiting.postMessage('SKIP_WAITING');
+      }
+
+      // Listen for the updatefound event to detect when a new service worker is installing
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+
+        // Listen for the state change of the new worker
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            console.log('New service worker installed, reloading the page...');
+            hardReload();  // Trigger a hard reload to apply the new worker
+          }
+        });
+      });
+    })
+    .catch((err) => {
+      console.error("Service Worker **not** registered", err);
+    });
 } else {
   console.warn("Service Worker not supported in this browser");
 }
