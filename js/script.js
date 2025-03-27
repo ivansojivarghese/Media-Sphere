@@ -4694,7 +4694,7 @@
 
     video.addEventListener('timeupdate', function() {
 
-        if (!searchQueried) { 
+        if (!searchQueried && !video.paused && inp.value.trim() === "" && !videoInfoOpen) { 
           loadingSpace.style.display = "";
           videoInfoElm.info.style.overflow = "";
 

@@ -558,7 +558,9 @@ const updateSuggestionsList = () => {
 
     // videoInfoElm.suggestions.style.height = r + "rem";
     videoInfoElm.suggestions.style.height = e + "px";
-    videoInfoElm.suggestions.style.display = "block";
+    if (!searchQueried) {
+      videoInfoElm.suggestions.style.display = "block"; 
+    }
   }, 1000);
 };
 
