@@ -5414,6 +5414,13 @@
         }
       }*/
 
+      var suggestionsP = document.querySelectorAll("#infoContainer .suggestions p");
+      suggestionsP.forEach(p => {
+        if (checkOverflow(p)) {
+          updateSuggestionsList();
+        }
+      });
+
     }, 1000/60);
 
     setInterval(function() {
