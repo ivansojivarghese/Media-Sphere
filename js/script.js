@@ -5412,7 +5412,7 @@
         videoInfoElm.suggestions.style.display = "block";
       }*/
      
-      updateSuggestionsList();
+      // updateSuggestionsList();
     }, 1000);
     
     setInterval(() => { // CLEAN UP notifications frequently
