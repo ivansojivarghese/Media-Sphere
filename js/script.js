@@ -5421,6 +5421,10 @@
         }
       });
 
+      if (isLandscape() && videoInfoOpen) { // 
+        videoInfoElm.main.style.transform = "none";
+      }
+
     }, 1000/60);
 
     setInterval(function() {
