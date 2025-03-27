@@ -734,6 +734,9 @@ div.thumbnailIcon {
 
 div.badge {
     background-color: #3f3f3f !important;
+}
+
+div.badge:first-child {
     margin-left: 1.2rem;
 }
 
