@@ -69,6 +69,13 @@
     
     function getURL(u, m) { // 
 
+      videoInfoElm.suggestions.innerHTML = "";
+      searchSuggestions = [];
+
+      videoInfoElm.suggestions.style.display = "";
+
+      inpBlock = false;
+
       if (searchPath === "url" || m || u) {
 
         clearBtn.style.display = inp.value ? "" : "none";
@@ -404,27 +411,27 @@
 
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
-
+/*
           videoInfoElm.suggestions.innerHTML = "";
           searchSuggestions = [];
 
           videoInfoElm.suggestions.style.display = "";
 
           inpBlock = false;
-
+*/
         } catch (error) {
           console.error(error);
 
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
-
+/*
           videoInfoElm.suggestions.innerHTML = "";
           searchSuggestions = [];
 
           videoInfoElm.suggestions.style.display = "";
 
           inpBlock = false;
-
+*/
           // INPUT ERROR
 
           showInputErrorFeedback("Something went wrong. Try again.");
@@ -462,26 +469,26 @@
 
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
-
+/*
           videoInfoElm.suggestions.innerHTML = "";
           searchSuggestions = [];
 
           videoInfoElm.suggestions.style.display = "";
 
-          inpBlock = false;
+          inpBlock = false;*/
 
         } catch (error) {
           console.error(error);
 
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
-
+/*
           videoInfoElm.suggestions.innerHTML = "";
           searchSuggestions = [];
 
           videoInfoElm.suggestions.style.display = "";
 
-          inpBlock = false;
+          inpBlock = false;*/
 
           // INPUT ERROR
 

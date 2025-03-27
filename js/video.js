@@ -491,6 +491,14 @@ const updateSuggestionsList = () => {
 
       div.onclick = function() {
         inp.value = this.children[0].innerHTML;
+
+        videoInfoElm.suggestions.innerHTML = "";
+        searchSuggestions = [];
+
+        videoInfoElm.suggestions.style.display = "";
+
+        inpBlock = false;
+
         setTimeout(function() {
           loadingSpace.style.display = "block";
           videoInfoElm.info.style.overflow = "hidden";
