@@ -1590,6 +1590,8 @@
     window.matchMedia("(orientation: landscape)").addEventListener("change", (e) => {
       console.log(e.matches ? "Switched to Landscape" : "Switched to Portrait");
 
+      updateSuggestionsList();
+
       if (e.matches) { // landscape
         if (videoInfoOpen) {
           video.classList.add("side-by-side");
@@ -1991,6 +1993,8 @@
       video.classList.remove("cover");
 
       videoSec.style.background = generateGradientRGB(imagePrimary, imagePalette);
+
+      updateSuggestionsList();
 
     });
 
@@ -5302,6 +5306,7 @@
 
     var checkAudioReady = null;
     var inpBlock = false;
+    var inpBCount = 0;
 
     setInterval(function() {
       if (!networkError || true) {
@@ -5400,12 +5405,27 @@
 
       if (inp.value.trim() === "") {
         videoInfoElm.suggestions.style.display = "";
-      } else if (!inpBlock && inp.value.trim() !== "") {
+      } /*else if (!inpBlock && inp.value.trim() !== "") {
         updateSuggestionsList();
-        inpBlock = true;
-      }
+        inpBCount++;
+        if (inpBCount > 1) {
+          inpBlock = true;
+          inpBCount = 0;
+        }
+      }*/
 
     }, 1000/60);
+
+    setInterval(function() {
+      if (!inpBlock && inp.value.trim() !== "") {
+        updateSuggestionsList();
+        inpBCount++;
+        if (inpBCount > 1) {
+          inpBlock = true;
+          inpBCount = 0;
+        }
+      }
+    }, 1000);
 
     setInterval(function() {
       if (inp.value.trim() === "") {
@@ -5568,6 +5588,9 @@
       dRes = dHeight * dWidth;
 
       getOptimalQuality();
+
+      updateSuggestionsList();
+      setTimeout(updateSuggestionsList, 100);
 
       if ((window.innerWidth < 500 && (screen.orientation.angle === 0 || screen.orientation.angle === 180)) || (window.innerHeight < 500 && (screen.orientation.angle === 90 || screen.orientation.angle === 270))) {
         pipButton.style.display = "none";

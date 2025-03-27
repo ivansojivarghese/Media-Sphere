@@ -489,6 +489,7 @@
     }
 
     function displaySearchResults(m, s, c) {
+
       var data = s ? relatedContent.data : m ? searchResults.data : hashtagResults.data;
       var ref = s ? null : m ? searchResults.refinements : null;
 
@@ -498,6 +499,11 @@
           element.remove();
         });
       }
+
+      videoInfoElm.suggestions.innerHTML = "";
+      searchSuggestions = [];
+      videoInfoElm.suggestions.style.display = "";
+      inpBlock = false;
 
       if (!s) {
         var refStuff = document.querySelectorAll("div.refinements div.keywordsBtn");
@@ -801,7 +807,7 @@
 
     inp.addEventListener("input", () => {
       inpBlock = false;
-      
+
       if (inp.value.trim() === "") {
         videoInfoElm.suggestions.innerHTML = "";
       } else {

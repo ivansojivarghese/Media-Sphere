@@ -486,8 +486,17 @@ const updateSuggestionsList = () => {
       const p = document.createElement("p");
       p.textContent = suggestion;
 
-      div.classList.add("suggestionBox");
+      div.classList.add("suggestionBox", "trsButtons", "trs");
       div.appendChild(p);
+
+      div.onclick = function() {
+        inp.value = this.children[0].innerHTML;
+        setTimeout(function() {
+          loadingSpace.style.display = "block";
+          videoInfoElm.info.style.overflow = "hidden";
+          searchQuery(inp.value);
+        }, 10);
+      };
 
       videoInfoElm.suggestions.appendChild(div);
 
@@ -501,6 +510,7 @@ const updateSuggestionsList = () => {
     var totalHeight = 0;
     const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
     var r = 0;
+    var e = 0;
     suggestElements.forEach(element => {
       var h = parseFloat(getComputedStyle(element).height);
       var m = parseFloat(getComputedStyle(element).marginBottom);
@@ -508,6 +518,13 @@ const updateSuggestionsList = () => {
       totalHeight += t;
     });
     r = totalHeight / rootFontSize;
+
+    var suggestionsTop = videoInfoElm.suggestions.getBoundingClientRect().top;
+    var balanceH = window.innerHeight - suggestionsTop;
+    var balanceHrem = Math.round((balanceH / rootFontSize) - 1);
+
+    // console.log(balanceHrem);
+    /*
     if (!isLandscape()) {
       if (r > 13.5) {
         r = 13.5;
@@ -516,8 +533,23 @@ const updateSuggestionsList = () => {
       if (r > 7.5) {
         r = 7.5;
       }
+    }*/
+   /*
+    if (r > balanceHrem) {
+      r = balanceHrem;
+    }*/
+    if (totalHeight > balanceH) {
+        if (isLandscape() && window.innerHeight < 500) {
+          e = balanceH;
+        } else {
+          e = (balanceH - rootFontSize);
+        }
+    } else {
+        e = totalHeight;
     }
-    videoInfoElm.suggestions.style.height = r + "rem";
+
+    // videoInfoElm.suggestions.style.height = r + "rem";
+    videoInfoElm.suggestions.style.height = e + "px";
     videoInfoElm.suggestions.style.display = "block";
   }, 1000);
 };
