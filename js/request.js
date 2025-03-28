@@ -680,11 +680,11 @@
             }
     
             // Animate in the new results
-            setTimeout(() => {
+            // setTimeout(() => {
               main.style.transition = "opacity 0.5s, transform 0.5s";
               main.style.opacity = "1";
               main.style.transform = "translateY(0)";
-            }, 100);
+            // }, 100);
           }
         }
       }, 500); // Delay to allow old results to fade out
