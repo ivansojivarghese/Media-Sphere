@@ -41,6 +41,11 @@ function hardReload() {
                 "Expires": "0"
             }
         }).done(function () {
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                  names.forEach(name => caches.delete(name));
+                });
+            }
             window.location.reload(true);
         });
 
