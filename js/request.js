@@ -524,6 +524,176 @@
     }
 
     function displaySearchResults(m, s, c) {
+      var data = s ? relatedContent.data : m ? searchResults.data : hashtagResults.data;
+      var ref = s ? null : m ? searchResults.refinements : null;
+    
+      var res = document.querySelectorAll(c + ".result_wrapper");
+    
+      // Animate out existing results
+      if (res.length) {
+        res.forEach((element) => {
+          element.style.transition = "opacity 0.5s, transform 0.5s";
+          element.style.opacity = "0";
+          element.style.transform = "translateY(20px)";
+        });
+    
+        setTimeout(() => {
+          res.forEach((element) => element.remove());
+        }, 500); // Remove after animation completes
+      }
+    
+      videoInfoElm.suggestions.innerHTML = "";
+      searchSuggestions = [];
+      videoInfoElm.suggestions.style.display = "";
+      inpBlock = false;
+    
+      if (!s) {
+        var refStuff = document.querySelectorAll("div.refinements div.keywordsBtn");
+        if (refStuff.length) {
+          refStuff.forEach((element) => {
+            element.style.transition = "opacity 0.3s";
+            element.style.opacity = "0";
+          });
+    
+          setTimeout(() => {
+            refStuff.forEach((element) => element.remove());
+          }, 300);
+        }
+      }
+    
+      // Handle refinements
+      if (ref) {
+        for (var k = 0; k < ref.length; k++) {
+          var refText = document.createElement("p");
+          var refBtn = document.createElement("div");
+    
+          refText.innerHTML = ref[k];
+    
+          refBtn.addEventListener("click", function(event) {
+            openSearch(event.currentTarget.children[0].innerHTML);
+          });
+    
+          refBtn.classList.add("keywordsBtn", "resBtn", "trs");
+          refBtn.appendChild(refText);
+          videoInfoElm.refinements.appendChild(refBtn);
+    
+          // Fade in refinements
+          setTimeout(() => {
+            refBtn.style.transition = "opacity 0.5s";
+            refBtn.style.opacity = "1";
+          }, 100);
+        }
+      }
+    
+      // Wait before inserting new results
+      setTimeout(() => {
+        for (var i = 0; i < data.length; i++) {
+          if ((data[i].type === "video" || (data[i].type === "playlist" && !data[i].title.includes("Mix"))) && 
+              (!data[i].badges || (data[i].badges && !containsWord(data[i].badges, 'live')))) {
+            
+            var main = document.createElement("div");
+            main.classList.add("result_wrapper", "trs", "cursor", "trsButtons", "noimg");
+            main.title = data[i].title;
+            main.style.opacity = "0"; // Start with 0 opacity
+            main.style.transform = "translateY(20px)"; // Slide up effect
+    
+            if (data[i].type === "video") {
+              main.setAttribute("data-url", "https://www.youtube.com/watch?v=" + data[i].videoId);
+            } else {
+              main.setAttribute("data-url", "https://www.youtube.com/playlist?list=" + data[i].playlistId);
+            }
+            main.onclick = function(event) {
+              getURL(event.currentTarget.getAttribute("data-url"), true);
+            };
+    
+            if (data[i].badges && data[i].badges.length) {
+              var badgesRow = document.createElement("div");
+              badgesRow.classList.add("badges_row");
+              for (var j = 0; j < data[i].badges.length; j++) {
+                var badge = document.createElement("div");
+                badge.classList.add("badge", "otherResBtn", "resBtn", "trs");
+    
+                var badge_text = document.createElement("p");
+                badge_text.innerHTML = data[i].badges[j];
+    
+                badge.appendChild(badge_text);
+                badgesRow.appendChild(badge);
+              }
+            }
+    
+            var thumbnail = document.createElement("div");
+            thumbnail.classList.add("thumbnail", "img");
+            thumbnail.style.backgroundImage = "url('" + data[i].thumbnail[data[i].thumbnail.length - 1].url + "')";
+    
+            if (data[i].type === "playlist") {
+              var thumbnailIconWrap = document.createElement("div");
+              thumbnailIconWrap.classList.add("thumbnailIconWrap");
+    
+              var thumbnailIcon = document.createElement("div");
+              thumbnailIcon.classList.add("thumbnailIcon", "img");
+              thumbnailIcon.style.backgroundImage = "url('../svg/playlist_play.svg')";
+    
+              thumbnailIconWrap.appendChild(thumbnailIcon);
+              thumbnail.appendChild(thumbnailIconWrap);
+            }
+    
+            var title = document.createElement("h5");
+            title.innerHTML = data[i].title;
+            title.classList.add("overflow", "resultTitle");
+    
+            var channelTitle = document.createElement("p");
+            channelTitle.innerHTML = data[i].channelTitle;
+            channelTitle.classList.add("overflow", "resultChannelTitle");
+    
+            var duration = document.createElement("p");
+            if (data[i].lengthText) {
+              duration.innerHTML = data[i].lengthText;
+            }
+            duration.classList.add("resultDuration");
+    
+            var date = document.createElement("p");
+            if (data[i].publishedTimeText) {
+              date.innerHTML = data[i].publishedTimeText;
+            } else if (data[i].type === "playlist") {
+              date.innerHTML = data[i].videoCount + " videos";
+            }
+            date.classList.add("resultDate");
+    
+            var textDiv = document.createElement("div");
+            textDiv.classList.add("resultText");
+    
+            if (badgesRow) {
+              main.appendChild(badgesRow);
+            }
+            main.appendChild(thumbnail);
+            main.appendChild(title);
+            main.appendChild(channelTitle);
+    
+            textDiv.appendChild(duration);
+            textDiv.appendChild(date);
+            main.appendChild(textDiv);
+    
+            if (!s) {
+              videoInfoElm.results.appendChild(main);
+            } else {
+              videoInfoElm.relatedResults.appendChild(main);
+            }
+    
+            // Animate in the new results
+            setTimeout(() => {
+              main.style.transition = "opacity 0.5s, transform 0.5s";
+              main.style.opacity = "1";
+              main.style.transform = "translateY(0)";
+            }, 100);
+          }
+        }
+      }, 500); // Delay to allow old results to fade out
+    
+      searchQueried = false;
+    }
+    
+/*
+    function displaySearchResults(m, s, c) {
 
       var data = s ? relatedContent.data : m ? searchResults.data : hashtagResults.data;
       var ref = s ? null : m ? searchResults.refinements : null;
@@ -672,6 +842,7 @@
 
       searchQueried = false;
     }
+      */
 
     inp.addEventListener("keypress", function(event) {
       if (inp.value.trim() === "") {

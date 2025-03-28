@@ -3919,6 +3919,12 @@
         } else {
           return "4K";
         }
+      } else if (q.indexOf("4320p") !== -1) {
+        if (q.indexOf("HDR") !== -1) {
+          return "8K HDR";
+        } else {
+          return "8K";
+        }
       } else if (q === "2K") {
         return "1440p";
       } else if (q === "2K HDR") {
@@ -3927,6 +3933,10 @@
         return "2160p";
       } else if (q === "4K HDR") {
         return "2160p HDR";
+      } else if (q === "8K") {
+        return "4320p";
+      } else if (q === "8K HDR") {
+        return "4320p HDR";
       } else {
         return q;
       }
