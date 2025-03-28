@@ -33,7 +33,8 @@ function hardReload() {
     if (videoControls.classList.contains('visible')) {
 
         $.ajax({
-            url: window.location.pathname + "?refresh=" + new Date().getTime(),
+            // url: window.location.pathname + "?refresh=" + new Date().getTime(),
+            url : window.location.href + "?nocache=" + new Date().getTime(),
             headers: {
                 "Pragma": "no-cache",
                 "Cache-Control": "no-cache, no-store, must-revalidate",
