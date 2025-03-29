@@ -1869,7 +1869,8 @@
             }
     
             // Handle horizontal movement
-            if (Math.abs(deltaX) > 10) {
+            // if (Math.abs(deltaX) > 10) {
+              if (deltaX > 0) {
                 hasMovedHorizontally = true;
                 panelElement.style.transform = `translateX(${deltaX}px)`;
             }
@@ -1891,12 +1892,12 @@
             const deltaX = touch.clientX - startX;
     
             // Consider it a swipe if the drag is significant (e.g., more than 100px)
-            if (deltaX > 100 || ((ori === "landscape-primary" || ori === "landscape-secondary") && deltaX < 0)) {
+            if (deltaX > 0 || ((ori === "landscape-primary" || ori === "landscape-secondary") && deltaX < 0)) {
                 onClose(); // Trigger the close action
             }
     
             // Reset the panel's style
-            if (((ori === "portrait-primary" || ori === "portrait-secondary") || deltaX > 100) || ((ori === "landscape-primary" || ori === "landscape-secondary") && deltaX < 0)) {
+            if (((ori === "portrait-primary" || ori === "portrait-secondary") || deltaX > 0) || ((ori === "landscape-primary" || ori === "landscape-secondary") && deltaX < 0)) {
               panelElement.style.transform = "";
             }
         });
@@ -4704,7 +4705,8 @@
 
     video.addEventListener('timeupdate', function() {
 
-        if (!searchQueried && !video.paused && inp.value.trim() === "" && !videoInfoOpen) { 
+        // if (!searchQueried && !video.paused && inp.value.trim() === "" && !videoInfoOpen) { 
+        if (!searchQueried) { 
           loadingSpace.style.display = "";
           videoInfoElm.info.style.overflow = "";
 
