@@ -1553,8 +1553,8 @@ function getImageData(url) {
   image.onload = () => {
     const colorThief = new ColorThief();
 
-    const imagePrimary = colorThief.getColor(image);
-    const imagePalette = colorThief.getPalette(image, 2);
+    imagePrimary = colorThief.getColor(image);
+    imagePalette = colorThief.getPalette(image, 2);
 
     console.log("Primary color:", imagePrimary);
     console.log("Color palette:", imagePalette);
