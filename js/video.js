@@ -1529,6 +1529,7 @@ function getVideoFromIndex(m, q, r) {
   }
 }
 
+/*
 function getImageData(url) {
   const image = new Image();
   image.crossOrigin = 'Anonymous'; // Needed for cross-origin images
@@ -1540,7 +1541,30 @@ function getImageData(url) {
       imagePrimary = colorThief.getColor(image);
       imagePalette = colorThief.getPalette(image, 2);
   };
+}*/
+
+function getImageData(url) {
+  const image = new Image();
+  image.crossOrigin = 'Anonymous'; // Still needed for cross-origin images
+
+  // Use the Vercel proxy URL instead of the third-party CORS proxy
+  image.src = `https://proxy-five-puce.vercel.app/api/proxy?url=${encodeURIComponent(url)}`;
+
+  image.onload = () => {
+    const colorThief = new ColorThief();
+
+    const imagePrimary = colorThief.getColor(image);
+    const imagePalette = colorThief.getPalette(image, 2);
+
+    console.log("Primary color:", imagePrimary);
+    console.log("Color palette:", imagePalette);
+  };
+
+  image.onerror = (error) => {
+    console.error("Error loading image:", error);
+  };
 }
+
 /*
 function generateGradientRGB(imagePrimary, imagePalette) { // REFERENCED FROM CHATGPT
   // Validate input
