@@ -382,7 +382,7 @@ video {
   transition: all 0.3s ease-in-out;
 }
 
-iframe, #videoContainer, object, canvas {
+iframe, #videoContainer, object {
   margin-top: 0;
   /*margin-top: 2rem;*/
   /*margin-top: calc((100svh - 4rem - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 5rem - 15rem)  / 2);*/
@@ -441,16 +441,17 @@ main .content {
   height: 100%;
   position: absolute;
 }
-
+/*
 canvas {
     position: absolute;
     top: calc(2rem + env(safe-area-inset-top) + 2.8rem);
     left: 1.5rem;
     z-index: -1;
     opacity: 0.4;
-    /*max-width: 32rem;
-    max-height: calc(100svh - 5rem - (2rem + env(safe-area-inset-top)) - (2rem + env(safe-area-inset-bottom)) + 2rem);*/
-}
+    /*
+    max-width: 32rem;
+    max-height: calc(100svh - 5rem - (2rem + env(safe-area-inset-top)) - (2rem + env(safe-area-inset-bottom)) + 2rem);
+}*/
 
 .container {
     display: flex;
