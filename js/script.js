@@ -599,6 +599,8 @@
 
     var autoInfoClose = false;
 
+    var videoNav = false;
+
     video.addEventListener('play', function () {
 
       if (videoPlay) {
@@ -631,6 +633,8 @@
         autoLoad = false;
 
         peekForward = false;
+
+        videoNav = false;
 
         audioVideoAlignDivisor = audioVideoAlignDivisorMax - (playEvents * ((audioVideoAlignDivisorMax - audioVideoAlignDivisorMin) / (playEventsMax - 0)));
         if (playEvents < playEventsMax) {
@@ -4745,7 +4749,7 @@
 
         const videoTitleLink = document.querySelector("#infoContainer h5.videoTitle a");
 
-        if (videoTitleLink === null) {
+        if (videoTitleLink === null && !videoNav) {
           abstractVideoInfo();
         }
 

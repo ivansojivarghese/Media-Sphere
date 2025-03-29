@@ -603,6 +603,7 @@
               main.setAttribute("data-url", "https://www.youtube.com/playlist?list=" + data[i].playlistId);
             }
             main.onclick = function(event) {
+              videoNav = true;
               getURL(event.currentTarget.getAttribute("data-url"), true);
             };
     
