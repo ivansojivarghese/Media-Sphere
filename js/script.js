@@ -5374,6 +5374,7 @@
         checkAudioReady = null;
       }
 
+      /*
       if ("Notification" in window) {
         switch (Notification.permission) {
           case 'granted':
@@ -5386,7 +5387,7 @@
           default:
               pms.ntf = false;
         }
-      }
+      }*/
 /*
       if (!document.hasFocus() && document.visibilityState === "visible" && audio.paused && !backgroundPlay) {
         video.pause();
@@ -5456,6 +5457,20 @@
         if (inpBCount > 1) {
           inpBlock = true;
           inpBCount = 0;
+        }
+      }
+
+      if ("Notification" in window) {
+        switch (Notification.permission) {
+          case 'granted':
+              pms.ntf = true;
+              break;
+          case 'denied':
+          case 'default':
+              pms.ntf = false;
+              break;
+          default:
+              pms.ntf = false;
         }
       }
     }, 1000);

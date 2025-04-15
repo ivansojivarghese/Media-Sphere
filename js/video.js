@@ -3072,4 +3072,4 @@ setInterval(() => {
 
   videoScrub.style.left = "calc("+ scrubX +"px + 0.8rem + calc(env(safe-area-inset-left)))";
   
-}, 1000/60);
+}, 1000);
