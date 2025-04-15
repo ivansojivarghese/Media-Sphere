@@ -35,7 +35,23 @@ var uA_L,
         },
         Lf : {
             fb : document.hasFocus()
-        }
+        },
+
+        // device performance metrics
+        _L : null,
+        getPef : null, // get device performance function
+        getPefCon : false, // "" usage control
+        iPef : 0, // initial device performance
+        pSpda : [], 
+        pSpd : 0, // device processor speed (average estimated in GHZ)
+        pSpdL : 0, // "" initial array length
+        pMin : [8, 15], // min./rec. processor speed
+        pCores : navigator.hardwareConcurrency, // no. of cpu logical cores
+        pCoresMin : [2, 6], // cores min./rec.
+        sfra : [],
+        sfr : 0, // screen refresh rate
+        sfrMin : [1, 60], // fps min./rec.
+        sfrx : false, // execution
     };
 
 // CODE referenced from user @molnarg from 'https://stackoverflow.com/users/1463900/molnarg', stackoverflow 2022

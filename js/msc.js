@@ -27,22 +27,6 @@
 
     // getScreenLock();
 
-var op = {
-    _L : null,
-    getPef : null, // get device performance function
-    getPefCon : false, // "" usage control
-    iPef : 0, // initial device performance
-    pSpda : [], 
-    pSpd : 0, // device processor speed (average estimated in GHZ)
-    pSpdL : 0, // "" initial array length
-    pMin : [8, 15], // min./rec. processor speed
-    pCores : navigator.hardwareConcurrency, // no. of cpu logical cores
-    pCoresMin : [2, 6], // cores min./rec.
-    sfra : [],
-    sfr : 0, // screen refresh rate
-    sfrMin : [1, 60], // fps min./rec.
-    sfrx : false, // execution
-};
 
 function pL() { // site parameters loop
     if (!op.iPef && op.pSpd && op.sfr && op.pCores) { // capture initial device performance value, to be used as reference
