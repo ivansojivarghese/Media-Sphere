@@ -352,6 +352,106 @@ if (!developer && localStorage.getItem("devtools") === null) { // anti-debugging
     window.stop();
 }*/
 
+// CODE REFERENCED FROM CARLOS DELGADO @ https://ourcodeworld.com/articles/read/1390/how-to-determine-the-screen-refresh-rate-in-hz-of-the-monitor-with-javascript-in-the-browser#disqus_thread
+
+/**
+ * Allows to obtain the estimated Hz of the primary monitor in the system.
+ * 
+ * @param {Function} callback The function triggered after obtaining the estimated Hz of the monitor.
+ * @param {Boolean} runIndefinitely If set to true, the callback will be triggered indefinitely (for live counter).
+ */
+function getScreenRefreshRate(callback, runIndefinitely){
+    let requestId = null;
+    let callbackTriggered = false;
+    runIndefinitely = runIndefinitely || false;
+
+    if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+    }
+    
+    let DOMHighResTimeStampCollection = [];
+
+    let triggerAnimation = function(DOMHighResTimeStamp){
+        DOMHighResTimeStampCollection.unshift(DOMHighResTimeStamp);
+        
+        if (DOMHighResTimeStampCollection.length > 10) {
+            let t0 = DOMHighResTimeStampCollection.pop();
+            let fps = Math.floor(1000 * 10 / (DOMHighResTimeStamp - t0));
+
+            if(!callbackTriggered){
+                callback.call(undefined, fps, DOMHighResTimeStampCollection);
+            }
+
+            if(runIndefinitely){
+                callbackTriggered = false;
+            }else{
+                callbackTriggered = true;
+            }
+        }
+    
+        requestId = window.requestAnimationFrame(triggerAnimation);
+    };
+    
+    window.requestAnimationFrame(triggerAnimation);
+
+    // Stop after half second if it shouldn't run indefinitely
+    if(!runIndefinitely){
+        window.setTimeout(function(){
+            window.cancelAnimationFrame(requestId);
+            requestId = null;
+        }, 500);
+    }
+}
+
+//////////////////////////////////////
+
+window.addEventListener("load", function() {
+    op.getPef = function() { // estimate processor speed
+
+        // JSBenchmark by Aaron Becker: @ https://stackoverflow.com/questions/19754792/measure-cpu-performance-via-js
+
+        var _speedconstant = 1.15600e-8; //if speed=(c*a)/t, then constant=(s*t)/a and time=(a*c)/s
+        var d = new Date();
+        var amount = 150000000;
+        var estprocessor = 1.7; //average processor speed, in GHZ
+
+        // console.log("JSBenchmark by Aaron Becker, running loop " + amount + " times.     Estimated time (for " + estprocessor + "ghz processor) is " + (Math.round(((_speedconstant * amount) / estprocessor) * 100) / 100) + "s");
+        
+        for (var i = amount; i > 0; i--) {}
+        var newd = new Date();
+        var accnewd = Number(String(newd.getSeconds()) + "." + String(newd.getMilliseconds()));
+        var accd = Number(String(d.getSeconds()) + "." + String(d.getMilliseconds()));
+        var di = accnewd - accd;
+
+        if (d.getMinutes() != newd.getMinutes()) {
+            di = (60 * (newd.getMinutes() - d.getMinutes())) + di
+        }
+        spd = ((_speedconstant * amount) / di);
+
+        // console.log("Time: " + Math.round(di * 1000) / 1000 + "s, estimated speed: " + Math.round(spd * 1000) / 1000 + "GHZ");
+
+        if ((Math.round(spd * 1000) / 1000) > 0) {
+            op.pSpda[op.pSpda.length] = Math.round(spd * 1000) / 1000; // store instantaneous calculated speed
+        }
+    };
+
+    op.getPef();
+    
+    // Warning: the method will be executed forever, ideal for live counters
+    // CODE REFERENCED FROM CARLOS DELGADO @https://ourcodeworld.com/articles/read/1390/how-to-determine-the-screen-refresh-rate-in-hz-of-the-monitor-with-javascript-in-the-browser#disqus_thread
+
+    getScreenRefreshRate(function(FPS){ // average screen refresh rate
+        // console.log(`${FPS} FPS`);
+        if (!op.sfrx) {
+            if (FPS > 0) {
+                op.sfra[op.sfra.length] = FPS; // array of values
+            }
+        } else {
+            op.sfa = FPS; // live
+        }
+    }, true);
+});
+
 
 uA_L = setInterval(function() {
     if (navigator.userAgent) {
