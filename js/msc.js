@@ -27,6 +27,91 @@
 
     // getScreenLock();
 
+var op = {
+    _L : null,
+    getPef : null, // get device performance function
+    getPefCon : false, // "" usage control
+    iPef : 0, // initial device performance
+    pSpda : [], 
+    pSpd : 0, // device processor speed (average estimated in GHZ)
+    pSpdL : 0, // "" initial array length
+    pMin : [8, 15], // min./rec. processor speed
+    pCores : navigator.hardwareConcurrency, // no. of cpu logical cores
+    pCoresMin : [2, 6], // cores min./rec.
+    sfra : [],
+    sfr : 0, // screen refresh rate
+    sfrMin : [1, 60], // fps min./rec.
+    sfrx : false, // execution
+};
+
+function pL() { // site parameters loop
+    if (!op.iPef && op.pSpd && op.sfr && op.pCores) { // capture initial device performance value, to be used as reference
+        op.iPef = devicePerformance(op.pSpd, op.sfr, op.pCores);
+        op.pSpdL = op.pSpda.length;
+        op.pSpda = [];
+    } else if (!op.getPefCon) { // get (live) subsequent frame-rate/CPU usage values every 3 sec.
+        op.getPefCon = true;
+        setTimeout(function() {
+            op.getPefCon = false;
+        }, (dev.i * 3));
+        if (op.getPef) {
+            op.getPef();
+        }
+    }
+    var liveSfr = mean(op.sfra.slice(-1 * (dev.i * 3))), // get screen refresh rates from last 3 seconds (mean)
+        liveCPU = mean(op.pSpda.slice(-5)), // get live CPU usage values (previous 5)
+        livePerformance = devicePerformance(liveCPU, liveSfr, op.pCores);
+
+    if (livePerformance && op.iPef) { 
+        var newSmooth = op.sSmoothDef * (livePerformance / op.iPef);
+        op.sSmooth = newSmooth; // scroll smoothness based on device performance: low = less smooth
+    }
+}
+
+function devicePerformance(p, r, c) { // estimate device performance using parameters
+
+    var pScore = (p >= op.pMin[0]) ? ((((p - op.pMin[0]) / (op.pMin[1] - op.pMin[0])) * 100) + 1) : 0, // performance score 
+        rScore = (r >= op.sfrMin[0]) ? ((((r - op.sfrMin[0]) / (op.sfrMin[1] - op.sfrMin[0])) * 100) + 1) : 0, // screen refresh rate score
+        cScore = (c >= op.pCoresMin[0]) ? ((((c - op.pCoresMin[0]) / (op.pCoresMin[1] - op.pCoresMin[0])) * 100) + 1) : 0; // logic cores score
+
+    if (pScore > 100) {
+        pScore = 0.6;
+    } else if (pScore > 0) {
+        pScore = (pScore / 100) * 0.6; // 60%
+    } else {
+        pScore = -1;
+    }
+    if (rScore > 100) {
+        rScore = 0.3;
+    } else if (rScore > 0) {
+        rScore = (rScore / 100) * 0.3; // 30%
+    } else {
+        rScore = -1;
+    }
+    if (cScore > 100) {
+        cScore = 0.1;
+    } else if (cScore > 0) {
+        cScore = (cScore / 100) * 0.1; // 10%
+    } else {
+        cScore = -1;
+    }
+    
+    // MINS
+    // 60% 1. p >= 8 GHZ
+    // 30% 2. r >= 50 fps
+    // 10% 3. c >= 2 cores
+    // RECS
+    // 60% 1. p >= 15 GHZ
+    // 30% 2. r >= 60 fps
+    // 10% 3. c >= 6 cores
+
+    if (pScore !== -1 && rScore !== -1 && cScore !== -1) {
+        return (pScore + rScore + cScore);
+    } else {
+        return 0;
+    }
+}
+
 function hardReload() {
     event.stopPropagation();
 
@@ -87,3 +172,4 @@ async function checkNewDeployment() {
 // Poll every 30 seconds
 setInterval(checkNewDeployment, 30000);
 
+op.L = setInterval(pL, 1000/60); 
