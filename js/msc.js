@@ -1,32 +1,39 @@
     
-    // REFERENCED FROM MEDIUM: https://medium.com/js-bytes/how-to-keep-your-screen-awake-using-javascript-aa15775d9bff
+// REFERENCED FROM MEDIUM: https://medium.com/js-bytes/how-to-keep-your-screen-awake-using-javascript-aa15775d9bff
 
-    let screenLock;
+let screenLock;
 
-    function isScreenLockSupported() {
-        return ('wakeLock' in navigator);
-    }
+function isScreenLockSupported() {
+    return ('wakeLock' in navigator);
+}
 
-    async function getScreenLock() {
-        if (isScreenLockSupported()){
-            // let screenLock;
-            try {
-                screenLock = await navigator.wakeLock.request('screen');
-            } catch(err) {
-                console.log(err.name, err.message);
-            }
-            // return screenLock;
+async function getScreenLock() {
+    if (isScreenLockSupported()){
+        // let screenLock;
+        try {
+            screenLock = await navigator.wakeLock.request('screen');
+        } catch(err) {
+            console.log(err.name, err.message);
         }
+        // return screenLock;
     }
+}
 
-    async function releaseScreenLock(screenLock) {
-        await screenLock.release().then(() => {
-            screenLock = null;
-        });
+async function releaseScreenLock(screenLock) {
+    await screenLock.release().then(() => {
+        screenLock = null;
+    });
+}
+
+// getScreenLock();
+
+function mean(ar) {
+    var res = 0;
+    for (i = 0; i <= ar.length - 1; i++) {
+        res += ar[i];
     }
-
-    // getScreenLock();
-
+    return (res / ar.length);
+}
 
 function pL() { // site parameters loop
     if (!op.iPef && op.pSpd && op.sfr && op.pCores) { // capture initial device performance value, to be used as reference
@@ -37,7 +44,7 @@ function pL() { // site parameters loop
         op.getPefCon = true;
         setTimeout(function() {
             op.getPefCon = false;
-        }, (dev.i * 3));
+        }, (3000));
         if (op.getPef) {
             op.getPef();
         }
