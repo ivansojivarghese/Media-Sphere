@@ -1,6 +1,10 @@
     
 // REFERENCED FROM MEDIUM: https://medium.com/js-bytes/how-to-keep-your-screen-awake-using-javascript-aa15775d9bff
 
+var liveSfr = 0;
+var liveCPU = 0;
+var livePerformance = 0;
+
 let screenLock;
 
 function isScreenLockSupported() {
@@ -49,14 +53,9 @@ function pL() { // site parameters loop
             op.getPef();
         }
     }
-    var liveSfr = mean(op.sfra.slice(-1 * (3000))), // get screen refresh rates from last 3 seconds (mean)
-        liveCPU = mean(op.pSpda.slice(-5)), // get live CPU usage values (previous 5)
-        livePerformance = devicePerformance(liveCPU, liveSfr, op.pCores);
-
-    if (livePerformance && op.iPef) { 
-        var newSmooth = op.sSmoothDef * (livePerformance / op.iPef);
-        op.sSmooth = newSmooth; // scroll smoothness based on device performance: low = less smooth
-    }
+    liveSfr = mean(op.sfra.slice(-1 * (3000))), // get screen refresh rates from last 3 seconds (mean)
+    liveCPU = mean(op.pSpda.slice(-5)), // get live CPU usage values (previous 5)
+    livePerformance = devicePerformance(liveCPU, liveSfr, op.pCores);
 }
 
 function devicePerformance(p, r, c) { // estimate device performance using parameters
