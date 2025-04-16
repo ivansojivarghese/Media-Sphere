@@ -4,7 +4,7 @@
   "start_url": "https://media-sphere.vercel.app/",
   "id": "https://media-sphere.vercel.app/",
   "short_name": "Media Sphere",
-  "description": "An installable Media Sphere app.",
+  "description": "Media Sphere is a next-generation AI-powered web media player that transforms passive video watching into an intelligent, interactive experience.",
   "display": "standalone",
   "launch_handler": {
         "client_mode": "navigate-new"

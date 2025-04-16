@@ -4982,7 +4982,8 @@
           Lt_e2 = false;
         }
       }
-    }, 1000/60);
+    }, 100);
+    // }, 1000/60);
 
     function fastSeekIteration() {
       if (longTap) {
@@ -5447,8 +5448,8 @@
       if (isLandscape() && videoInfoOpen) { // 
         videoInfoElm.main.style.transform = "none";
       }
-
-    }, 1000/60);
+    }, 100);
+    // }, 1000/60);
 
     setInterval(function() {
       if (!inpBlock && inp.value.trim() !== "") {
