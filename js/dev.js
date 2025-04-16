@@ -449,7 +449,7 @@ window.addEventListener("load", function() {
         } else {
             op.sfa = FPS; // live
         }
-    }, true);
+    }, false);
 });
 
 
