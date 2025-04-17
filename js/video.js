@@ -355,7 +355,10 @@ async function sourceCheck(i, m) {
       }
     };
     await navigator.mediaCapabilities.decodingInfo(videoConfiguration).then((result) => {
-      if (((result.supported && result.smooth && result.powerEfficient) || (result.supported && videoSources[i].height < videoHDmin) || (!result.supported && !result.smooth && !result.powerEfficient) || true) && !checkDuplicateQuality(supportedVideoSources, videoSources[i].qualityLabel)) {
+      if (((result.supported && result.smooth && result.powerEfficient) // ideal
+        || (result.supported && videoSources[i].height < videoHDmin)  // fallback for lower res.
+        /*|| (!result.supported && !result.smooth && !result.powerEfficient)*/ /*|| true*/)  // worst-case fallback
+        && !checkDuplicateQuality(supportedVideoSources, videoSources[i].qualityLabel)) { // check for duplicate res.
         supportedVideoSources[supportedVideoSources.length] = videoSources[i];
       }
     });
