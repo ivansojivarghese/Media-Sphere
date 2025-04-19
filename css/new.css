@@ -733,6 +733,30 @@ div.thumbnailIcon {
     background-color: #3f3f3f;
 }
 
+.scrollToTop {
+    width: 4rem;
+    height: 4rem;
+    position: fixed;
+    background: #3f3f3f;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 5;
+    border-radius: 50%;
+    box-shadow: 0 0.235rem 0.47rem rgba(0, 0, 0, 0.3), 0 0.117rem 0.235rem rgba(255, 255, 255, 0.05) inset;
+    transform: scale(0);
+}
+
+.scrollToTop:active {
+    transform: scale(0.95);
+  background-color: #2f2f2f;
+  box-shadow: 0 0.117rem 0.35rem rgba(0, 0, 0, 0.4),
+              0 0.06rem 0.176rem rgba(255, 255, 255, 0.04) inset;
+}
+
+.scrollToTop.grow {
+    transform: scale(1);
+}
+
 div.badge {
     background-color: #3f3f3f !important;
 }

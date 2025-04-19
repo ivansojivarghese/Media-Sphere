@@ -9,6 +9,8 @@ var videoInfoElm = {
   infoHead : document.querySelector("#infoContainer .head"),
   infoHeadSec : document.querySelector("#infoContainer .headSec"),
 
+  scrollToTop : document.querySelector("#infoContainer .scrollToTop"),
+
   suggestions : document.querySelector("#infoContainer .suggestions"),
 
   videoTitle : document.querySelector("#infoContainer h5.videoTitle"),
@@ -379,6 +381,41 @@ async function sourceCheck(i, m) {
     });
   }
 }
+
+let lastScrollTop = 0;
+let scrollDown = false;
+videoInfoElm.info.addEventListener("scroll", function() {
+  const currentScrollTop = videoInfoElm.info.scrollTop;
+
+  if (currentScrollTop > lastScrollTop) {
+    scrollDown = true;
+
+    // if scroll down past the query area (half the viewport height), then hide the navbar - show scrollTop FAB
+
+    if (currentScrollTop > (window.innerHeight / 2)) {
+      videoInfoElm.infoHead.style.transform = "translateY(-100%)";
+      videoInfoElm.scrollToTop.classList.add("grow");
+    }
+
+  } else if (currentScrollTop < lastScrollTop) {
+    scrollDown = false;
+
+    // show the navbar, if hidden
+    videoInfoElm.infoHead.style.transform = "none";
+    videoInfoElm.scrollToTop.classList.remove("grow");
+  }
+
+  lastScrollTop = currentScrollTop;
+});
+
+videoInfoElm.scrollToTop.addEventListener("click", function() {
+  videoInfoElm.info.scrollTo(
+    {
+      top: 0,
+      behavior: 'smooth'
+    }
+  );
+});
 
 function resetVariables() {
   // VARIABLE ACROSS DIFF. VIDEO SOURCES WITHIN A VIDEO FILE
