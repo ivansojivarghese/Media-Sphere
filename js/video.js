@@ -412,6 +412,13 @@ videoInfoElm.info.addEventListener("scroll", function() {
       scrollDownExt = false;
     }
 
+    if (currentScrollTop === 0) {
+      // hide the search bar 
+      inp.classList.remove("float");
+      videoInfoElm.suggestions.classList.remove("float");
+      clearBtn.classList.remove("float");
+    }
+
     // show the navbar, if hidden
     videoInfoElm.infoHead.style.transform = "none";
     videoInfoElm.scrollToTop.classList.remove("grow");
