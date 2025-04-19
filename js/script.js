@@ -1644,10 +1644,17 @@
       videoInfoElm.scrollToTop.classList.remove("grow");
 
       const b = document.querySelector("#infoContainer .head .searchBtn");
-      /*
       if (b.classList.contains("active")) {
-        videoInfoElm.info.scrollTo(0,0);
-      }*/
+        // videoInfoElm.info.scrollTo(0,0);
+
+        if (scrollDownExt) {
+          // show the search bar + focus
+          inp.classList.add("float");
+          videoInfoElm.suggestions.classList.add("float");
+          clearBtn.classList.add("float");
+          inp.focus();
+        }
+      }
 
       if (!videoInfoOpen || e) {
         videoInfoElm.info.style.transform = "none";

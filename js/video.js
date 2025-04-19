@@ -384,6 +384,7 @@ async function sourceCheck(i, m) {
 
 let lastScrollTop = 0;
 let scrollDown = false;
+let scrollDownExt = false;
 videoInfoElm.info.addEventListener("scroll", function() {
   const currentScrollTop = videoInfoElm.info.scrollTop;
 
@@ -393,12 +394,23 @@ videoInfoElm.info.addEventListener("scroll", function() {
     // if scroll down past the query area (half the viewport height), then hide the navbar - show scrollTop FAB
 
     if (currentScrollTop > (window.innerHeight / 2)) {
+      scrollDownExt = true;
+
       videoInfoElm.infoHead.style.transform = "translateY(-100%)";
       videoInfoElm.scrollToTop.classList.add("grow");
+
+      // hide the search bar 
+      inp.classList.remove("float");
+      videoInfoElm.suggestions.classList.remove("float");
+      clearBtn.classList.remove("float");
     }
 
   } else if (currentScrollTop < lastScrollTop) {
     scrollDown = false;
+
+    if (currentScrollTop <= (window.innerHeight / 2)) {
+      scrollDownExt = false;
+    }
 
     // show the navbar, if hidden
     videoInfoElm.infoHead.style.transform = "none";
