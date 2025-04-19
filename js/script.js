@@ -1641,7 +1641,13 @@
         videoInfoElm.textStuff.classList.add("side");
       }
 
+      // show the navbar, if hidden
+      videoInfoElm.infoHead.style.transform = "none";
       videoInfoElm.scrollToTop.classList.remove("grow");
+
+      inp.classList.remove("float");
+      videoInfoElm.suggestions.classList.remove("float");
+      clearBtn.classList.remove("float");
 
       const b = document.querySelector("#infoContainer .head .searchBtn");
       if (b.classList.contains("active")) {
@@ -1749,7 +1755,13 @@
         videoInfoElm.textStuff.classList.add("side");
       }
 
+      // show the navbar, if hidden
+    videoInfoElm.infoHead.style.transform = "none";
       videoInfoElm.scrollToTop.classList.remove("grow");
+
+      inp.classList.remove("float");
+      videoInfoElm.suggestions.classList.remove("float");
+      clearBtn.classList.remove("float");
 
       const b = document.querySelector("#infoContainer .head .infoBtn");
       /*
