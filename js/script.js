@@ -1882,7 +1882,9 @@
             // if (Math.abs(deltaX) > 10) {
               if (deltaX > 0) {
                 hasMovedHorizontally = true;
-                panelElement.style.transform = `translateX(${deltaX}px)`;
+                // panelElement.style.transform = `translateX(${deltaX}px)`;
+                panelElement.style.left = deltaX + "px";
+                videoInfoElm.scrollToTop.classList.remove("grow");
             }
         });
     
@@ -1909,6 +1911,7 @@
             // Reset the panel's style
             if (((ori === "portrait-primary" || ori === "portrait-secondary") || deltaX > 0) || ((ori === "landscape-primary" || ori === "landscape-secondary") && deltaX < 0)) {
               panelElement.style.transform = "";
+              panelElement.style.left = "";
             }
         });
     
