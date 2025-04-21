@@ -4891,7 +4891,7 @@
         // }
       }
 
-      if (video.paused && video.buffered.length) {
+      if (video.paused && video.buffered.length && bufferLoad) {
         video.play();
       }
 
