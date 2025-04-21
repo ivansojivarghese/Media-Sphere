@@ -1628,10 +1628,19 @@
       }
     }
 
+    var searchBtnClick = false;
+
     function openSearch(v, i, e) {
       event.stopPropagation();
 
       curTab = "search";
+
+      if (e) {
+        searchBtnClick = true;
+        setTimeout(function () {
+          searchBtnClick = false;
+        }, 100);
+      }
 
       if (isLandscape()) {
         video.classList.add("side-by-side");

@@ -388,43 +388,47 @@ let scrollDownExt = false;
 videoInfoElm.info.addEventListener("scroll", function() {
   const currentScrollTop = videoInfoElm.info.scrollTop;
 
-  if (currentScrollTop > lastScrollTop) {
-    scrollDown = true;
+  if (!searchBtnClick) { // prevent when clicked on search button
 
-    // if scroll down past the query area (half the viewport height), then hide the navbar - show scrollTop FAB
+    if (currentScrollTop > lastScrollTop) {
+      scrollDown = true;
 
-    if (currentScrollTop > (window.innerHeight / 2)) {
-      scrollDownExt = true;
+      // if scroll down past the query area (half the viewport height), then hide the navbar - show scrollTop FAB
 
-      videoInfoElm.infoHead.style.transform = "translateY(-100%)";
-      videoInfoElm.scrollToTop.classList.add("grow");
+      if (currentScrollTop > (window.innerHeight / 2)) {
+        scrollDownExt = true;
 
-      // hide the search bar 
-      inp.classList.remove("float");
-      videoInfoElm.suggestions.classList.remove("float");
-      clearBtn.classList.remove("float");
+        videoInfoElm.infoHead.style.transform = "translateY(-100%)";
+        videoInfoElm.scrollToTop.classList.add("grow");
+
+        // hide the search bar 
+        inp.classList.remove("float");
+        videoInfoElm.suggestions.classList.remove("float");
+        clearBtn.classList.remove("float");
+      }
+
+    } else if (currentScrollTop < lastScrollTop) {
+      scrollDown = false;
+
+      if (currentScrollTop <= (window.innerHeight / 2)) {
+        scrollDownExt = false;
+      }
+
+      if (currentScrollTop === 0) {
+        // hide the search bar 
+        inp.classList.remove("float");
+        videoInfoElm.suggestions.classList.remove("float");
+        clearBtn.classList.remove("float");
+      }
+
+      // show the navbar, if hidden
+      videoInfoElm.infoHead.style.transform = "none";
+      videoInfoElm.scrollToTop.classList.remove("grow");
     }
 
-  } else if (currentScrollTop < lastScrollTop) {
-    scrollDown = false;
+    lastScrollTop = currentScrollTop;
 
-    if (currentScrollTop <= (window.innerHeight / 2)) {
-      scrollDownExt = false;
-    }
-
-    if (currentScrollTop === 0) {
-      // hide the search bar 
-      inp.classList.remove("float");
-      videoInfoElm.suggestions.classList.remove("float");
-      clearBtn.classList.remove("float");
-    }
-
-    // show the navbar, if hidden
-    videoInfoElm.infoHead.style.transform = "none";
-    videoInfoElm.scrollToTop.classList.remove("grow");
   }
-
-  lastScrollTop = currentScrollTop;
 });
 
 videoInfoElm.scrollToTop.addEventListener("click", function() {
