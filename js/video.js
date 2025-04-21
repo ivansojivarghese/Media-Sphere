@@ -404,6 +404,10 @@ videoInfoElm.info.addEventListener("scroll", function() {
         // hide the search bar 
         inp.classList.remove("op");
         setTimeout(function() {
+          inp.classList.remove("op2");
+        }, 210);
+        
+        setTimeout(function() {
           if (!searchBtnClick) {
             inp.classList.remove("float");
             videoInfoElm.suggestions.classList.remove("float");
@@ -422,6 +426,7 @@ videoInfoElm.info.addEventListener("scroll", function() {
       if (currentScrollTop === 0) {
         // hide the search bar 
         inp.classList.remove("op");
+        inp.classList.remove("op2");
         // inp.classList.add("op2");
         // setTimeout(function() {
           if (!searchBtnClick) {

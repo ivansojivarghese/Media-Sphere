@@ -402,10 +402,6 @@ a.noUnderline {
     transform: rotate(-90deg);
 }
 
-.scrollToTop:active {
-    transform: scale(0.95);
-}
-
 .seekButton {
     width: 1.25rem;
     height: 1.25rem;
@@ -759,7 +755,7 @@ div.thumbnailIcon {
 }
 
 .scrollToTop:active {
-    transform: scale(0.95);
+    transform: scale(0.95) !important;
   background-color: #2f2f2f;
   box-shadow: 0 0.117rem 0.35rem rgba(0, 0, 0, 0.4),
               0 0.06rem 0.176rem rgba(255, 255, 255, 0.04) inset;
@@ -1018,6 +1014,10 @@ input#urlBar {
 
 .wrapper.search input.float.op {
     opacity: 1 !important;
+    /*transition: 0.2s opacity cubic-bezier(0.22,0.61,0.36,1);*/
+}
+
+.wrapper.search input.float.op2 {
     transition: 0.2s opacity cubic-bezier(0.22,0.61,0.36,1);
 }
 /*

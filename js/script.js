@@ -1655,6 +1655,7 @@
       videoInfoElm.scrollToTop.classList.remove("grow");
 
       inp.classList.remove("op");
+      inp.classList.remove("op2");
       setTimeout(function() {
         if (!searchBtnClick) {
           inp.classList.remove("float");
@@ -1673,6 +1674,7 @@
           videoInfoElm.suggestions.classList.add("float");
           clearBtn.classList.add("float");
           setTimeout(function() {
+            inp.classList.add("op2");
             inp.classList.add("op");
             inp.focus();  
           }, 210);
@@ -1788,6 +1790,7 @@
       videoInfoElm.scrollToTop.classList.remove("grow");
 
       inp.classList.remove("op");
+      inp.classList.remove("op2");
       setTimeout(function() {
         if (!searchBtnClick) {
           inp.classList.remove("float");
