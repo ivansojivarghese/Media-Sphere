@@ -402,9 +402,12 @@ videoInfoElm.info.addEventListener("scroll", function() {
         videoInfoElm.scrollToTop.classList.add("grow");
 
         // hide the search bar 
-        inp.classList.remove("float");
-        videoInfoElm.suggestions.classList.remove("float");
-        clearBtn.classList.remove("float");
+        inp.classList.remove("op");
+        setTimeout(function() {
+          inp.classList.remove("float");
+          videoInfoElm.suggestions.classList.remove("float");
+          clearBtn.classList.remove("float");
+        }, 210);
       }
 
     } else if (currentScrollTop < lastScrollTop) {
@@ -416,9 +419,12 @@ videoInfoElm.info.addEventListener("scroll", function() {
 
       if (currentScrollTop === 0) {
         // hide the search bar 
-        inp.classList.remove("float");
-        videoInfoElm.suggestions.classList.remove("float");
-        clearBtn.classList.remove("float");
+        inp.classList.remove("op");
+        setTimeout(function() {
+          inp.classList.remove("float");
+          videoInfoElm.suggestions.classList.remove("float");
+          clearBtn.classList.remove("float");
+        }, 210);
       }
 
       // show the navbar, if hidden

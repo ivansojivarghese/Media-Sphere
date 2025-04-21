@@ -1009,6 +1009,9 @@ p.durationDiv {
     z-index: 8;
     width: calc(100% - 1.2rem - 1.2rem - 2.4rem - calc(env(safe-area-inset-right)) - 3rem);
     box-shadow: 0 0.117rem 0.47rem rgba(0, 0, 0, 0.1);
+}
+
+.wrapper.search input.float.op {
     opacity: 1;
 }
 
