@@ -1920,6 +1920,7 @@
     function setupSwipeToClose(panelElement, onClose) {
         let startX = 0;
         let startY = 0;
+        let startLeft = 0;
         let isSwiping = false;
         let hasMovedHorizontally = false;
         let isScrolling = false; // Flag to indicate a vertical scroll
@@ -1930,6 +1931,9 @@
             const touch = event.touches[0];
             startX = touch.clientX;
             startY = touch.clientY;
+
+            startLeft = panelElement.offsetLeft; // Save initial `left` value
+
             isSwiping = true;
             hasMovedHorizontally = false;
             isScrolling = false;
@@ -1955,9 +1959,9 @@
                 hasMovedHorizontally = true;
                 // panelElement.style.transform = `translateX(${deltaX}px)`;
 
-                var d = panelElement.getBoundingClientRect().left;
+                // var d = panelElement.getBoundingClientRect().left;
 
-                panelElement.style.left = (d + deltaX) + "px";
+                panelElement.style.left = `${startLeft + deltaX}px`;
                 videoInfoElm.scrollToTop.classList.remove("grow");
             }
         });
@@ -1976,10 +1980,22 @@
     
             const touch = event.changedTouches[0];
             const deltaX = touch.clientX - startX;
+            /*
+            const isLandscape = ori === "landscape-primary" || ori === "landscape-secondary";
+            const isPortrait = ori === "portrait-primary" || ori === "portrait-secondary";
+            const threshold = 100; // Minimum distance to trigger a full swipe
+            const shouldClose = (isPortrait && deltaX > threshold) || (isLandscape && deltaX < -threshold);
+            */
     
             // Consider it a swipe if the drag is significant (e.g., more than 100px)
             if (deltaX > 0 || ((ori === "landscape-primary" || ori === "landscape-secondary") && deltaX < 0)) {
                 onClose(); // Trigger the close action
+            } else {
+              // Snap back animation
+              panelElement.style.left = startLeft + "px";
+              setTimeout(() => {
+                panelElement.style.left = "";
+              }, 250); // after the transition ends
             }
     
             // Reset the panel's style

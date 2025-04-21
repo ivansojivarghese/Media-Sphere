@@ -669,6 +669,10 @@ div.thumbnailIcon {
     #infoContainer, #infoContainer .head {
         width: calc(21rem + calc(env(safe-area-inset-left)) + calc(env(safe-area-inset-right))) !important;
     }
+
+    .wrapper.search input.float {
+        width: calc(21rem - 1.2rem - 1.2rem - 2.7rem - calc(env(safe-area-inset-right)));
+    }
 }
 
 .videoTitle.textReset {

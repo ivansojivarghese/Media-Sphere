@@ -385,69 +385,74 @@ async function sourceCheck(i, m) {
 let lastScrollTop = 0;
 let scrollDown = false;
 let scrollDownExt = false;
+const scrollThreshold = 20; // change this value to adjust sensitivity
 videoInfoElm.info.addEventListener("scroll", function() {
   const currentScrollTop = videoInfoElm.info.scrollTop;
+  const scrollDiff = Math.abs(currentScrollTop - lastScrollTop);
 
   videoInfoElm.suggestions.style.display = "none";
 
   if (!searchBtnClick) { // prevent when clicked on search button
 
-    if (currentScrollTop > lastScrollTop) {
-      scrollDown = true;
+    // only proceed if scroll difference exceeds threshold
+    if (scrollDiff > scrollThreshold) {
 
-      // if scroll down past the query area (half the viewport height), then hide the navbar - show scrollTop FAB
+      if (currentScrollTop > lastScrollTop) {
+        scrollDown = true;
 
-      if (currentScrollTop > (window.innerHeight / 2)) {
-        scrollDownExt = true;
+        // if scroll down past the query area (half the viewport height), then hide the navbar - show scrollTop FAB
 
-        videoInfoElm.infoHead.style.transform = "translateY(-100%)";
-        videoInfoElm.scrollToTop.classList.add("grow");
+        if (currentScrollTop > (window.innerHeight / 2)) {
+          scrollDownExt = true;
 
-        // hide the search bar 
-        inp.classList.remove("op");
-        setTimeout(function() {
+          videoInfoElm.infoHead.style.transform = "translateY(-100%)";
+          videoInfoElm.scrollToTop.classList.add("grow");
+
+          // hide the search bar 
+          inp.classList.remove("op");
+          setTimeout(function() {
+            inp.classList.remove("op2");
+          }, 210);
+          
+          setTimeout(function() {
+            if (!searchBtnClick) {
+              inp.classList.remove("float");
+              videoInfoElm.suggestions.classList.remove("float");
+              clearBtn.classList.remove("float");
+            }
+          }, 210);
+        }
+
+      } else if (currentScrollTop < lastScrollTop) {
+        scrollDown = false;
+
+        if (currentScrollTop <= (window.innerHeight / 2)) {
+          scrollDownExt = false;
+        }
+
+        if (currentScrollTop === 0) {
+          // hide the search bar 
+          inp.classList.remove("op");
           inp.classList.remove("op2");
-        }, 210);
-        
-        setTimeout(function() {
-          if (!searchBtnClick) {
-            inp.classList.remove("float");
-            videoInfoElm.suggestions.classList.remove("float");
-            clearBtn.classList.remove("float");
-          }
-        }, 210);
+          // inp.classList.add("op2");
+          // setTimeout(function() {
+            if (!searchBtnClick) {
+              inp.classList.remove("float");
+              videoInfoElm.suggestions.classList.remove("float");
+              clearBtn.classList.remove("float");
+            }
+          // }, 210);
+        } else {
+          // inp.classList.remove("op2");
+        }
+
+        // show the navbar, if hidden
+        videoInfoElm.infoHead.style.transform = "none";
+        videoInfoElm.scrollToTop.classList.remove("grow");
       }
 
-    } else if (currentScrollTop < lastScrollTop) {
-      scrollDown = false;
-
-      if (currentScrollTop <= (window.innerHeight / 2)) {
-        scrollDownExt = false;
-      }
-
-      if (currentScrollTop === 0) {
-        // hide the search bar 
-        inp.classList.remove("op");
-        inp.classList.remove("op2");
-        // inp.classList.add("op2");
-        // setTimeout(function() {
-          if (!searchBtnClick) {
-            inp.classList.remove("float");
-            videoInfoElm.suggestions.classList.remove("float");
-            clearBtn.classList.remove("float");
-          }
-        // }, 210);
-      } else {
-        // inp.classList.remove("op2");
-      }
-
-      // show the navbar, if hidden
-      videoInfoElm.infoHead.style.transform = "none";
-      videoInfoElm.scrollToTop.classList.remove("grow");
+      lastScrollTop = currentScrollTop;
     }
-
-    lastScrollTop = currentScrollTop;
-
   }
 });
 
