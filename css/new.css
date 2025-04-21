@@ -394,6 +394,15 @@ a.noUnderline {
     margin-left: 0.9rem;
 }
 
+.scrollToTop .img {
+    background-image: url("../svg/chevron.svg");
+    width: 2rem;
+    height: 2rem;
+    margin: 0.75rem 0.35rem;
+    margin-left: 0.9rem;
+    transform: rotate(-90deg);
+}
+
 .seekButton {
     width: 1.25rem;
     height: 1.25rem;
