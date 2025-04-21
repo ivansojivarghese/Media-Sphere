@@ -422,13 +422,16 @@ videoInfoElm.info.addEventListener("scroll", function() {
       if (currentScrollTop === 0) {
         // hide the search bar 
         inp.classList.remove("op");
-        setTimeout(function() {
+        inp.classList.add("op2");
+        // setTimeout(function() {
           if (!searchBtnClick) {
             inp.classList.remove("float");
             videoInfoElm.suggestions.classList.remove("float");
             clearBtn.classList.remove("float");
           }
-        }, 210);
+        // }, 210);
+      } else {
+        inp.classList.remove("op2");
       }
 
       // show the navbar, if hidden

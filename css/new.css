@@ -1012,7 +1012,11 @@ p.durationDiv {
 }
 
 .wrapper.search input.float.op {
-    opacity: 0;
+    opacity: 1;
+}
+
+.wrapper.search input.float.op2 {
+    opacity: 1;
 }
 
 input[type="search"]::-webkit-search-cancel-button {

@@ -1673,7 +1673,7 @@
           videoInfoElm.suggestions.classList.add("float");
           clearBtn.classList.add("float");
           setTimeout(function() {
-            // inp.classList.add("op");
+            inp.classList.add("op");
             inp.focus();  
           }, 10);
         }
