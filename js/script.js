@@ -1683,14 +1683,16 @@
 
         videoInfoElm.info.classList.add("openInfo");
 
-        if (p) {
-          videoInfoElm.info.scrollTo(
-            {
-              top: p,
-              behavior: 'smooth'
-            }
-          );
-        }
+        setTimeout(function() {
+          if (p) {
+            videoInfoElm.info.scrollTo(
+              {
+                top: p,
+                behavior: 'smooth'
+              }
+            );
+          }
+        }, 10);
       }
 
       const allBtn = document.querySelectorAll("#infoContainer .head .cursor");
@@ -1822,14 +1824,16 @@
           // videoContainer.style.opacity = 0.5;
         }
 
-        if (p) {
-          videoInfoElm.info.scrollTo(
-            {
-              top: p,
-              behavior: 'smooth'
-            }
-          );
-        }
+        setTimeout(function() {
+          if (p) {
+            videoInfoElm.info.scrollTo(
+              {
+                top: p,
+                behavior: 'smooth'
+              }
+            );
+          }
+        }, 10);  
 
         if (!videoEnd && !video.paused && (!isMusic || (isMusic && CVactivityScore > 0.2)) && (ori === "portrait-primary" || ori === "portrait-secondary")) {
           video.requestPictureInPicture().then(function() {
