@@ -1667,7 +1667,7 @@
       if (b.classList.contains("active")) {
         // videoInfoElm.info.scrollTo(0,0);
 
-        if (scrollDownExt) {
+        if (scrollDownExt && !inp.classList.contains("float")) {
           // show the search bar + focus
           inp.classList.add("float");
           videoInfoElm.suggestions.classList.add("float");
@@ -1675,7 +1675,7 @@
           setTimeout(function() {
             inp.classList.add("op");
             inp.focus();  
-          }, 10);
+          }, 210);
         }
       }
 
