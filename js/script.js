@@ -1712,10 +1712,6 @@
       const searchWrapper = document.querySelector("#infoContainer .wrapper.search");
       searchWrapper.style.display = "block";
 
-      if (e.currentTarget === searchButton) {
-        inp.focus();
-      }
-
       if (i) {
         setSearchPath("query");
       }
@@ -1745,6 +1741,10 @@
         }, 100);
       }
 
+      if (e.currentTarget === searchButton) {
+        inp.focus();
+      }
+
       const allSearchPathBtn = document.querySelectorAll("#infoContainer .wrapper.search .resBtn");
       // Remove 'active' class from all elements
       allSearchPathBtn.forEach(btn => btn.classList.remove('active'));
@@ -1766,7 +1766,7 @@
           // videoContainer.style.opacity = 0.5;
         }*/
 
-        if (!videoEnd && !video.paused && (!isMusic || (isMusic && CVactivityScore > 0.2)) && (ori === "portrait-primary" || ori === "portrait-secondary")) {
+        if (!videoEnd && !video.paused && e.currentTarget !== searchButton && (!isMusic || (isMusic && CVactivityScore > 0.2)) && (ori === "portrait-primary" || ori === "portrait-secondary")) {
           video.requestPictureInPicture().then(function() {
             getScreenLock();
             pipEnabled = true;
