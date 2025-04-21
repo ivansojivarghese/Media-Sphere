@@ -1630,7 +1630,7 @@
 
     var searchBtnClick = false;
 
-    function openSearch(v, i, e) {
+    function openSearch(v, i, e, p) {
       event.stopPropagation();
 
       curTab = "search";
@@ -1640,6 +1640,15 @@
         setTimeout(function () {
           searchBtnClick = false;
         }, 100);
+      }
+
+      if (p) {
+        videoInfoElm.info.scrollTo(
+          {
+            top: p,
+            behavior: 'smooth'
+          }
+        );
       }
 
       if (isLandscape()) {
@@ -1751,10 +1760,21 @@
       }
     }
 
-    function openVideoInfo() {
+    function openVideoInfo(p) {
       event.stopPropagation();
 
       curTab = "info";
+
+      if (p) {
+        if (p) {
+          videoInfoElm.info.scrollTo(
+            {
+              top: p,
+              behavior: 'smooth'
+            }
+          );
+        }
+      }
 
       if (isLandscape()) {
         video.classList.add("side-by-side");
@@ -1817,13 +1837,14 @@
     function closeVideoInfo() {
 
       var preTab = "";
+      var preScrollPos = videoInfoElm.info.scrollTop;
 
       switch (curTab) {
         case "search":
-          preTab = "openSearch(false, true, event)";
+          preTab = "openSearch(false, true, event, " + preScrollPos +")";
         break;
         case "info":
-          preTab = "openVideoInfo()";
+          preTab = "openVideoInfo(" + preScrollPos + ")";
         break;
       }
 
