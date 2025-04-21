@@ -1954,7 +1954,10 @@
               if (deltaX > 0) {
                 hasMovedHorizontally = true;
                 // panelElement.style.transform = `translateX(${deltaX}px)`;
-                panelElement.style.left = deltaX + "px";
+
+                var d = panelElement.getBoundingClientRect().left;
+
+                panelElement.style.left = (d + deltaX) + "px";
                 videoInfoElm.scrollToTop.classList.remove("grow");
             }
         });
