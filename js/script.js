@@ -1639,7 +1639,7 @@
         searchBtnClick = true;
         setTimeout(function () {
           searchBtnClick = false;
-        }, 100);
+        }, 300);
       }
 
       if (isLandscape()) {
@@ -1656,9 +1656,11 @@
 
       inp.classList.remove("op");
       setTimeout(function() {
-        inp.classList.remove("float");
-        videoInfoElm.suggestions.classList.remove("float");
-        clearBtn.classList.remove("float");
+        if (!searchBtnClick) {
+          inp.classList.remove("float");
+          videoInfoElm.suggestions.classList.remove("float");
+          clearBtn.classList.remove("float");
+        }
       }, 210);
 
       const b = document.querySelector("#infoContainer .head .searchBtn");
@@ -1671,7 +1673,7 @@
           videoInfoElm.suggestions.classList.add("float");
           clearBtn.classList.add("float");
           setTimeout(function() {
-            inp.classList.add("op");
+            // inp.classList.add("op");
             inp.focus();  
           }, 10);
         }
@@ -1787,9 +1789,11 @@
 
       inp.classList.remove("op");
       setTimeout(function() {
-        inp.classList.remove("float");
-        videoInfoElm.suggestions.classList.remove("float");
-        clearBtn.classList.remove("float");
+        if (!searchBtnClick) {
+          inp.classList.remove("float");
+          videoInfoElm.suggestions.classList.remove("float");
+          clearBtn.classList.remove("float");
+        }
       }, 210);
 
       const b = document.querySelector("#infoContainer .head .infoBtn");

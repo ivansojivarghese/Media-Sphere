@@ -404,9 +404,11 @@ videoInfoElm.info.addEventListener("scroll", function() {
         // hide the search bar 
         inp.classList.remove("op");
         setTimeout(function() {
-          inp.classList.remove("float");
-          videoInfoElm.suggestions.classList.remove("float");
-          clearBtn.classList.remove("float");
+          if (!searchBtnClick) {
+            inp.classList.remove("float");
+            videoInfoElm.suggestions.classList.remove("float");
+            clearBtn.classList.remove("float");
+          }
         }, 210);
       }
 
@@ -421,9 +423,11 @@ videoInfoElm.info.addEventListener("scroll", function() {
         // hide the search bar 
         inp.classList.remove("op");
         setTimeout(function() {
-          inp.classList.remove("float");
-          videoInfoElm.suggestions.classList.remove("float");
-          clearBtn.classList.remove("float");
+          if (!searchBtnClick) {
+            inp.classList.remove("float");
+            videoInfoElm.suggestions.classList.remove("float");
+            clearBtn.classList.remove("float");
+          }
         }, 210);
       }
 
