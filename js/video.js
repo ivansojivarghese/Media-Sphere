@@ -388,6 +388,8 @@ let scrollDownExt = false;
 videoInfoElm.info.addEventListener("scroll", function() {
   const currentScrollTop = videoInfoElm.info.scrollTop;
 
+  videoInfoElm.suggestions.style.display = "none";
+
   if (!searchBtnClick) { // prevent when clicked on search button
 
     if (currentScrollTop > lastScrollTop) {
@@ -2600,6 +2602,9 @@ function abstractVideoInfo() {
   }
 
   videoInfoElm.main.setAttribute("onclick", "openVideoInfo()");
+
+  // Sort by height descending (highest to lowest)
+  supportedVideoSources.sort((a, b) => b.height - a.height);
 
   for (var j = 0; j < supportedVideoSources.length; j++) {
     var d = document.createElement("div");

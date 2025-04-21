@@ -643,7 +643,11 @@
             title.classList.add("overflow", "resultTitle");
     
             var channelTitle = document.createElement("p");
-            channelTitle.innerHTML = data[i].channelTitle;
+            if (data[i].channelTitle !== undefined) {
+              channelTitle.innerHTML = data[i].channelTitle;
+            } else {
+              channelTitle.innerHTML = "";
+            }
             channelTitle.classList.add("overflow", "resultChannelTitle");
     
             var duration = document.createElement("p");
@@ -668,7 +672,9 @@
             }
             main.appendChild(thumbnail);
             main.appendChild(title);
-            main.appendChild(channelTitle);
+            if (channelTitle.innerHTML) {
+              main.appendChild(channelTitle);
+            }
     
             textDiv.appendChild(duration);
             textDiv.appendChild(date);

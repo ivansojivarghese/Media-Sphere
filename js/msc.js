@@ -109,7 +109,8 @@ function hardReload() {
 
         $.ajax({
             // url: window.location.pathname + "?refresh=" + new Date().getTime(),
-            url : window.location.href + "?nocache=" + new Date().getTime(),
+            // url : window.location.href + "?nocache=" + new Date().getTime(),
+            url :  window.location.href,
             headers: {
                 "Pragma": "no-cache",
                 "Cache-Control": "no-cache, no-store, must-revalidate",
