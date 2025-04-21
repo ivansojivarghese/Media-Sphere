@@ -1002,10 +1002,10 @@ p.durationDiv {
     padding-right: 3rem;
     box-sizing: content-box;
 }
-
+/*
 input#urlBar {
     opacity: 0;
-}
+}*/
 
 .wrapper.search input.float {
     top: 5rem;
