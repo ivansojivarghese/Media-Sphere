@@ -4891,6 +4891,10 @@
         // }
       }
 
+      if (video.paused && video.buffered.length) {
+        video.play();
+      }
+
       if ((audio.currentTime > (audio.duration - 30)) && (audio.currentTime < (audio.duration - 5)) && radioLoop && !videoLoop && backgroundPlay && !readyForNext) {
 
         readyForNext = true;
