@@ -1712,6 +1712,10 @@
       const searchWrapper = document.querySelector("#infoContainer .wrapper.search");
       searchWrapper.style.display = "block";
 
+      if (e.currentTarget === searchButton) {
+        inp.focus();
+      }
+
       if (i) {
         setSearchPath("query");
       }

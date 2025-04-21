@@ -746,8 +746,8 @@ div.thumbnailIcon {
     height: 4rem;
     position: fixed;
     background: #3f3f3f;
-    bottom: 1.5rem;
-    right: 1.5rem;
+    bottom: calc(1.5rem + calc(env(safe-area-inset-bottom)));
+    right: calc(1.5rem + calc(env(safe-area-inset-right)));
     z-index: 5;
     border-radius: 50%;
     box-shadow: 0 0.235rem 0.47rem rgba(0, 0, 0, 0.3), 0 0.117rem 0.235rem rgba(255, 255, 255, 0.05) inset;
