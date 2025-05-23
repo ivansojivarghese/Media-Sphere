@@ -91,6 +91,7 @@ const assets = [
   'svg/open.svg',
   'svg/link.svg',
   'svg/globe.svg',
+  'svg/profile.svg',
   'svg/home.svg',
   'svg/trending.svg',
   'svg/search.svg',

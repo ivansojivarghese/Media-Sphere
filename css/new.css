@@ -783,6 +783,11 @@ div.badge:first-child {
 
 #infoContainer .homeBtn .img { 
     background-image: url("../svg/home.svg");
+    /*margin-left: calc(env(safe-area-inset-left));*/
+}
+
+#infoContainer .profileBtn .img { 
+    background-image: url("../svg/profile.svg");
     margin-left: calc(env(safe-area-inset-left));
 }
 
