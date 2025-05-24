@@ -1,6 +1,9 @@
-
 export default async function handler(req, res) {
-  const code = req.query.code;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { code } = req.body;
 
   if (!code) {
     return res.status(400).json({ error: 'Missing code' });
@@ -12,7 +15,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        code: code,
+        code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',
@@ -35,8 +38,7 @@ export default async function handler(req, res) {
 
     const user = await userRes.json();
 
-    // Optionally: store user info or session here
-    // For now, just return the user info
+    // Return user info
     return res.status(200).json({ user });
 
   } catch (error) {
