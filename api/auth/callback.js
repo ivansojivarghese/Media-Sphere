@@ -1,4 +1,7 @@
 export default async function handler(req, res) {
+  console.log('Request method:', req.method);
+  console.log('Request body:', req.body);
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -18,12 +21,13 @@ export default async function handler(req, res) {
         code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',
+        redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',  // must exactly match your Google console redirect uri
         grant_type: 'authorization_code',
       }),
     });
 
     const tokenData = await tokenRes.json();
+    console.log('Token response:', tokenData);
 
     if (tokenData.error) {
       return res.status(400).json({ error: tokenData.error_description || tokenData.error });
@@ -38,9 +42,7 @@ export default async function handler(req, res) {
 
     const user = await userRes.json();
 
-    // Return user info
     return res.status(200).json({ user });
-
   } catch (error) {
     console.error('OAuth callback error:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
