@@ -1,41 +1,46 @@
 
-import axios from 'axios';
-import qs from 'qs';
-
 export default async function handler(req, res) {
   const code = req.query.code;
 
-  if (!code) return res.status(400).send('Missing code');
+  if (!code) {
+    return res.status(400).json({ error: 'Missing code' });
+  }
 
   try {
-    const tokenRes = await axios.post(
-      'https://oauth2.googleapis.com/token',
-      qs.stringify({
-        code,
+    // Exchange code for tokens
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code: code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',
         grant_type: 'authorization_code',
       }),
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      }
-    );
+    });
 
-    const { access_token } = tokenRes.data;
+    const tokenData = await tokenRes.json();
 
-    const userInfoRes = await axios.get(
-      'https://openidconnect.googleapis.com/v1/userinfo',
-      {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      }
-    );
+    if (tokenData.error) {
+      return res.status(400).json({ error: tokenData.error_description || tokenData.error });
+    }
 
-    res.status(200).json({ user: userInfoRes.data });
-  } catch (err) {
-    console.error(err.response?.data || err.message);
-    res.status(500).send('OAuth flow failed');
+    // Get user info
+    const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: {
+        Authorization: `Bearer ${tokenData.access_token}`,
+      },
+    });
+
+    const user = await userRes.json();
+
+    // Optionally: store user info or session here
+    // For now, just return the user info
+    return res.status(200).json({ user });
+
+  } catch (error) {
+    console.error('OAuth callback error:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
