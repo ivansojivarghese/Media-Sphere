@@ -946,6 +946,7 @@
   </script>
   <script>
 
+    /*
     window.onload = () => {
       const client = google.accounts.oauth2.initCodeClient({
         client_id: '563046789370-limrh8resbqqgs7uonld1hch23tjme56.apps.googleusercontent.com',
@@ -985,6 +986,21 @@
         client.requestCode();  // Redirects user to Google sign-in
       };
     };
+    */
+
+    window.onload = () => {
+      const client = google.accounts.oauth2.initCodeClient({
+        client_id: '563046789370-limrh8resbqqgs7uonld1hch23tjme56.apps.googleusercontent.com',
+        scope: 'openid email profile',
+        ux_mode: 'redirect',
+        redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',
+      });
+
+      document.getElementById('profileSignIn').onclick = () => {
+        client.requestCode();
+      };
+    };
+
     
     function checkInitParam() {
       let params = new URLSearchParams(document.location.search);
