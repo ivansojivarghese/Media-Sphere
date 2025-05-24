@@ -8,6 +8,9 @@
     <!-- FFMpeg -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.1/dist/ffmpeg.min.js"></script> -->
 
+    <!-- Google Client OAuth 2.0 -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <!-- Include Google Cast SDK -->
     <!-- <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script> -->
     <!-- <script type="text/javascript" src="https://www.gstatic.com/cast/sdk/libs/sender/1.0/cast_framework.js"></script> -->
@@ -531,7 +534,7 @@
             </div>
             <div class="head trs">
               <div class="headSec">
-                <div class="profileBtn cursor trs trsButtons noimg" onclick="" title="Profile">
+                <div id="profileSignIn" class="profileBtn cursor trs trsButtons noimg" onclick="" title="Profile">
                   <div class="img"></div>
                 </div>
                 <div class="homeBtn cursor trs trsButtons noimg" onclick="" title="Home">
@@ -942,6 +945,19 @@
     });
   </script>
   <script>
+
+    window.onload = () => {
+      const client = google.accounts.oauth2.initCodeClient({
+        client_id: '563046789370-limrh8resbqqgs7uonld1hch23tjme56.apps.googleusercontent.com',
+        scope: 'openid email profile',
+        ux_mode: 'redirect',
+        redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',
+      });
+
+      document.getElementById('profileSignIn').onclick = () => {
+        client.requestCode();  // Redirects user to Google sign-in
+      };
+    };
     
     function checkInitParam() {
       let params = new URLSearchParams(document.location.search);
