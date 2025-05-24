@@ -950,8 +950,28 @@
       const client = google.accounts.oauth2.initCodeClient({
         client_id: '563046789370-limrh8resbqqgs7uonld1hch23tjme56.apps.googleusercontent.com',
         scope: 'openid email profile',
-        ux_mode: 'redirect',
-        redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',
+        ux_mode: 'popup',
+        // redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',
+        callback: async (response) => {  // handle code here
+          const code = response.code;
+
+          // Send code to your backend to exchange for tokens
+          const res = await fetch('/api/auth/callback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code }),
+          });
+
+          const data = await res.json();
+
+          if (data.user) {
+            // Store user info or update UI
+            localStorage.setItem('user', JSON.stringify(data.user));
+            window.location.href = '/';  // redirect or update app state
+          } else {
+            alert('Login failed');
+          }
+        }
       });
 
       document.getElementById('profileSignIn').onclick = () => {
