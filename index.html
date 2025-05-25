@@ -991,7 +991,7 @@
     window.onload = () => {
       const client = google.accounts.oauth2.initCodeClient({
         client_id: '563046789370-limrh8resbqqgs7uonld1hch23tjme56.apps.googleusercontent.com',
-        scope: 'openid email profile',
+        scope: 'openid email profile https://www.googleapis.com/auth/youtube.readonly',
         ux_mode: 'redirect',
         redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',
       });

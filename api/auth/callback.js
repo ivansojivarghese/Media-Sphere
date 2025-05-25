@@ -20,6 +20,8 @@ export default async function handler(req, res) {
     });
 
     const tokenData = await tokenRes.json();
+    const accessToken = tokenData.access_token;
+    localStorage.setItem('access_token', accessToken);
 
     if (tokenData.error) {
       return res.status(400).json({ error: tokenData.error_description || tokenData.error });
@@ -34,9 +36,20 @@ export default async function handler(req, res) {
 
     const user = await userRes.json();
 
+    // Get YouTube channel data (requires YouTube scope!)
+    const ytRes = await fetch('https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&mine=true', {
+      headers: {
+        Authorization: `Bearer ${tokenData.access_token}`,
+      },
+    });
+
+    const youtube = await ytRes.json();
+
     // Optionally: store user info or session here
     // For now, just return the user info
-    return res.status(200).json({ user });
+    // return res.status(200).json({ user });
+
+    return res.status(200).json({ user, youtube });
 
   } catch (error) {
     console.error('OAuth callback error:', error);
