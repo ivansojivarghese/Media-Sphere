@@ -49,7 +49,13 @@ export default async function handler(req, res) {
     // For now, just return the user info
     // return res.status(200).json({ user });
 
-    return res.status(200).json({ user, youtube });
+    // return res.status(200).json({ user, youtube, access_token: accessToken });
+
+    // Encode user and YouTube info as base64 JSON (to avoid long query strings)
+    const userData = Buffer.from(JSON.stringify({ user, youtube })).toString('base64');
+
+    // Redirect to frontend with access token and encoded user data
+    return res.redirect(`https://media-sphere.vercel.app?token=${accessToken}&data=${userData}`);
 
   } catch (error) {
     console.error('OAuth callback error:', error);

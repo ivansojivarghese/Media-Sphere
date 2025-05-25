@@ -999,6 +999,24 @@
       document.getElementById('profileSignIn').onclick = () => {
         client.requestCode();
       };
+
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+      const encodedData = params.get('data');
+
+      if (token && encodedData) {
+        const decoded = JSON.parse(atob(encodedData));
+        const user = decoded.user;
+        const youtube = decoded.youtube;
+
+        // Store token if needed
+        localStorage.setItem('access_token', token);
+
+        console.log('User:', user);
+        console.log('YouTube:', youtube);
+      } else {
+        console.error('Missing token or data');
+      }
     };
 
     
