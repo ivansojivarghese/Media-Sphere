@@ -1630,6 +1630,113 @@
 
     var searchBtnClick = false;
 
+    function openProfile(p) {
+      curTab = "profile";
+
+      if (isLandscape()) {
+        video.classList.add("side-by-side");
+        videoSec.classList.add("side-by-side");
+        videoControls.classList.add("side-by-side");
+        videoInfoElm.main.classList.add("side");
+        videoInfoElm.textStuff.classList.add("side");
+      }
+
+      // show the navbar, if hidden
+      videoInfoElm.infoHead.style.transform = "none";
+      videoInfoElm.scrollToTop.classList.remove("grow");
+
+      inp.classList.remove("op");
+      inp.classList.remove("op2");
+      setTimeout(function() {
+        if (!searchBtnClick) {
+          inp.classList.remove("float");
+          videoInfoElm.suggestions.classList.remove("float");
+          clearBtn.classList.remove("float");
+        }
+      }, 210);
+
+      const b = document.querySelector("#infoContainer .head .searchBtn");
+      if (b.classList.contains("active")) {
+        // videoInfoElm.info.scrollTo(0,0);
+
+        if (scrollDownExt && !inp.classList.contains("float")) {
+          // show the search bar + focus
+          inp.classList.add("float");
+          videoInfoElm.suggestions.classList.add("float");
+          clearBtn.classList.add("float");
+          setTimeout(function() {
+            inp.classList.add("op2");
+            inp.classList.add("op");
+            inp.focus();  
+          }, 210);
+        }
+      }
+
+      if (!videoInfoOpen || e) {
+        videoInfoElm.info.style.transform = "none";
+        videoInfoOpen = true;
+
+        videoInfoElm.info.classList.add("openInfo");
+
+        setTimeout(function() {
+          if (p) {
+            videoInfoElm.info.scrollTo(
+              {
+                top: p,
+                behavior: 'smooth'
+              }
+            );
+          }
+        }, 10);
+      }
+
+      const allBtn = document.querySelectorAll("#infoContainer .head .cursor");
+      // Remove 'active' class from all elements
+      allBtn.forEach(btn => btn.classList.remove('active'));
+
+      const wrappers = document.querySelectorAll("#infoContainer .wrapper");
+      wrappers.forEach(wrapper => wrapper.style.display = "");
+
+      const profileBtn = document.querySelector("#infoContainer .head .profileBtn");
+      profileBtn.classList.add("active");
+
+      const profileWrapper = document.querySelector("#infoContainer .wrapper.profile");
+      profileWrapper.style.display = "block";
+
+      var ori = screen.orientation.type;
+
+      if (((!loading || loading) || initialVideoLoad) ) {
+        videoInfoElm.info.style.transform = "none";
+        videoInfoOpen = true;
+
+        videoInfoElm.info.classList.add("openInfo");
+
+        if (ori === "landscape-primary" || ori === "landscape-secondary") {
+          // mainContent.style.backgroundColor = "#000";
+          // videoContainer.style.opacity = 0.5;
+        }
+
+        setTimeout(function() {
+          if (p) {
+            videoInfoElm.info.scrollTo(
+              {
+                top: p,
+                behavior: 'smooth'
+              }
+            );
+          }
+        }, 10);  
+
+        if (!videoEnd && !video.paused && (!isMusic || (isMusic && CVactivityScore > 0.2)) && (ori === "portrait-primary" || ori === "portrait-secondary")) {
+          video.requestPictureInPicture().then(function() {
+            getScreenLock();
+            pipEnabled = true;
+            backgroundPlayManual = false;
+          });
+        }
+      }
+    }
+
     function openSearch(v, i, e, p) {
       event.stopPropagation();
 
@@ -1754,18 +1861,8 @@
 
       var ori = screen.orientation.type;
 
-      if (/*videoControls.classList.contains('visible') &&*/ ((!loading || loading) || initialVideoLoad) /*&& (!videoErr && !audioErr)*/) {
-        /*
-        videoInfoElm.info.style.transform = "none";
-        videoInfoOpen = true;
-
-        videoInfoElm.info.classList.add("openInfo");
-
-        if (ori === "landscape-primary" || ori === "landscape-secondary") {
-          // mainContent.style.backgroundColor = "#000";
-          // videoContainer.style.opacity = 0.5;
-        }*/
-
+      if (((!loading || loading) || initialVideoLoad)) {
+        
         if (!videoEnd && !video.paused && e.currentTarget !== searchButton && (!isMusic || (isMusic && CVactivityScore > 0.2)) && (ori === "portrait-primary" || ori === "portrait-secondary")) {
           video.requestPictureInPicture().then(function() {
             getScreenLock();
@@ -1824,7 +1921,7 @@
 
       var ori = screen.orientation.type;
 
-      if (/*videoControls.classList.contains('visible') &&*/ ((!loading || loading) || initialVideoLoad) /*&& (!videoErr && !audioErr)*/) {
+      if (((!loading || loading) || initialVideoLoad) ) {
         videoInfoElm.info.style.transform = "none";
         videoInfoOpen = true;
 
@@ -1862,6 +1959,9 @@
       var preScrollPos = videoInfoElm.info.scrollTop;
 
       switch (curTab) {
+        case "profile":
+          preTab = "openProfile(" + preScrollPos + ")";
+        break;
         case "search":
           preTab = "openSearch(false, true, event, " + preScrollPos +")";
         break;

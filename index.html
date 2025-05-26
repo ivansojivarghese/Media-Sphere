@@ -1022,6 +1022,10 @@
         const user = decoded.user;
         const youtube = decoded.youtube;
 
+        var preTab = "openProfile()";
+        videoInfoElm.main.setAttribute("onclick", preTab);
+        curTab = "";
+
         // Store token if needed
         localStorage.setItem('access_token', token);
 
