@@ -703,7 +703,7 @@ div.thumbnailIcon {
     margin-bottom: 0.5rem;
 }
 
-#infoContainer .head {
+#infoContainer .head, #infoContainer .nav {
     /*
     display: flex;
     flex-direction: row;
@@ -720,6 +720,14 @@ div.thumbnailIcon {
     backdrop-filter: blur(0.53rem);
     background: rgba(48, 48, 48, 0.7);
     padding-top: calc(env(safe-area-inset-top));
+}
+
+#infoContainer .nav {
+    bottom: 0;
+    z-index: 100;
+    backdrop-filter: blur(0.53rem);
+    background: rgba(48, 48, 48, 0.7);
+    padding-bottom: calc(env(safe-area-inset-bottom));
 }
 
 #infoContainer .headSec {
