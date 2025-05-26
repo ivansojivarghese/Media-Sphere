@@ -1032,21 +1032,23 @@
         curTab = "";
 
         // Store token if needed
-        localStorage.setItem('access_token', token);
+        if (encodedData) {
+          localStorage.setItem('access_token', token);
 
-        // Store other info
-        localStorage.setItem('email', user.email);
-        localStorage.setItem('name', user.name);
-        localStorage.setItem('picture', user.picture);
+          // Store other info
+          localStorage.setItem('email', user.email);
+          localStorage.setItem('name', user.name);
+          localStorage.setItem('picture', user.picture);
 
-        localStorage.setItem('customURL', youtube.items["0"].snippet.customUrl);
-        localStorage.setItem('title', youtube.items["0"].snippet.title);
+          localStorage.setItem('customURL', youtube.items["0"].snippet.customUrl);
+          localStorage.setItem('title', youtube.items["0"].snippet.title);
 
-        console.log('User:', user);
-        console.log('YouTube:', youtube);
+          console.log('User:', user);
+          console.log('YouTube:', youtube);
 
-        profileUserData = user;
-        profileYouTubeData = youtube;
+          profileUserData = user;
+          profileYouTubeData = youtube;
+        }
 
         document.getElementById('profileSignIn').onclick = () => {
           openProfile();
