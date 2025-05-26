@@ -730,7 +730,7 @@ div.thumbnailIcon {
     padding-bottom: calc(env(safe-area-inset-bottom));
 }
 
-#infoContainer .headSec {
+#infoContainer .headSec, #infoContainer .nav {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
