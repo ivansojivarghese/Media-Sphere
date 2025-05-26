@@ -5602,7 +5602,7 @@
 
       if (videoInfoElm.info.scrollTop) {
         videoInfoElm.infoHead.style.boxShadow = "0 0.21rem 0.53rem rgba(0, 0, 0, 0.2)";
-        videoInfoElm.nav.style.boxShadow = "0 0.21rem 0.53rem rgba(0, 0, 0, 0.2)";
+        videoInfoElm.nav.style.boxShadow = "rgba(0, 0, 0, 0.2) 0px -0.21rem 0.53rem";
 
       } else {
         videoInfoElm.infoHead.style.boxShadow = "";
