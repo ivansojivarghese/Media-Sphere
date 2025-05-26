@@ -728,9 +728,10 @@ div.thumbnailIcon {
     backdrop-filter: blur(0.53rem);
     background: rgba(48, 48, 48, 0.7);
     padding-bottom: calc(env(safe-area-inset-bottom));
-    height: 3rem;
     left: 0;
     top: auto;
+    padding: 0 !important;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 0.21rem 0.53rem;
 }
 
 #infoContainer .headSec, #infoContainer .nav {
@@ -758,6 +759,10 @@ div.thumbnailIcon {
 
 #infoContainer .wrapper.profile .nav .cursor {
     background-color: transparent;
+    width: calc(100% / 3);
+    border-radius: 0;
+    padding-top: 0.75rem;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
 }
 
 #infoContainer .wrapper.profile .nav .cursor .img {
@@ -783,7 +788,7 @@ div.thumbnailIcon {
     height: 4rem;
     position: fixed;
     background: #3f3f3f;
-    bottom: calc(1.5rem + calc(env(safe-area-inset-bottom)));
+    bottom: calc(4.5rem + calc(env(safe-area-inset-bottom)));
     right: calc(1.5rem + calc(env(safe-area-inset-right)));
     z-index: 5;
     border-radius: 50%;
