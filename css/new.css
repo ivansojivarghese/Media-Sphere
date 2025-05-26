@@ -760,6 +760,18 @@ div.thumbnailIcon {
     background-color: transparent;
 }
 
+.likedBtn .img {
+    background-image: url("../svg/liked.svg");
+}
+
+.watchBtn .img {
+    background-image: url("../svg/watch.svg");
+}
+
+.playlistsBtn .img {
+    background-image: url("../svg/playlists.svg");
+}
+
 .scrollToTop {
     width: 4rem;
     height: 4rem;
