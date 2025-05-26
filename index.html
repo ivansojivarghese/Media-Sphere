@@ -1021,9 +1021,11 @@
       const encodedData = params.get('data');
 
       if ((token && encodedData) || (localStorage.getItem("access_token") !== null)) {
-        const decoded = JSON.parse(atob(encodedData));
-        const user = decoded.user;
-        const youtube = decoded.youtube;
+        if (encodedData) {
+          const decoded = JSON.parse(atob(encodedData));
+          const user = decoded.user;
+          const youtube = decoded.youtube;
+        }
 
         var preTab = "openProfile()";
         videoInfoElm.main.setAttribute("onclick", preTab);
