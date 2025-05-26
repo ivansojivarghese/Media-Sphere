@@ -1045,6 +1045,8 @@
         document.querySelector('#profileSignIn .img').classList.add("signedIn");
         document.querySelector('#profileSignIn .img').style.backgroundImage = "url(" + profileUserData.picture + ")";
 
+        videoInfoElm.main.click();
+
         // Remove query params from current URL
         const cleanUrl = window.location.origin + window.location.pathname;
 
