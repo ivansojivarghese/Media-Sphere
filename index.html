@@ -1020,7 +1020,7 @@
       const token = params.get('token');
       const encodedData = params.get('data');
 
-      if (token && encodedData) {
+      if ((token && encodedData) || (localStorage.getItem("access_token") !== null)) {
         const decoded = JSON.parse(atob(encodedData));
         const user = decoded.user;
         const youtube = decoded.youtube;
