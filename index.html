@@ -1016,6 +1016,10 @@
         client.requestCode();
       };
 
+      getUserData();
+    };
+
+    function getUserData() {
       const params = new URLSearchParams(window.location.search);
       const token = params.get('token');
       const encodedData = params.get('data');
@@ -1068,8 +1072,7 @@
       } else {
         console.error('Missing token or data');
       }
-    };
-
+    }
     
     function checkInitParam() {
       let params = new URLSearchParams(document.location.search);
