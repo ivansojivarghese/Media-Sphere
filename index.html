@@ -1001,6 +1001,9 @@
     };
     */
 
+    var profileUserData = {};
+    var profileYouTubeData = {};
+
     window.onload = () => {
       const client = google.accounts.oauth2.initCodeClient({
         client_id: '563046789370-limrh8resbqqgs7uonld1hch23tjme56.apps.googleusercontent.com',
@@ -1031,6 +1034,9 @@
 
         console.log('User:', user);
         console.log('YouTube:', youtube);
+
+        profileUserData = user;
+        profileYouTubeData = youtube;
 
         document.getElementById('profileSignIn').onclick = () => {
           openProfile();
