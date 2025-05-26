@@ -1031,6 +1031,10 @@
 
         console.log('User:', user);
         console.log('YouTube:', youtube);
+
+        document.getElementById('profileSignIn').onclick = () => {
+          openProfile();
+        };
       } else {
         console.error('Missing token or data');
       }
