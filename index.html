@@ -1055,7 +1055,7 @@
         };
 
         document.querySelector('#profileSignIn .img').classList.add("signedIn");
-        document.querySelector('#profileSignIn .img').style.backgroundImage = "url(" + profileUserData.picture + ")";
+        document.querySelector('#profileSignIn .img').style.backgroundImage = "url(" + localStorage.getItem("picture") + ")";
 
         videoInfoElm.main.click();
 
