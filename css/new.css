@@ -733,7 +733,7 @@ div.thumbnailIcon {
     padding-right: calc(env(safe-area-inset-right));
 }
 
-#infoContainer .head .cursor {
+#infoContainer .head .cursor, #infoContainer .wrapper.profile .nav .cursor {
     height: 2rem;
     width: 3rem;
     padding: 0.75rem 0;
@@ -743,6 +743,10 @@ div.thumbnailIcon {
     /*border-radius: 0.5rem;*/
     border-radius: 50%;
     background-color: #3f3f3f;
+}
+
+#infoContainer .wrapper.profile .nav .cursor {
+
 }
 
 .scrollToTop {
