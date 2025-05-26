@@ -829,6 +829,14 @@ div.badge:first-child {
     margin-left: calc(env(safe-area-inset-left));
 }
 
+#infoContainer .profileBtn .img.signedIn {
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    position: relative;
+    top: -0.5rem;
+}
+
 #infoContainer .trendingBtn .img { 
     background-image: url("../svg/trending.svg");
 }
