@@ -728,6 +728,9 @@ div.thumbnailIcon {
     backdrop-filter: blur(0.53rem);
     background: rgba(48, 48, 48, 0.7);
     padding-bottom: calc(env(safe-area-inset-bottom));
+    height: 3rem;
+    left: 0;
+    top: auto;
 }
 
 #infoContainer .headSec, #infoContainer .nav {
@@ -754,7 +757,7 @@ div.thumbnailIcon {
 }
 
 #infoContainer .wrapper.profile .nav .cursor {
-
+    background-color: transparent;
 }
 
 .scrollToTop {
