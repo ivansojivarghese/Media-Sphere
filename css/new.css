@@ -666,12 +666,17 @@ div.thumbnailIcon {
 }
 
 @media screen and (orientation: landscape) {
-    #infoContainer, #infoContainer .head {
+    #infoContainer, #infoContainer .head, #infoContainer .nav {
         width: calc(21rem + calc(env(safe-area-inset-left)) + calc(env(safe-area-inset-right))) !important;
     }
 
     .wrapper.search input.float {
         width: calc(21rem - 1.2rem - 1.2rem - 2.7rem - calc(env(safe-area-inset-right))) !important;
+    }
+
+    #infoContainer .nav {
+        left: auto !important;
+        right: calc(0rem + calc(env(safe-area-inset-right))) !important;
     }
 }
 

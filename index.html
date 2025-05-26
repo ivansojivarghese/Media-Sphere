@@ -1032,6 +1032,14 @@
         // Store token if needed
         localStorage.setItem('access_token', token);
 
+        // Store other info
+        localStorage.setItem('email', user.email);
+        localStorage.setItem('name', user.name);
+        localStorage.setItem('picture', user.picture);
+
+        localStorage.setItem('customURL', youtube.items["0"].snippet.customUrl);
+        localStorage.setItem('title', youtube.items["0"].snippet.title);
+
         console.log('User:', user);
         console.log('YouTube:', youtube);
 
