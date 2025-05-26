@@ -731,7 +731,7 @@ div.thumbnailIcon {
     left: 0;
     top: auto;
     padding: 0 !important;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 0.21rem 0.53rem;
+    /*box-shadow: rgba(0, 0, 0, 0.2) 0px 0.21rem 0.53rem;*/
 }
 
 #infoContainer .headSec, #infoContainer .nav {

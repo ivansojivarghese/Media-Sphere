@@ -9,6 +9,8 @@ var videoInfoElm = {
   infoHead : document.querySelector("#infoContainer .head"),
   infoHeadSec : document.querySelector("#infoContainer .headSec"),
 
+  nav : document.querySelector("#infoContainer .wrapper.profile .nav"),
+
   scrollToTop : document.querySelector("#infoContainer .scrollToTop"),
 
   suggestions : document.querySelector("#infoContainer .suggestions"),

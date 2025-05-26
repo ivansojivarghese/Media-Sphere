@@ -1672,6 +1672,7 @@
         }
       }
 
+      /*
       if (!videoInfoOpen || e) {
         videoInfoElm.info.style.transform = "none";
         videoInfoOpen = true;
@@ -1688,7 +1689,7 @@
             );
           }
         }, 10);
-      }
+      }*/
 
       const allBtn = document.querySelectorAll("#infoContainer .head .cursor");
       // Remove 'active' class from all elements
@@ -5601,8 +5602,11 @@
 
       if (videoInfoElm.info.scrollTop) {
         videoInfoElm.infoHead.style.boxShadow = "0 0.21rem 0.53rem rgba(0, 0, 0, 0.2)";
+        videoInfoElm.nav.style.boxShadow = "0 0.21rem 0.53rem rgba(0, 0, 0, 0.2)";
+
       } else {
         videoInfoElm.infoHead.style.boxShadow = "";
+        videoInfoElm.nav.style.boxShadow = "";
       }
 
       if (videoLoop) {
