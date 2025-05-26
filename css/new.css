@@ -760,6 +760,12 @@ div.thumbnailIcon {
     background-color: transparent;
 }
 
+#infoContainer .wrapper.profile .nav .cursor .img {
+    width: 2rem;
+    height: 2rem;
+    margin: 0 auto;
+}
+
 .likedBtn .img {
     background-image: url("../svg/liked.svg");
 }
