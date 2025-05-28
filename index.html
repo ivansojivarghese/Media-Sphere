@@ -1025,7 +1025,7 @@
       const token = params.get('token');
       const encodedData = params.get('data');
 
-      if ((token && encodedData) || (encodedData && localStorage.getItem("access_token"))) {
+      if ((token && encodedData) || (localStorage.getItem("access_token"))) {
         if (encodedData) {
           decoded = JSON.parse(atob(encodedData));
           user = decoded.user;
