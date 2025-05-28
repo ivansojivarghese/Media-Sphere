@@ -1651,6 +1651,7 @@
       setTimeout(function() {
         if (!searchBtnClick) {
           inp.classList.remove("float");
+          videoInfoElm.infoHeadSec.classList.remove("ext");
           videoInfoElm.suggestions.classList.remove("float");
           // clearBtn.classList.remove("float");
         }
@@ -1663,6 +1664,7 @@
         if (scrollDownExt && !inp.classList.contains("float")) {
           // show the search bar + focus
           inp.classList.add("float");
+          videoInfoElm.infoHeadSec.classList.add("ext");
           videoInfoElm.suggestions.classList.add("float");
           clearBtn.classList.add("float");
           setTimeout(function() {
@@ -1769,6 +1771,7 @@
       setTimeout(function() {
         if (!searchBtnClick) {
           inp.classList.remove("float");
+          videoInfoElm.infoHeadSec.classList.remove("ext");
           videoInfoElm.suggestions.classList.remove("float");
           // clearBtn.classList.remove("float");
         }
@@ -1781,6 +1784,7 @@
         if (scrollDownExt && !inp.classList.contains("float")) {
           // show the search bar + focus
           inp.classList.add("float");
+          videoInfoElm.infoHeadSec.classList.add("ext");
           videoInfoElm.suggestions.classList.add("float");
           clearBtn.classList.add("float");
           setTimeout(function() {
@@ -1899,6 +1903,7 @@
       setTimeout(function() {
         if (!searchBtnClick) {
           inp.classList.remove("float");
+          videoInfoElm.infoHeadSec.classList.remove("ext");
           videoInfoElm.suggestions.classList.remove("float");
           // clearBtn.classList.remove("float");
         }

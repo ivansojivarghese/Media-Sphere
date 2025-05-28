@@ -420,6 +420,7 @@ videoInfoElm.info.addEventListener("scroll", function() {
           setTimeout(function() {
             if (!searchBtnClick) {
               inp.classList.remove("float");
+              videoInfoElm.infoHeadSec.classList.remove("ext");
               videoInfoElm.suggestions.classList.remove("float");
               // clearBtn.classList.remove("float");
             }
@@ -442,6 +443,7 @@ videoInfoElm.info.addEventListener("scroll", function() {
           // setTimeout(function() {
             if (!searchBtnClick) {
               inp.classList.remove("float");
+              videoInfoElm.infoHeadSec.classList.remove("ext");
               videoInfoElm.suggestions.classList.remove("float");
               // clearBtn.classList.remove("float");
             }
