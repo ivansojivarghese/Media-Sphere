@@ -1647,11 +1647,12 @@
 
       inp.classList.remove("op");
       inp.classList.remove("op2");
+      clearBtn.classList.remove("float");
       setTimeout(function() {
         if (!searchBtnClick) {
           inp.classList.remove("float");
           videoInfoElm.suggestions.classList.remove("float");
-          clearBtn.classList.remove("float");
+          // clearBtn.classList.remove("float");
         }
       }, 210);
 
@@ -1764,11 +1765,12 @@
 
       inp.classList.remove("op");
       inp.classList.remove("op2");
+      clearBtn.classList.remove("float");
       setTimeout(function() {
         if (!searchBtnClick) {
           inp.classList.remove("float");
           videoInfoElm.suggestions.classList.remove("float");
-          clearBtn.classList.remove("float");
+          // clearBtn.classList.remove("float");
         }
       }, 210);
 
@@ -1893,11 +1895,12 @@
 
       inp.classList.remove("op");
       inp.classList.remove("op2");
+      clearBtn.classList.remove("float");
       setTimeout(function() {
         if (!searchBtnClick) {
           inp.classList.remove("float");
           videoInfoElm.suggestions.classList.remove("float");
-          clearBtn.classList.remove("float");
+          // clearBtn.classList.remove("float");
         }
       }, 210);
 

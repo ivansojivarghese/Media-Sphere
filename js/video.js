@@ -415,12 +415,13 @@ videoInfoElm.info.addEventListener("scroll", function() {
           setTimeout(function() {
             inp.classList.remove("op2");
           }, 210);
+          clearBtn.classList.remove("float");
           
           setTimeout(function() {
             if (!searchBtnClick) {
               inp.classList.remove("float");
               videoInfoElm.suggestions.classList.remove("float");
-              clearBtn.classList.remove("float");
+              // clearBtn.classList.remove("float");
             }
           }, 210);
         }
@@ -436,12 +437,13 @@ videoInfoElm.info.addEventListener("scroll", function() {
           // hide the search bar 
           inp.classList.remove("op");
           inp.classList.remove("op2");
+          clearBtn.classList.remove("float");
           // inp.classList.add("op2");
           // setTimeout(function() {
             if (!searchBtnClick) {
               inp.classList.remove("float");
               videoInfoElm.suggestions.classList.remove("float");
-              clearBtn.classList.remove("float");
+              // clearBtn.classList.remove("float");
             }
           // }, 210);
         } else {

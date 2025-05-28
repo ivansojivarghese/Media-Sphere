@@ -528,18 +528,35 @@
       var ref = s ? null : m ? searchResults.refinements : null;
     
       var res = document.querySelectorAll(c + ".result_wrapper");
+
+      // var indexCount;
     
       // Animate out existing results
+      
       if (res.length) {
+        /*
         res.forEach((element) => {
           element.style.transition = "opacity 0.5s, transform 0.5s";
           element.style.opacity = "0";
-          element.style.transform = "translateY(20px)";
+          element.style.transform = "translateX(20px)";
         });
     
         setTimeout(() => {
           res.forEach((element) => element.remove());
         }, 500); // Remove after animation completes
+        */
+
+        res.forEach((element, index) => {
+          // indexCount++;
+          setTimeout(() => {
+            element.style.transition = "all 0.2s ease-in-out";
+            element.style.opacity = "0";
+        
+            setTimeout(() => {
+               element.remove();
+            }, 250); // Remove after its animation completes
+          }, index * 200); // Delay each element's start time (200ms apart)
+        });
       }
     
       videoInfoElm.suggestions.innerHTML = "";
@@ -584,9 +601,11 @@
           }, 100);
         }
       }
+
+      var resultsList = [];
     
       // Wait before inserting new results
-      setTimeout(() => {
+      // setTimeout(() => {
         for (var i = 0; i < data.length; i++) {
           if ((data[i].type === "video" || (data[i].type === "playlist" && !data[i].title.includes("Mix"))) && 
               (!data[i].badges || (data[i].badges && !containsWord(data[i].badges, 'live')))) {
@@ -679,22 +698,54 @@
             textDiv.appendChild(duration);
             textDiv.appendChild(date);
             main.appendChild(textDiv);
-    
+
+            resultsList[resultsList.length] = main;
+
+            /*
             if (!s) {
               videoInfoElm.results.appendChild(main);
             } else {
               videoInfoElm.relatedResults.appendChild(main);
-            }
+            }*/
     
             // Animate in the new results
             // setTimeout(() => {
-              main.style.transition = "opacity 0.5s, transform 0.5s";
-              main.style.opacity = "1";
-              main.style.transform = "translateY(0)";
+              //main.style.transition = "all 0.2s ease-in-out";
+              //main.style.opacity = "1";
             // }, 100);
           }
         }
-      }, 500); // Delay to allow old results to fade out
+       // }, indexCount * 200); // Delay to allow old results to fade out
+
+      resultsList.reverse().forEach((el, index) => {
+        // Measure current scroll position
+        const prevScrollTop = videoInfoElm.results.scrollTop;
+      
+        // Set initial state
+        el.style.opacity = "0";
+        el.style.transition = "none"; // prevent flicker before insertion
+      
+        // Insert at the top
+        videoInfoElm.results.insertBefore(el, videoInfoElm.results.firstChild);
+      
+        // Measure new scroll height added by el
+        const addedHeight = el.offsetHeight;
+      
+        // Maintain scroll position after insertion
+        videoInfoElm.info.scrollTop = prevScrollTop + addedHeight;
+      
+        // Animate scroll up smoothly
+        videoInfoElm.info.scrollTo({
+          top: prevScrollTop,
+          behavior: "smooth",
+        });
+      
+        // Animate the element itself in a staggered way
+        setTimeout(() => {
+          el.style.transition = "all 0.2s ease-in-out";
+          el.style.opacity = "1";
+        }, index * 10);
+      });
     
       searchQueried = false;
     }
