@@ -726,7 +726,12 @@
         el.style.transition = "none"; // prevent flicker before insertion
       
         // Insert at the top
-        videoInfoElm.results.insertBefore(el, videoInfoElm.results.firstChild);
+        // videoInfoElm.results.insertBefore(el, videoInfoElm.results.firstChild);
+        if (!s) {
+          videoInfoElm.results.insertBefore(el, videoInfoElm.results.firstChild);
+        } else {
+          videoInfoElm.relatedResults.insertBefore(el, videoInfoElm.relatedResults.firstChild);
+        }
       
         // Measure new scroll height added by el
         const addedHeight = el.offsetHeight;
