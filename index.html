@@ -1019,16 +1019,17 @@
       getUserData();
     };
 
+    var decoded, user, youtube;
     function getUserData() {
       const params = new URLSearchParams(window.location.search);
       const token = params.get('token');
       const encodedData = params.get('data');
 
-      if ((token && encodedData) || (localStorage.getItem("access_token") !== null)) {
+      if ((token && encodedData) || (encodedData && localStorage.getItem("access_token"))) {
         if (encodedData) {
-          const decoded = JSON.parse(atob(encodedData));
-          const user = decoded.user;
-          const youtube = decoded.youtube;
+          decoded = JSON.parse(atob(encodedData));
+          user = decoded.user;
+          youtube = decoded.youtube;
         }
 
         var preTab = "openProfile()";
