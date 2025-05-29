@@ -1843,9 +1843,17 @@
 
         // perform a query
 
+        const prevScrollTop = videoInfoElm.results.scrollTop;
+
         loadingSpace.style.display = "block";
         videoInfoElm.info.style.overflow = "hidden";
         searchQuery(v);
+
+        // Animate scroll up smoothly
+        videoInfoElm.info.scrollTo({
+          top: prevScrollTop,
+          behavior: "smooth",
+        });
 
       } else {
         setTimeout(function() {
