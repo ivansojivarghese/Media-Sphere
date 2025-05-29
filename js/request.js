@@ -89,8 +89,16 @@
           if (u) {
             // closeVideoInfo();
 
+            const prevScrollTop = videoInfoElm.results.scrollTop;
+
             loadingSpace.style.display = "block";
             videoInfoElm.info.style.overflow = "hidden";
+
+            // Animate scroll up smoothly
+            videoInfoElm.info.scrollTo({
+              top: prevScrollTop,
+              behavior: "smooth",
+            });
           }
 
           if (contents !== "") {
