@@ -1012,10 +1012,6 @@
         redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',
       });
 
-      document.getElementById('profileSignIn').onclick = () => {
-        client.requestCode();
-      };
-
       getUserData();
     };
 
@@ -1073,6 +1069,10 @@
 
       } else {
         console.error('Missing token or data');
+
+        document.getElementById('profileSignIn').onclick = () => {
+          client.requestCode();
+        };
       }
     }
     
