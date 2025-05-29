@@ -568,13 +568,13 @@
         var refStuff = document.querySelectorAll("div.refinements div.keywordsBtn");
         if (refStuff.length) {
           refStuff.forEach((element) => {
-            element.style.transition = "opacity 0.3s";
+            element.style.transition = "all 0.2s ease-in-out";
             element.style.opacity = "0";
           });
     
           setTimeout(() => {
             refStuff.forEach((element) => element.remove());
-          }, 300);
+          }, 250);
         }
       }
     
@@ -596,9 +596,9 @@
     
           // Fade in refinements
           setTimeout(() => {
-            refBtn.style.transition = "opacity 0.5s";
+            refBtn.style.transition = "all 0.2s ease-in-out";
             refBtn.style.opacity = "1";
-          }, 100);
+          }, 10);
         }
       }
 
