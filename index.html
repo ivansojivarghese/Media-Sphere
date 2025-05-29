@@ -1055,14 +1055,15 @@
           profileYouTubeData = youtube;
         }
 
-        document.getElementById('profileSignIn').onclick = () => {
-          openProfile();
-        };
-
         document.querySelector('#profileSignIn .img').classList.add("signedIn");
         document.querySelector('#profileSignIn .img').style.backgroundImage = "url(" + localStorage.getItem("picture") + ")";
 
-        videoInfoElm.main.click();
+        if (!localStorage.getItem("mediaURL")) {
+          document.getElementById('profileSignIn').onclick = () => {
+            openProfile();
+          };
+          videoInfoElm.main.click();
+        }
 
         // Remove query params from current URL
         const cleanUrl = window.location.origin + window.location.pathname;
