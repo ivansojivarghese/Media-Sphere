@@ -725,40 +725,42 @@
         }
        // }, indexCount * 200); // Delay to allow old results to fade out
 
-      resultsList.reverse().forEach((el, index) => {
-        // Measure current scroll position
-        const prevScrollTop = videoInfoElm.results.scrollTop;
-      
-        // Set initial state
-        el.style.opacity = "0";
-        el.style.transition = "none"; // prevent flicker before insertion
-      
-        // Insert at the top
-        // videoInfoElm.results.insertBefore(el, videoInfoElm.results.firstChild);
-        if (!s) {
-          videoInfoElm.results.insertBefore(el, videoInfoElm.results.firstChild);
-        } else {
-          videoInfoElm.relatedResults.insertBefore(el, videoInfoElm.relatedResults.firstChild);
-        }
-      
-        // Measure new scroll height added by el
-        const addedHeight = el.offsetHeight;
-      
-        // Maintain scroll position after insertion
-        videoInfoElm.info.scrollTop = prevScrollTop + addedHeight;
-      
-        // Animate scroll up smoothly
-        videoInfoElm.info.scrollTo({
-          top: prevScrollTop,
-          behavior: "smooth",
+      if (searchQueried) {
+        resultsList.reverse().forEach((el, index) => {
+          // Measure current scroll position
+          const prevScrollTop = videoInfoElm.results.scrollTop;
+        
+          // Set initial state
+          el.style.opacity = "0";
+          el.style.transition = "none"; // prevent flicker before insertion
+        
+          // Insert at the top
+          // videoInfoElm.results.insertBefore(el, videoInfoElm.results.firstChild);
+          if (!s) {
+            videoInfoElm.results.insertBefore(el, videoInfoElm.results.firstChild);
+          } else {
+            videoInfoElm.relatedResults.insertBefore(el, videoInfoElm.relatedResults.firstChild);
+          }
+        
+          // Measure new scroll height added by el
+          const addedHeight = el.offsetHeight;
+        
+          // Maintain scroll position after insertion
+          videoInfoElm.info.scrollTop = prevScrollTop + addedHeight;
+        
+          // Animate scroll up smoothly
+          videoInfoElm.info.scrollTo({
+            top: prevScrollTop,
+            behavior: "smooth",
+          });
+        
+          // Animate the element itself in a staggered way
+          setTimeout(() => {
+            el.style.transition = "all 0.2s ease-in-out";
+            el.style.opacity = "1";
+          }, index * 10);
         });
-      
-        // Animate the element itself in a staggered way
-        setTimeout(() => {
-          el.style.transition = "all 0.2s ease-in-out";
-          el.style.opacity = "1";
-        }, index * 10);
-      });
+      }
     
       searchQueried = false;
     }
