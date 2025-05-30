@@ -838,6 +838,7 @@
           }
         }
         if (!loadNeeded) {
+          thumbnailImages = [];
           videoInfoElm.info.removeEventListener("scroll", redoLoadThumbnail);
         }
     }
