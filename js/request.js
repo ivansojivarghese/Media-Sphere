@@ -659,10 +659,10 @@
             const thumbnailUrl = data[i].thumbnail[data[i].thumbnail.length - 1].url;
 
             thumbnailImages[thumbnailImages.length] = new Image();
-            thumbnailImages[thumbnailImages.length].src = thumbnailUrl;
-            thumbnailImages[thumbnailImages.length].style.display = "none"; // hide initially
+            thumbnailImages[thumbnailImages.length - 1].src = thumbnailUrl;
+            thumbnailImages[thumbnailImages.length - 1].style.display = "none"; // hide initially
 
-            thumbnailImages[thumbnailImages.length].onload = function () {
+            thumbnailImages[thumbnailImages.length - 1].onload = function () {
                 thumbnail.style.opacity = "0";
                 setTimeout(function () {
                     thumbnail.style.backgroundImage = "url('" + thumbnailUrl + "')";
