@@ -533,8 +533,12 @@
 
     var thumbnailImages = [];
 
-    function loadThumbnail(j, url) {
-      var thumbnail = document.querySelectorAll(".wrapper.search .result_wrapper .thumbnail")[j];
+    function loadThumbnail(j, url, s) {
+      if (s) {
+        var thumbnail = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail")[j];
+      } else {
+        var thumbnail = document.querySelectorAll(".wrapper.search .result_wrapper .thumbnail")[j];
+      }
       thumbnail.style.opacity = "0";
       setTimeout(function () {
           thumbnail.style.backgroundImage = "url('" + url + "')";
@@ -676,7 +680,7 @@
 
             const thisIndex = thumbnailImages.length - 1;
             thumbnailImages[thisIndex].onload = function () {
-              loadThumbnail(thisIndex, thumbnailUrl);
+              loadThumbnail(thisIndex, thumbnailUrl, s);
             };
     
             if (data[i].type === "playlist") {
