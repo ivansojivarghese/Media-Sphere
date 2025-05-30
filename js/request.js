@@ -533,7 +533,7 @@
 
     var thumbnailImages = [];
 
-    function loadThumbnail(j, url, s) {
+    function loadThumbnail(j, url, s, m) {
       if (s) {
         var thumbnail = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail")[j];
       } else {
@@ -547,6 +547,16 @@
               thumbnail.style.opacity = "1";
           }, 10);
       }, 250);
+      if (!s) {
+        thumbnailImages = [];
+      } else if (!m) {
+        for (let k = 0; k < thumbnailImages.length; k++) {
+          loadThumbnail(k, thumbnailImages[k], true, true);
+          if (k === thumbnailImages.length - 1) {
+            thumbnailImages = [];
+          }
+        }
+      }
     }
 
     function displaySearchResults(m, s, c) {
