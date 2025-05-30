@@ -621,8 +621,8 @@
             var main = document.createElement("div");
             main.classList.add("result_wrapper", "trs", "cursor", "trsButtons", "noimg");
             main.title = data[i].title;
-            main.style.opacity = "0"; // Start with 0 opacity
-            main.style.transform = "translateY(20px)"; // Slide up effect
+            // main.style.opacity = "0"; // Start with 0 opacity
+            // main.style.transform = "translateY(20px)"; // Slide up effect
     
             if (data[i].type === "video") {
               main.setAttribute("data-url", "https://www.youtube.com/watch?v=" + data[i].videoId);
@@ -709,6 +709,11 @@
 
             resultsList[resultsList.length] = main;
 
+            if (s) {
+              main.style.opacity = "1"; // Start with 0 opacity
+              videoInfoElm.relatedResults.appendChild(main);
+            }
+
             /*
             if (!s) {
               videoInfoElm.results.appendChild(main);
@@ -725,10 +730,17 @@
         }
        // }, indexCount * 200); // Delay to allow old results to fade out
 
-      if (searchQueried) {
+      // if (searchQueried || s) {
+      if (!s) {
         resultsList.reverse().forEach((el, index) => {
           // Measure current scroll position
           const prevScrollTop = videoInfoElm.results.scrollTop;
+          /*
+          if (videoNav) {
+            const prevScrollTop = videoInfoElm.info.scrollTop;
+          } else if (s || searchQueried) {
+            const prevScrollTop = 0;
+          }*/
         
           // Set initial state
           el.style.opacity = "0";
@@ -739,7 +751,7 @@
           if (!s) {
             videoInfoElm.results.insertBefore(el, videoInfoElm.results.firstChild);
           } else {
-            videoInfoElm.relatedResults.insertBefore(el, videoInfoElm.relatedResults.firstChild);
+            // videoInfoElm.relatedResults.insertBefore(el, videoInfoElm.relatedResults.firstChild);
           }
         
           // Measure new scroll height added by el
