@@ -531,6 +531,8 @@
       });
     }
 
+    var thumbnailImages = [];
+
     function displaySearchResults(m, s, c) {
       var data = s ? relatedContent.data : m ? searchResults.data : hashtagResults.data;
       var ref = s ? null : m ? searchResults.refinements : null;
@@ -614,7 +616,7 @@
     
       // Wait before inserting new results
       // setTimeout(() => {
-        for (var i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
           if ((data[i].type === "video" || (data[i].type === "playlist" && !data[i].title.includes("Mix"))) && 
               (!data[i].badges || (data[i].badges && !containsWord(data[i].badges, 'live')))) {
             
@@ -654,20 +656,20 @@
             // thumbnail.style.backgroundImage = "url('" + data[i].thumbnail[data[i].thumbnail.length - 1].url + "')";
             thumbnail.style.backgroundColor = "#3f3f3f";
 
-            var img = new Image();
-            img.src = data[i].thumbnail[data[i].thumbnail.length - 1].url;
-            img.style.display = "none"; // hide initially
+            const thumbnailUrl = data[i].thumbnail[data[i].thumbnail.length - 1].url;
 
-            // When the image fully loads, show it
-            img.onload = function () {
-                // img.style.display = "block";
-                // thumbnail.style.backgroundColor = "transparent"; // remove grey
+            thumbnailImages[thumbnailImages.length] = new Image();
+            thumbnailImages[thumbnailImages.length].src = thumbnailUrl;
+            thumbnailImages[thumbnailImages.length].style.display = "none"; // hide initially
+
+            thumbnailImages[thumbnailImages.length].onload = function () {
                 thumbnail.style.opacity = "0";
-                setTimeout(function() {
-                  thumbnail.style.backgroundImage = "url('" + data[i].thumbnail[data[i].thumbnail.length - 1].url + "')";
-                  setTimeout(function() {
-                    thumbnail.style.opacity = "";
-                  }, 10);
+                setTimeout(function () {
+                    thumbnail.style.backgroundImage = "url('" + thumbnailUrl + "')";
+                    setTimeout(function () {
+                        thumbnail.style.backgroundColor = "transparent";
+                        thumbnail.style.opacity = "1";
+                    }, 10);
                 }, 250);
             };
     
