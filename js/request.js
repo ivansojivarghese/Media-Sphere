@@ -674,17 +674,9 @@
             thumbnailImages[thumbnailImages.length - 1].src = thumbnailUrl;
             thumbnailImages[thumbnailImages.length - 1].style.display = "none"; // hide initially
 
-            thumbnailImages[thumbnailImages.length - 1].onload = function () {
-              loadThumbnail(thumbnailImages.length - 1, thumbnailUrl);
-                /*
-                thumbnail.style.opacity = "0";
-                setTimeout(function () {
-                    thumbnail.style.backgroundImage = "url('" + thumbnailUrl + "')";
-                    setTimeout(function () {
-                        thumbnail.style.backgroundColor = "transparent";
-                        thumbnail.style.opacity = "1";
-                    }, 10);
-                }, 250);*/
+            const thisIndex = thumbnailImages.length - 1;
+            thumbnailImages[thisIndex].onload = function () {
+              loadThumbnail(thisIndex, thumbnailUrl);
             };
     
             if (data[i].type === "playlist") {
