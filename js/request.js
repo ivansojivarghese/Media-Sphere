@@ -650,8 +650,26 @@
             }
     
             var thumbnail = document.createElement("div");
-            thumbnail.classList.add("thumbnail", "img");
-            thumbnail.style.backgroundImage = "url('" + data[i].thumbnail[data[i].thumbnail.length - 1].url + "')";
+            thumbnail.classList.add("thumbnail", "img", "trs");
+            // thumbnail.style.backgroundImage = "url('" + data[i].thumbnail[data[i].thumbnail.length - 1].url + "')";
+            thumbnail.style.backgroundColor = "#3f3f3f";
+
+            var img = new Image();
+            img.src = data[i].thumbnail[data[i].thumbnail.length - 1].url;
+            img.style.display = "none"; // hide initially
+
+            // When the image fully loads, show it
+            img.onload = function () {
+                // img.style.display = "block";
+                // thumbnail.style.backgroundColor = "transparent"; // remove grey
+                thumbnail.style.opacity = "0";
+                setTimeout(function() {
+                  thumbnail.style.backgroundImage = "url('" + data[i].thumbnail[data[i].thumbnail.length - 1].url + "')";
+                  setTimeout(function() {
+                    thumbnail.style.opacity = "";
+                  }, 10);
+                }, 250);
+            };
     
             if (data[i].type === "playlist") {
               var thumbnailIconWrap = document.createElement("div");
@@ -660,6 +678,7 @@
               var thumbnailIcon = document.createElement("div");
               thumbnailIcon.classList.add("thumbnailIcon", "img");
               thumbnailIcon.style.backgroundImage = "url('../svg/playlist_play.svg')";
+              // thumbnailIcon.style.backgroundColor = "#3f3f3f";
     
               thumbnailIconWrap.appendChild(thumbnailIcon);
               thumbnail.appendChild(thumbnailIconWrap);
