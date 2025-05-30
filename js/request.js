@@ -534,7 +534,7 @@
     var thumbnailImages = [];
 
     function loadThumbnail(j, url) {
-      var thumbnail = document.querySelectorAll(".wrapper.search .result_wrapper")[j];
+      var thumbnail = document.querySelectorAll(".wrapper.search .result_wrapper")[j].children[1];
       thumbnail.style.opacity = "0";
       setTimeout(function () {
           thumbnail.style.backgroundImage = "url('" + url + "')";
