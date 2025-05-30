@@ -820,12 +820,28 @@
           }, i * 100); // each image loads 100ms after the previous one
         }
 
-        videoInfoElm.info.addEventListener("scroll", redoLoadThumbnail);
+        setInterval(function() {
+          var thumbnails = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail");
+          var noBgThumbnailsWithIndex = Array.from(thumbnails)
+              .map((el, idx) => ({ el, idx }))
+              .filter(item => !item.el.style.backgroundImage);
+
+          for (let i = 0; i < noBgThumbnailsWithIndex.length; i++) {
+                // setTimeout(function () {
+               
+                  loadThumbnail(noBgThumbnailsWithIndex[i].idx, thumbnailImages[noBgThumbnailsWithIndex[i].idx].src, true);
+                
+          // }, i * 100); // each image loads 100ms after the previous one
+        }
+        }, 2500);
+
+        // videoInfoElm.info.addEventListener("scroll", redoLoadThumbnail);
       }
     
       searchQueried = false;
     }
 
+    /*
     function redoLoadThumbnail() {
       var loadNeeded = false;
       for (let i = 0; i < thumbnailImages.length; i++) {
@@ -842,6 +858,7 @@
           videoInfoElm.info.removeEventListener("scroll", redoLoadThumbnail);
         }
     }
+        */
     
 /*
     function displaySearchResults(m, s, c) {

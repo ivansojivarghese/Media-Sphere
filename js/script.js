@@ -1843,7 +1843,8 @@
 
         // perform a query
 
-        const prevScrollTop = videoInfoElm.info.scrollTop;
+        // const prevScrollTop = videoInfoElm.info.scrollTop;
+        const prevScrollTop = 0;
 
         loadingSpace.style.display = "block";
         videoInfoElm.info.style.overflow = "hidden";
