@@ -885,7 +885,7 @@
     audio.addEventListener('play', function () {
       // if (!networkError) {
 
-          videoInfoElm.info.addEventListener("scroll", ch);
+          // videoInfoElm.info.addEventListener("scroll", ch);
 
           if (!loading && !bufferLoad && !seekingLoad && !bufferingDetected) {
             video.play();
@@ -4584,6 +4584,8 @@
     });
 
     audio.addEventListener('canplay', function() {
+
+      videoInfoElm.info.addEventListener("scroll", ch);
 
       audioRun = false;
 
