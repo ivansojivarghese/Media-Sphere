@@ -83,7 +83,7 @@
       thumbnailImages = [];
       thumbnailLoadLoops = [];
 
-      videoInfoElm.info.addEventListener("scroll", ch);
+      // videoInfoElm.info.addEventListener("scroll", ch);
 
       videoInfoElm.suggestions.style.display = "";
 

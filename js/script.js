@@ -603,6 +603,8 @@
 
     video.addEventListener('play', function () {
 
+      // videoInfoElm.info.addEventListener("scroll", ch);
+
       if (videoPlay) {
 
         // videoSec.currentTime = video.currentTime;
@@ -882,6 +884,8 @@
 
     audio.addEventListener('play', function () {
       // if (!networkError) {
+
+          videoInfoElm.info.addEventListener("scroll", ch);
 
           if (!loading && !bufferLoad && !seekingLoad && !bufferingDetected) {
             video.play();
