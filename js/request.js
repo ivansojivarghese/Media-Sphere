@@ -818,7 +818,7 @@
           }, index * 10);
         });
       } else {
-        var thumbnails = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail");
+        
 
         for (let i = 0; i < thumbnailImages.length; i++) {
                 setTimeout(function () {
@@ -826,6 +826,7 @@
           }, i * 100); // each image loads 100ms after the previous one
         }
 
+        var thumbnails = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail");
         for (j = 0; j < thumbnails.length; j++) {
           thumbnailLoadLoops[j] = setInterval(scrollLoadThumbnail(thumbnails[j], j), 1000);
         }
@@ -855,7 +856,7 @@
     function scrollLoadThumbnail(el, i) {
       var t = el.getBoundingClientRect().top;
       if (t < window.innerHeight) {
-        loadThumbnail(i, thumbnailImages[i], true);
+        loadThumbnail(i, thumbnailImages[i].src, true);
         clearInterval(thumbnailLoadLoops[i]);
       }
     }
