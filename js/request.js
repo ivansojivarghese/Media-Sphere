@@ -855,7 +855,7 @@
 
     function scrollLoadThumbnail(el, i) {
       var t = el.getBoundingClientRect().top;
-      if (t < window.innerHeight) {
+      if (t > 0 && t < window.innerHeight) {
         loadThumbnail(i, thumbnailImages[i].src, true);
         clearInterval(thumbnailLoadLoops[i]);
       }
