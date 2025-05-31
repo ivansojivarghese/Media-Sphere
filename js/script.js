@@ -1832,7 +1832,8 @@
 
       if (v) {
         thumbnailImages = [];
-        
+        thumbnailLoadLoops = [];
+
         setSearchPath("query");
 
         if (v.includes("#")) {

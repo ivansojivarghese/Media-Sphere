@@ -73,6 +73,7 @@
       searchSuggestions = [];
 
       thumbnailImages = [];
+      thumbnailLoadLoops = [];
 
       videoInfoElm.suggestions.style.display = "";
 
@@ -858,6 +859,7 @@
       if (t > 0 && t < window.innerHeight) {
         loadThumbnail(i, thumbnailImages[i].src, true);
         clearInterval(thumbnailLoadLoops[i]);
+        thumbnailLoadLoops[i] = null;
       }
     }
 
