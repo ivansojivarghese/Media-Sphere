@@ -828,8 +828,8 @@
         }
 
         var thumbnails = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail");
-        for (j = 0; j < thumbnails.length; j++) {
-          thumbnailLoadLoops[j] = setInterval(scrollLoadThumbnail(thumbnails[j], j), 1000);
+        for (let j = 0; j < Math.min(thumbnails.length, 20); j++) {
+          thumbnailLoadLoops[j] = setInterval(() => scrollLoadThumbnail(thumbnails[j], j), 1000);
         }
 
         /*
