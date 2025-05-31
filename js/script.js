@@ -1831,6 +1831,8 @@
       }
 
       if (v) {
+        thumbnailImages = [];
+        
         setSearchPath("query");
 
         if (v.includes("#")) {

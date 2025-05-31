@@ -72,6 +72,8 @@
       videoInfoElm.suggestions.innerHTML = "";
       searchSuggestions = [];
 
+      thumbnailImages = [];
+
       videoInfoElm.suggestions.style.display = "";
 
       inpBlock = false;
