@@ -820,6 +820,7 @@
           }, i * 100); // each image loads 100ms after the previous one
         }
 
+        /*
         setInterval(function() {
           var thumbnails = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail");
           var noBgThumbnailsWithIndex = Array.from(thumbnails)
@@ -833,7 +834,7 @@
                 
           // }, i * 100); // each image loads 100ms after the previous one
         }
-        }, 2500);
+        }, 2500);*/
 
         // videoInfoElm.info.addEventListener("scroll", redoLoadThumbnail);
       }
