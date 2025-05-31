@@ -559,6 +559,8 @@
       }*/
     }
 
+    var thumbnailLoadLoops = [];
+
     function displaySearchResults(m, s, c) {
       var data = s ? relatedContent.data : m ? searchResults.data : hashtagResults.data;
       var ref = s ? null : m ? searchResults.refinements : null;
@@ -814,10 +816,16 @@
           }, index * 10);
         });
       } else {
+        var thumbnails = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail");
+
         for (let i = 0; i < thumbnailImages.length; i++) {
                 setTimeout(function () {
                   loadThumbnail(i, thumbnailImages[i].src, true);
           }, i * 100); // each image loads 100ms after the previous one
+        }
+
+        for (j = 0; j < thumbnails.length; j++) {
+          thumbnailLoadLoops[j] = setInterval(scrollLoadThumbnail(thumbnails[j], j), 1000);
         }
 
         /*
@@ -840,6 +848,14 @@
       }
     
       searchQueried = false;
+    }
+
+    function scrollLoadThumbnail(el, i) {
+      var t = el.getBoundingClientRect().top;
+      if (t < window.innerHeight) {
+        loadThumbnail(i, thumbnailImages[i], true);
+        clearInterval(thumbnailLoadLoops[i]);
+      }
     }
 
     /*
