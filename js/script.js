@@ -1993,6 +1993,9 @@
         case "info":
           preTab = "openVideoInfo(" + preScrollPos + ")";
         break;
+        default:
+          preTab = "openVideoInfo(" + 0 + ")";
+        break;
       }
 
       videoInfoElm.main.setAttribute("onclick", preTab);
