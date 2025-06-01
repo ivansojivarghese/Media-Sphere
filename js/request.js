@@ -397,13 +397,16 @@
     async function fetchYouTubeVideosAndPlaylists(v, p, headers, data) {
         const videoMap = {};
             if (v.length) {
-              const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${v.join(',')}`, { headers });
+              const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${v.join(',')}`, { headers });
               const videoData = await videoRes.json();
               videoData.items.forEach(video => {
                 const thumbs = video.snippet.thumbnails;
                 const bestThumb = thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium || thumbs.default;
                 videoMap[video.id] = {
                   title: video.snippet.title,
+                  channelTitle: video.snippet.channelTitle,
+                  duration: parseDuration(video.contentDetails.duration),
+                  uploadText: timeAgo(new Date(video.snippet.publishedAt)),
                   thumbnail: bestThumb.url,
                   type: 'video'
                 };
@@ -412,13 +415,15 @@
 
             const playlistMap = {};
             if (p.length) {
-              const playlistRes = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${p.join(',')}`, { headers });
+              const playlistRes = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${p.join(',')}`, { headers });
               const playlistData = await playlistRes.json();
               playlistData.items.forEach(playlist => {
                 const thumbs = playlist.snippet.thumbnails;
                 const bestThumb = thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium || thumbs.default;
                 playlistMap[playlist.id] = {
                   title: playlist.snippet.title,
+                  channelTitle: playlist.snippet.channelTitle,
+                  uploadText: timeAgo(new Date(playlist.snippet.publishedAt)),
                   thumbnail: bestThumb.url,
                   type: 'playlist'
                 };
@@ -435,6 +440,32 @@
 
               return finalResults;
     }
+
+    function parseDuration(iso) {
+      const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+      if (!match) return '';
+      const [ , h = 0, m = 0, s = 0 ] = match.map(v => parseInt(v || 0, 10));
+      const parts = h ? [h, String(m).padStart(2, '0'), String(s).padStart(2, '0')] :
+                        [m, String(s).padStart(2, '0')];
+      return parts.join(':');
+    }
+
+    function timeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      const intervals = [
+        { label: 'year', seconds: 31536000 },
+        { label: 'month', seconds: 2592000 },
+        { label: 'day', seconds: 86400 },
+        { label: 'hour', seconds: 3600 },
+        { label: 'minute', seconds: 60 }
+      ];
+      for (const { label, seconds: s } of intervals) {
+        const count = Math.floor(seconds / s);
+        if (count >= 1) return `${count} ${label}${count > 1 ? 's' : ''} ago`;
+      }
+      return 'just now';
+    }
+
 
     var searchQueried = false;
 
@@ -539,7 +570,7 @@
             'Accept': 'application/json'
           };
 
-          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
+          url = `https://www.googleapis.com/youtube/v3/search?part=snippet,contentDetails&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
           fetch(url, { headers })
           .then(response => response.json())
           .then(data => {
