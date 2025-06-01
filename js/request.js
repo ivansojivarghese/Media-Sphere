@@ -402,12 +402,31 @@
               videoData.items.forEach(video => {
                 const thumbs = video.snippet.thumbnails;
                 const bestThumb = thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium || thumbs.default;
+
+                const badges = [];
+                // 1. New: uploaded within 7 days
+                const now = new Date();
+                const publishedAt = new Date(video.snippet.publishedAt);
+                const ageInDays = (now - publishedAt) / (1000 * 60 * 60 * 24);
+                if (ageInDays <= 7) badges.push("New");
+
+                // 2. 4K: Has 'maxres' thumbnail and HD flag
+                const hasMaxRes = !!thumbs.maxres;
+                const isHD = video.contentDetails.definition === "hd";
+                if (isHD && hasMaxRes) {
+                  badges.push("4K");
+                } else if (isHD) {
+                  badges.push("HD");
+                }
+
                 videoMap[video.id] = {
                   title: video.snippet.title,
+                  videoId: video.id,
                   channelTitle: video.snippet.channelTitle,
                   duration: parseDuration(video.contentDetails.duration),
                   uploadText: timeAgo(new Date(video.snippet.publishedAt)),
                   thumbnail: bestThumb.url,
+                  badges,
                   type: 'video'
                 };
               });
@@ -422,6 +441,7 @@
                 const bestThumb = thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium || thumbs.default;
                 playlistMap[playlist.id] = {
                   title: playlist.snippet.title,
+                  playlistId: playlist.id,
                   channelTitle: playlist.snippet.channelTitle,
                   uploadText: timeAgo(new Date(playlist.snippet.publishedAt)),
                   thumbnail: bestThumb.url,
@@ -564,7 +584,7 @@
         const videoIds = [];
         const playlistIds = [];
       
-        if (accessToken) {
+        if (accessToken) { // with user personalization
 
           headers = {
             'Authorization': `Bearer ${accessToken}`,
@@ -574,7 +594,7 @@
           url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
           fetch(url, { headers })
           .then(response => response.json())
-          .then(data => {
+          .then(async data => {
             // console.log(data.items);
 
             data.items.forEach(item => {
@@ -587,7 +607,7 @@
 
             // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
 
-            searchResults = fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+            searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
             console.log(searchResults);
 
             hideInputErrorFeedback();
@@ -608,7 +628,7 @@
           })
           .catch(error => console.error('Error:', error));
 
-        } else {
+        } else { // without user personalization
           url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
           fetch(url)
           .then(response => response.json())
@@ -717,7 +737,7 @@
     var thumbnailLoadLoops = [];
 
     function displaySearchResults(m, s, c) {
-      var data = s ? relatedContent.data : m ? searchResults.data : hashtagResults.data;
+      var data = s ? relatedContent.data : m ? searchResults : hashtagResults.data;
       var ref = s ? null : m ? searchResults.refinements : null;
     
       var res = document.querySelectorAll(c + ".result_wrapper");
