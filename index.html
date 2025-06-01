@@ -1008,9 +1008,9 @@
           "Content-Type": "application/x-www-form-urlencoded"
         },
         body: new URLSearchParams({
-          client_id: localStorage.getItem('clientID', clientID),
-          client_secret: localStorage.getItem('clientSecret', clientSecret),
-          refresh_token: localStorage.getItem('refresh_token', refreshToken),
+          client_id: localStorage.getItem('clientID'),
+          client_secret: localStorage.getItem('clientSecret'),
+          refresh_token: localStorage.getItem('refresh_token'),
           grant_type: "refresh_token"
         })
       });
@@ -1097,8 +1097,6 @@
         if (Date.now() >= expiryTime) {
           
           await refreshAccessToken();
-
-          localStorage.setItem('access_token', token);
         }
 
         document.querySelector('#profileSignIn .img').classList.add("signedIn");
