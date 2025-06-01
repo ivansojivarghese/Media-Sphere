@@ -394,7 +394,7 @@
       inpBlock = false;
     }
 
-    async function fetchYouTubeVideosAndPlaylists(v, p) {
+    async function fetchYouTubeVideosAndPlaylists(v, p, headers) {
         const videoMap = {};
             if (v.length) {
               const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${v.join(',')}`, { headers });
@@ -516,7 +516,7 @@
           }
         };*/
 
-        var url, type, sort;
+        var url, headers, type, sort;
         const accessToken = localStorage.getItem("access_token");
         if (queryType.value) {
           type = '&type=' + queryType.value;
@@ -534,13 +534,13 @@
       
         if (accessToken) {
 
+          headers = {
+            'Authorization': `Bearer ${accessToken}`,
+            'Accept': 'application/json'
+          };
+
           url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
-          fetch(url, {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Accept': 'application/json'
-            }
-          })
+          fetch(url, headers)
           .then(response => response.json())
           .then(data => {
             // console.log(data.items);
@@ -553,7 +553,7 @@
               }
             });
 
-            console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds));
+            console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers));
 
             
 
