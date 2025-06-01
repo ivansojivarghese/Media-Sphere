@@ -859,7 +859,8 @@
             // thumbnail.style.backgroundImage = "url('" + data[i].thumbnail[data[i].thumbnail.length - 1].url + "')";
             thumbnail.style.backgroundColor = "#3f3f3f";
 
-            const thumbnailUrl = data[i].thumbnail[data[i].thumbnail.length - 1].url;
+            // const thumbnailUrl = data[i].thumbnail[data[i].thumbnail.length - 1].url;
+            const thumbnailUrl = data[i].thumbnail;
 
             thumbnailImages[thumbnailImages.length] = new Image();
             thumbnailImages[thumbnailImages.length - 1].src = thumbnailUrl;
@@ -896,14 +897,16 @@
             channelTitle.classList.add("overflow", "resultChannelTitle");
     
             var duration = document.createElement("p");
-            if (data[i].lengthText) {
-              duration.innerHTML = data[i].lengthText;
+            // if (data[i].lengthText) {
+            if (data[i].duration) {
+              duration.innerHTML = data[i].duration;
             }
             duration.classList.add("resultDuration");
     
             var date = document.createElement("p");
-            if (data[i].publishedTimeText) {
-              date.innerHTML = data[i].publishedTimeText;
+            // if (data[i].publishedTimeText) {
+            if (data[i].uploadText) {
+              date.innerHTML = data[i].uploadText;
             } else if (data[i].type === "playlist") {
               date.innerHTML = data[i].videoCount + " videos";
             }
