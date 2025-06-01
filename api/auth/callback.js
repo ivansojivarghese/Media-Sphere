@@ -23,6 +23,8 @@ export default async function handler(req, res) {
     const accessToken = tokenData.access_token;
     // localStorage.setItem('access_token', accessToken);
 
+    console.log(tokenData);
+
     if (tokenData.error) {
       return res.status(400).json({ error: tokenData.error_description || tokenData.error });
     }
