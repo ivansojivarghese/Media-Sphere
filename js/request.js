@@ -479,7 +479,7 @@
         if (queryType.value) {
           type = '&type=' + queryType.value;
         } else {
-          type = 'video,playlist';
+          type = '&type=video,playlist';
         }
         if (querySort.value) {
           sort = '&order=' + querySort.value;
