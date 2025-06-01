@@ -540,7 +540,7 @@
           };
 
           url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
-          fetch(url, headers)
+          fetch(url, { headers })
           .then(response => response.json())
           .then(data => {
             // console.log(data.items);
