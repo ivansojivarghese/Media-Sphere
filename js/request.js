@@ -411,13 +411,14 @@
                 if (ageInDays <= 7) badges.push("New");
 
                 // 2. 4K: Has 'maxres' thumbnail and HD flag
+                /*
                 const hasMaxRes = !!thumbs.maxres;
                 const isHD = video.contentDetails.definition === "hd";
                 if (isHD && hasMaxRes) {
                   badges.push("4K");
                 } else if (isHD) {
                   badges.push("HD");
-                }
+                }*/
 
                 videoMap[video.id] = {
                   title: video.snippet.title,
@@ -626,7 +627,18 @@
             videoInfoElm.info.style.overflow = "";
 
           })
-          .catch(error => console.error('Error:', error));
+          .catch((error) => {
+            console.error('Error:', error);
+
+            loadingSpace.style.display = "none";
+            videoInfoElm.info.style.overflow = "";
+
+            // INPUT ERROR
+
+            showInputErrorFeedback("Something went wrong. Try again.");
+
+            searchQueried = false;
+          });
 
         } else { // without user personalization
           url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
