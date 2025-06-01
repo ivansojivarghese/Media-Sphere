@@ -394,7 +394,7 @@
       inpBlock = false;
     }
 
-    async function fetchYouTubeVideosAndPlaylists(v, p, headers) {
+    async function fetchYouTubeVideosAndPlaylists(v, p, headers, data) {
         const videoMap = {};
             if (v.length) {
               const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${v.join(',')}`, { headers });
@@ -425,7 +425,7 @@
               });
             }
 
-            const finalResults = data.items.items.map(item => {
+            const finalResults = data.items.map(item => {
                 if (item.id.kind === 'youtube#video') {
                   return videoMap[item.id.videoId];
                 } else if (item.id.kind === 'youtube#playlist') {
@@ -553,7 +553,7 @@
               }
             });
 
-            console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers));
+            console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
 
             
 
