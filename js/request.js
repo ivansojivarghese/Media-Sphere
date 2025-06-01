@@ -474,7 +474,7 @@
           }
         };*/
 
-        var url, headers, type, sort;
+        var url, type, sort;
         const accessToken = localStorage.getItem("access_token");
         if (queryType.value) {
           type = '&type=' + queryType.value;
@@ -490,12 +490,13 @@
         if (accessToken) {
 
           url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;
+          /*
           headers = {
             Authorization: `Bearer ${accessToken}`,
             Accept: 'application/json'
           };
-
-          /*
+*/
+          
           fetch(url, {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -506,7 +507,7 @@
           .then(data => {
             console.log(data.items);
           })
-          .catch(error => console.error('Error:', error));*/
+          .catch(error => console.error('Error:', error));
 
         } else {
           url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
@@ -524,10 +525,10 @@
           .catch(error => console.error('Error:', error));
         }
 
-        
+        /*
         try {
-          // const response = await fetch(url, options);
-          const response = await fetch(url, headers);
+          const response = await fetch(url, options);
+          // const response = await fetch(url, headers);
           searchResults = await response.json();
           console.log(searchResults);
 
@@ -558,7 +559,7 @@
 
           searchQueried = false;
         }
-        
+        */
 
       }
 
