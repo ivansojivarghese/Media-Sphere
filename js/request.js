@@ -516,6 +516,7 @@
           .catch(error => console.error('Error:', error));
         }
 
+        /*
         try {
           const response = await fetch(url, options);
           searchResults = await response.json();
@@ -548,7 +549,8 @@
 
           searchQueried = false;
         }
-
+        */
+       
       }
 
       clearBtn.style.display = q ? "" : "none";
