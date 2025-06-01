@@ -474,10 +474,21 @@
           }
         };*/
 
-        var url;
+        var url, type, sort;
         const accessToken = localStorage.getItem("access_token");
+        if (queryType.value) {
+          type = '&type=' + queryType.value;
+        } else {
+          type = '';
+        }
+        if (querySort.value) {
+          sort = '&order=' + querySort.value;
+        } else {
+          sort = '';
+        }
+      
         if (accessToken) {
-          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en&type=${queryType.value}&order=${querySort.value}&maxResults=${maxQuery}`;
+          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;
           fetch(url, {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -490,7 +501,7 @@
           })
           .catch(error => console.error('Error:', error));
         } else {
-          url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en&type=${queryType.value}&order=${querySort.value}&key=${API_KEY}&maxResults=${maxQuery}`;
+          url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
           fetch(url)
           .then(response => response.json())
           .then(data => {
