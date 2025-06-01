@@ -1004,8 +1004,10 @@
     var profileUserData = {};
     var profileYouTubeData = {};
 
+    var client;
+
     window.onload = () => {
-      const client = google.accounts.oauth2.initCodeClient({
+      client = google.accounts.oauth2.initCodeClient({
         client_id: '563046789370-limrh8resbqqgs7uonld1hch23tjme56.apps.googleusercontent.com',
         scope: 'openid email profile https://www.googleapis.com/auth/youtube.readonly',
         ux_mode: 'redirect',

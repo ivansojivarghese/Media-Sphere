@@ -339,11 +339,12 @@ function checkDuplicateQuality(arr, q) {
 
 // Usage example
 const panel = videoInfoElm.info;
+/*
 setupSwipeToClose(panel, () => {
   console.log("videoInfo closed!");
   closeVideoInfo();
   panel.style.transform = "none"; // Or any close action you prefer
-}); 
+}); */
 
 async function sourceCheck(i, m) {
   // var mime = replaceSingleWithDoubleQuotes(replaceDoubleQuotes(videoSources[i].mimeType));
