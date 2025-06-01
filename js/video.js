@@ -2051,7 +2051,7 @@ function timeAgo(dateString) { // ISO8601 date string to human-readable string c
   }
 
   const weeks = Math.floor(days / 7);
-  if (weeks < 4) {
+  if (weeks <= 4) {
       return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
   }
 

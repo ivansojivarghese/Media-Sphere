@@ -471,7 +471,7 @@
                         [m, String(s).padStart(2, '0')];
       return parts.join(':');
     }
-
+/*
     function timeAgo(date) {
       const seconds = Math.floor((new Date() - date) / 1000);
       const intervals = [
@@ -486,7 +486,7 @@
         if (count >= 1) return `${count} ${label}${count > 1 ? 's' : ''} ago`;
       }
       return 'just now';
-    }
+    }*/
 
 
     var searchQueried = false;
