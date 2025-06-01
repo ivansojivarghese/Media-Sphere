@@ -14,6 +14,9 @@
     var searchResults = null;
     var hashtagResults = null;
 
+    var maxQuery = 20;
+    var API_KEY = "AIzaSyAtcIpyHJI05qb0cIo4wdMVYfuC-Z9bQQI";
+
 /*
     inp.addEventListener('select', function() {
       this.selectionStart = this.selectionEnd;
@@ -461,7 +464,7 @@
         }
 
       } else {
-      
+        /*
         const url = 'https://yt-api.p.rapidapi.com/search?query=' + q + '&geo=' + countryAPIres.country + '&lang=en&type=' + queryType.value + '&upload_date=' + queryDate.value + '&sort_by=' + querySort.value;
         const options = {
           method: 'GET',
@@ -469,7 +472,38 @@
             'x-rapidapi-key': '89ce58ef37msh8e59da617907bbcp1455bajsn66709ef67e50',
             'x-rapidapi-host': 'yt-api.p.rapidapi.com'
           }
-        };
+        };*/
+
+        var url;
+        const accessToken = localStorage.getItem("access_token");
+        if (accessToken) {
+          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en&type=${queryType.value}&order=${querySort.value}&maxResults=${maxQuery}`;
+          fetch(url, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Accept': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data.items);
+          })
+          .catch(error => console.error('Error:', error));
+        } else {
+          url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en&type=${queryType.value}&order=${querySort.value}&key=${API_KEY}&maxResults=${maxQuery}`;
+          fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            data.items.forEach(item => {
+              console.log({
+                title: item.snippet.title,
+                videoId: item.id.videoId,
+                thumbnail: item.snippet.thumbnails.default.url
+              });
+            });
+          })
+          .catch(error => console.error('Error:', error));
+        }
 
         try {
           const response = await fetch(url, options);
@@ -490,26 +524,12 @@
 
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
-/*
-          videoInfoElm.suggestions.innerHTML = "";
-          searchSuggestions = [];
-
-          videoInfoElm.suggestions.style.display = "";
-
-          inpBlock = false;*/
 
         } catch (error) {
           console.error(error);
 
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
-/*
-          videoInfoElm.suggestions.innerHTML = "";
-          searchSuggestions = [];
-
-          videoInfoElm.suggestions.style.display = "";
-
-          inpBlock = false;*/
 
           // INPUT ERROR
 
