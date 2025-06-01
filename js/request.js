@@ -644,16 +644,58 @@
           url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
           fetch(url)
           .then(response => response.json())
-          .then(data => {
+          .then(async data => {
+
+            /*
             data.items.forEach(item => {
               console.log({
                 title: item.snippet.title,
                 videoId: item.id.videoId,
                 thumbnail: item.snippet.thumbnails.default.url
               });
+            });*/
+
+            data.items.forEach(item => {
+              if (item.id.kind === 'youtube#video') {
+                videoIds.push(item.id.videoId);
+              } else if (item.id.kind === 'youtube#playlist') {
+                playlistIds.push(item.id.playlistId);
+              }
             });
+
+            // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
+
+            searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+            console.log(searchResults);
+
+            hideInputErrorFeedback();
+
+            if (!searchResults.length) {
+            
+              // INPUT ERROR
+
+              showInputErrorFeedback("No results found. Try again.");
+            } else {
+              
+              displaySearchResults(true, null, "div.wrapper.search ");
+            }
+
+            loadingSpace.style.display = "none";
+            videoInfoElm.info.style.overflow = "";
+
           })
-          .catch(error => console.error('Error:', error));
+          .catch((error) => {
+            console.error('Error:', error);
+
+            loadingSpace.style.display = "none";
+            videoInfoElm.info.style.overflow = "";
+
+            // INPUT ERROR
+
+            showInputErrorFeedback("Something went wrong. Try again.");
+
+            searchQueried = false;
+          });
         }
 
         /*
