@@ -425,6 +425,7 @@
                   channelTitle: playlist.snippet.channelTitle,
                   uploadText: timeAgo(new Date(playlist.snippet.publishedAt)),
                   thumbnail: bestThumb.url,
+                  videoCount: playlist.contentDetails.itemCount,
                   type: 'playlist'
                 };
               });
@@ -570,7 +571,7 @@
             'Accept': 'application/json'
           };
 
-          url = `https://www.googleapis.com/youtube/v3/search?part=snippet,contentDetails&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
+          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
           fetch(url, { headers })
           .then(response => response.json())
           .then(data => {
@@ -584,9 +585,25 @@
               }
             });
 
-            console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
+            // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
 
+            searchResults = fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+            console.log(searchResults);
+
+            hideInputErrorFeedback();
+
+            if (!searchResults.length) {
             
+              // INPUT ERROR
+
+              showInputErrorFeedback("No results found. Try again.");
+            } else {
+              
+              displaySearchResults(true, null, "div.wrapper.search ");
+            }
+
+            loadingSpace.style.display = "none";
+            videoInfoElm.info.style.overflow = "";
 
           })
           .catch(error => console.error('Error:', error));
