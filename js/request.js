@@ -394,6 +394,48 @@
       inpBlock = false;
     }
 
+    async function fetchYouTubeVideosAndPlaylists(v, p) {
+        const videoMap = {};
+            if (v.length) {
+              const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${v.join(',')}`, { headers });
+              const videoData = await videoRes.json();
+              videoData.items.forEach(video => {
+                const thumbs = video.snippet.thumbnails;
+                const bestThumb = thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium || thumbs.default;
+                videoMap[video.id] = {
+                  title: video.snippet.title,
+                  thumbnail: bestThumb.url,
+                  type: 'video'
+                };
+              });
+            }
+
+            const playlistMap = {};
+            if (p.length) {
+              const playlistRes = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${p.join(',')}`, { headers });
+              const playlistData = await playlistRes.json();
+              playlistData.items.forEach(playlist => {
+                const thumbs = playlist.snippet.thumbnails;
+                const bestThumb = thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium || thumbs.default;
+                playlistMap[playlist.id] = {
+                  title: playlist.snippet.title,
+                  thumbnail: bestThumb.url,
+                  type: 'playlist'
+                };
+              });
+            }
+
+            const finalResults = data.items.items.map(item => {
+                if (item.id.kind === 'youtube#video') {
+                  return videoMap[item.id.videoId];
+                } else if (item.id.kind === 'youtube#playlist') {
+                  return playlistMap[item.id.playlistId];
+                }
+              }).filter(Boolean); // Remove any undefined entries (just in case)
+
+              return finalResults;
+    }
+
     var searchQueried = false;
 
     async function searchQuery(q) {
@@ -486,17 +528,13 @@
         } else {
           sort = '';
         }
+
+        const videoIds = [];
+        const playlistIds = [];
       
         if (accessToken) {
 
-          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;
-          /*
-          headers = {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: 'application/json'
-          };
-*/
-          
+          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
           fetch(url, {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -505,7 +543,20 @@
           })
           .then(response => response.json())
           .then(data => {
-            console.log(data.items);
+            // console.log(data.items);
+
+            data.items.forEach(item => {
+              if (item.id.kind === 'youtube#video') {
+                videoIds.push(item.id.videoId);
+              } else if (item.id.kind === 'youtube#playlist') {
+                playlistIds.push(item.id.playlistId);
+              }
+            });
+
+            console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds));
+
+            
+
           })
           .catch(error => console.error('Error:', error));
 
