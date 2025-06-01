@@ -1021,9 +1021,10 @@
     function getUserData() {
       const params = new URLSearchParams(window.location.search);
       const token = params.get('token');
+      const refreshToken = params.get('refreshToken');
       const encodedData = params.get('data');
 
-      if ((token && encodedData) || (localStorage.getItem("access_token"))) {
+      if ((token && refreshToken && encodedData) || (localStorage.getItem("access_token"))) {
         if (encodedData) {
           decoded = JSON.parse(atob(encodedData));
           user = decoded.user;
@@ -1037,6 +1038,7 @@
         // Store token if needed
         if (encodedData) {
           localStorage.setItem('access_token', token);
+          localStorage.setItem('refresh_token', refreshToken);
 
           // Store other info
           localStorage.setItem('email', user.email);
