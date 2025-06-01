@@ -959,10 +959,12 @@
     
             var date = document.createElement("p");
             // if (data[i].publishedTimeText) {
-            if (data[i].uploadText) {
-              date.innerHTML = data[i].uploadText;
-            } else if (data[i].type === "playlist") {
+            
+            
+            if (data[i].type === "playlist") {
               date.innerHTML = data[i].videoCount + " videos";
+            } else if (data[i].uploadText) {
+              date.innerHTML = data[i].uploadText;
             }
             date.classList.add("resultDate");
     
