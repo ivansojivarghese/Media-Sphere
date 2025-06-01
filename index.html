@@ -1001,6 +1001,37 @@
     };
     */
 
+    async function refreshAccessToken() {
+      const response = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+          client_id: localStorage.getItem('clientID', clientID),
+          client_secret: localStorage.getItem('clientSecret', clientSecret),
+          refresh_token: localStorage.getItem('refresh_token', refreshToken),
+          grant_type: "refresh_token"
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const newAccessToken = data.access_token;
+        const newExpiryTime = Date.now() + data.expires_in * 1000;
+
+        // Save these values for future use
+        token = newAccessToken;
+        expiryTime = newExpiryTime;
+
+        localStorage.setItem('access_token', token);
+        localStorage.setItem('expiryTime', expiryTime);
+      } else {
+        console.error("Failed to refresh token", data);
+      }
+    }
+
     var profileUserData = {};
     var profileYouTubeData = {};
 
@@ -1017,12 +1048,16 @@
       getUserData();
     };
 
-    var decoded, user, youtube;
-    function getUserData() {
+    var decoded, user, youtube, token, expiryTime;
+    async function getUserData() {
       const params = new URLSearchParams(window.location.search);
-      const token = params.get('token');
+      token = params.get('token');
       const refreshToken = params.get('refreshToken');
+      expiryTime = params.get('expiryTime');
       const encodedData = params.get('data');
+
+      const clientID =  params.get('clientID');
+      const clientSecret = params.get('clientSecret');
 
       if ((token && refreshToken && encodedData) || (localStorage.getItem("access_token"))) {
         if (encodedData) {
@@ -1039,6 +1074,10 @@
         if (encodedData) {
           localStorage.setItem('access_token', token);
           localStorage.setItem('refresh_token', refreshToken);
+          localStorage.setItem('expiryTime', expiryTime);
+
+          localStorage.setItem('clientID', clientID);
+          localStorage.setItem('clientSecret', clientSecret);
 
           // Store other info
           localStorage.setItem('email', user.email);
@@ -1053,6 +1092,13 @@
 
           profileUserData = user;
           profileYouTubeData = youtube;
+        }
+
+        if (Date.now() >= expiryTime) {
+          
+          await refreshAccessToken();
+
+          localStorage.setItem('access_token', token);
         }
 
         document.querySelector('#profileSignIn .img').classList.add("signedIn");

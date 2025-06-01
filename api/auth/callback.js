@@ -22,7 +22,12 @@ export default async function handler(req, res) {
     const tokenData = await tokenRes.json();
     const accessToken = tokenData.access_token;
     const refreshToken = tokenData.refresh_token;
+    const expiry = tokenData.expires_in;
+    const expiryTime = Date.now() + (expiry * 1000);
     // localStorage.setItem('access_token', accessToken);
+
+    const clientID =  process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
     console.log(tokenData);
 
@@ -58,7 +63,7 @@ export default async function handler(req, res) {
     const userData = Buffer.from(JSON.stringify({ user, youtube })).toString('base64');
 
     // Redirect to frontend with access token and encoded user data
-    return res.redirect(`https://media-sphere.vercel.app?token=${accessToken}&refreshToken=${refreshToken}&data=${userData}`);
+    return res.redirect(`https://media-sphere.vercel.app?token=${accessToken}&refreshToken=${refreshToken}&expiry=${expiryTime}&clientID=${clientID}&clientSecret=${clientSecret}&data=${userData}`);
 
   } catch (error) {
     console.error('OAuth callback error:', error);
