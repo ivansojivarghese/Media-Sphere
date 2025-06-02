@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     const clientID =  process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
-    console.log(expiry, expiryTime);
+    // console.log(expiry, expiryTime);
 
     if (tokenData.error) {
       return res.status(400).json({ error: tokenData.error_description || tokenData.error });
