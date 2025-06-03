@@ -397,10 +397,11 @@
     async function fetchYouTubeVideosAndPlaylists(v, p, headers, data) {
         const videoMap = {};
             if (v.length) {
+              var videoRes;
               if (headers) {
-                const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${v.join(',')}`, { headers });
+                videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${v.join(',')}`, { headers });
               } else {
-                const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${v.join(',')}&key=${API_KEY}`);
+                videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${v.join(',')}&key=${API_KEY}`);
               }
               const videoData = await videoRes.json();
               videoData.items.forEach(video => {
@@ -439,10 +440,11 @@
 
             const playlistMap = {};
             if (p.length) {
+              var playlistRes;
               if (headers) {
-                const playlistRes = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${p.join(',')}`, { headers });
+                playlistRes = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${p.join(',')}`, { headers });
               } else {
-                const playlistRes = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${p.join(',')}&key=${API_KEY}`);
+                playlistRes = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${p.join(',')}&key=${API_KEY}`);
               }
               const playlistData = await playlistRes.json();
               playlistData.items.forEach(playlist => {
