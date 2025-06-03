@@ -3106,6 +3106,7 @@ function formatDescription(text) {
 var relatedContent = null;
 
 async function getRelatedContent(id) {
+  /*
   const url = 'https://yt-api.p.rapidapi.com/related?id=' + id + '&geo=' + countryAPIres.country + '&lang=en';
   const options = {
     method: 'GET',
@@ -3113,13 +3114,23 @@ async function getRelatedContent(id) {
       'x-rapidapi-key': '89ce58ef37msh8e59da617907bbcp1455bajsn66709ef67e50',
       'x-rapidapi-host': 'yt-api.p.rapidapi.com'
     }
-  };
+  };*/
+
+  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&relatedToVideoId=${id}&key=${API_KEY}&maxResults=${maxQuery}`;
 
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(url);
     relatedContent = await response.json();
 
     console.log(relatedContent);
+
+    relatedContent.items.forEach(item => {
+      console.log({
+        title: item.snippet.title,
+        videoId: item.id.videoId,
+        thumbnail: item.snippet.thumbnails.default.url
+      });
+    });
 
     if (relatedContent.data.length) {
 
