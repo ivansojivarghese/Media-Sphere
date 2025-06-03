@@ -426,6 +426,7 @@
                 }*/
 
                 videoMap[video.id] = {
+                  snippet: video.snippet,
                   title: video.snippet.title,
                   videoId: video.id,
                   channelTitle: video.snippet.channelTitle,
@@ -451,6 +452,7 @@
                 const thumbs = playlist.snippet.thumbnails;
                 const bestThumb = thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium || thumbs.default;
                 playlistMap[playlist.id] = {
+                  snippet: playlist.snippet,
                   title: playlist.snippet.title,
                   playlistId: playlist.id,
                   channelTitle: playlist.snippet.channelTitle,
@@ -512,6 +514,7 @@
         // Remove the '#' character from the q variable
         q = q.replace('#', '');
 
+        /*
         const url = 'https://yt-api.p.rapidapi.com/hashtag?tag=' + q + '&geo=' + countryAPIres.country + '&lang=en&type=' + queryType.value + '&upload_date=' + queryDate.value + '&sort_by=' + querySort.value;
         const options = {
           method: 'GET',
@@ -519,8 +522,88 @@
             'x-rapidapi-key': '89ce58ef37msh8e59da617907bbcp1455bajsn66709ef67e50',
             'x-rapidapi-host': 'yt-api.p.rapidapi.com'
           }
-        };
+        };*/
 
+        var url, headers, type, sort;
+        const accessToken = localStorage.getItem("access_token");
+        if (queryType.value) {
+          type = '&type=' + queryType.value;
+        } else {
+          type = '&type=video,playlist';
+        }
+        if (querySort.value) {
+          sort = '&order=' + querySort.value;
+        } else {
+          sort = '';
+        }
+
+        const videoIds = [];
+        const playlistIds = [];
+
+        url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
+          fetch(url)
+          .then(response => response.json())
+          .then(async data => {
+
+          /*
+          data.items.forEach(item => {
+            console.log({
+              title: item.snippet.title,
+              videoId: item.id.videoId,
+              thumbnail: item.snippet.thumbnails.default.url
+            });
+          });*/
+
+          data.items.forEach(item => {
+            if (item.id.kind === 'youtube#video') {
+              videoIds.push(item.id.videoId);
+            } else if (item.id.kind === 'youtube#playlist') {
+              playlistIds.push(item.id.playlistId);
+            }
+          });
+
+          // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
+
+          searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+          console.log(searchResults);
+
+          searchResults = searchResults.filter(item => {
+            const tags = item.snippet?.tags || [];
+            return tags.some(tag => tag.toLowerCase() === q.toLowerCase());
+          });
+
+          console.log(searchResults);
+
+          hideInputErrorFeedback();
+
+          if (!searchResults.length) {
+          
+            // INPUT ERROR
+
+            showInputErrorFeedback("No results found. Try again.");
+          } else {
+            
+            displaySearchResults(true, null, "div.wrapper.search ");
+          }
+
+          loadingSpace.style.display = "none";
+          videoInfoElm.info.style.overflow = "";
+
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+
+          loadingSpace.style.display = "none";
+          videoInfoElm.info.style.overflow = "";
+
+          // INPUT ERROR
+
+          showInputErrorFeedback("Something went wrong. Try again.");
+
+          searchQueried = false;
+        });
+
+        /*
         try {
           const response = await fetch(url, options);
           hashtagResults = await response.json();
@@ -540,33 +623,20 @@
 
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
-/*
-          videoInfoElm.suggestions.innerHTML = "";
-          searchSuggestions = [];
 
-          videoInfoElm.suggestions.style.display = "";
-
-          inpBlock = false;
-*/
         } catch (error) {
           console.error(error);
 
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
-/*
-          videoInfoElm.suggestions.innerHTML = "";
-          searchSuggestions = [];
 
-          videoInfoElm.suggestions.style.display = "";
-
-          inpBlock = false;
-*/
           // INPUT ERROR
 
           showInputErrorFeedback("Something went wrong. Try again.");
 
           searchQueried = false;
         }
+          */
 
       } else {
         /*
