@@ -1159,6 +1159,12 @@ div.result_wrapper {
     /*opacity: 0;*/
 }
 
+.wrapper.profile h3 {
+    font-size: 2rem;
+    margin-bottom: 2rem;    
+    padding-top: 1rem;
+}
+
 #infoContainer h5.resultTitle {
     padding-left: 1.2rem;
     /*padding-right: 1.2rem;*/

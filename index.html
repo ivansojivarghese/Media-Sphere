@@ -556,13 +556,13 @@
             </div>
             <div class="wrapper profile">
               <div class="liked">
-                <h1>Liked</h1>
+                <h3>Liked videos</h3>
               </div>
               <div class="watchLater" style="display: none;">
-                <h1>Watch Later</h1>
+                <h3>Watch Later</h3>
               </div>
               <div class="playlists" style="display: none;">
-                <h1>Playlists</h1>
+                <h3>Playlists</h3>
               </div>
               <div class="nav">
                 <div class="likedBtn cursor trs trsButtons noimg" title="Liked Videos">
@@ -1085,14 +1085,16 @@
             (thumbs.medium && thumbs.medium.url) ||
             (thumbs.default && thumbs.default.url);
 
-        thumbnailImages[thumbnailImages.length] = new Image();
-        thumbnailImages[thumbnailImages.length - 1].src = thumbnailUrl;
-        thumbnailImages[thumbnailImages.length - 1].style.display = "none"; // hide initially
+        if (thumbnailUrl) {
+          thumbnailImages[thumbnailImages.length] = new Image();
+          thumbnailImages[thumbnailImages.length - 1].src = thumbnailUrl;
+          thumbnailImages[thumbnailImages.length - 1].style.display = "none"; // hide initially
 
-        const thisIndex = thumbnailImages.length - 1;
-        thumbnailImages[thisIndex].onload = function () {
-          loadThumbnail(thisIndex, thumbnailUrl, true, true);
-        };
+          const thisIndex = thumbnailImages.length - 1;
+          thumbnailImages[thisIndex].onload = function () {
+            loadThumbnail(thisIndex, thumbnailUrl, true, true);
+          };
+        }
 
         var title = document.createElement("h5");
         title.innerHTML = ar[i].snippet.title;
