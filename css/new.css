@@ -1150,13 +1150,13 @@ select:focus-visible {
     font-weight: bold;
 }
 
-div.results div.result_wrapper {
+div.result_wrapper {
     /*width: calc(100% + 2.4rem);*/
     width: calc(100% + env(safe-area-inset-right) + 2.4rem);
     margin-bottom: 3rem;
     position: relative;
     left: -1.2rem;
-    opacity: 0;
+    /*opacity: 0;*/
 }
 
 #infoContainer h5.resultTitle {
