@@ -1110,6 +1110,9 @@
           videoInfoElm.main.click();
         } else {
           // thumbnailImages = [];
+          document.getElementById('profileSignIn').onclick = () => {
+            openProfile();
+          };
         }
 
         // Remove query params from current URL
