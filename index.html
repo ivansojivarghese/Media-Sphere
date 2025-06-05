@@ -1100,6 +1100,9 @@
         date.innerHTML = timeAgo(ar[i].snippet.publishedAt);
         date.classList.add("resultDate");
 
+        var textDiv = document.createElement("div");
+        textDiv.classList.add("resultText");
+
         main.appendChild(thumbnail);
         main.appendChild(title);
         main.appendChild(channelTitle);
