@@ -1111,7 +1111,7 @@
 
         fetch("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=LL&maxResults=50", {
           headers: {
-            Authorization: "Bearer " + access_token
+            Authorization: "Bearer " + localStorage.getItem('access_token')
           }
         })
         .then(response => response.json())
