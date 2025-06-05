@@ -1163,6 +1163,10 @@ div.result_wrapper {
     /*opacity: 0;*/
 }
 
+.wrapper.profile div.result_wrapper {
+    margin-bottom: 4rem;
+}
+
 .wrapper.profile h3 {
     font-size: 2rem;
     margin-bottom: 2rem;    
