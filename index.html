@@ -1085,7 +1085,7 @@
 
         const thisIndex = thumbnailImages.length - 1;
         thumbnailImages[thisIndex].onload = function () {
-          loadThumbnail(thisIndex, thumbnailUrl, s);
+          loadThumbnail(thisIndex, thumbnailUrl, true);
         };
 
         var title = document.createElement("h5");
