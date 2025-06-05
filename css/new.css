@@ -775,6 +775,10 @@ div.thumbnailIcon {
     padding-bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
 }
 
+#infoContainer .wrapper.profile .nav .cursor.active {
+    background-color: #3f3f3f;
+}
+
 #infoContainer .wrapper.profile .nav .cursor .img {
     width: 1.5rem;
     height: 1.5rem;
