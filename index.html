@@ -1052,6 +1052,62 @@
       getUserData();
     };
 
+    function showPlaylist(ar, el) {
+      for (let i = 0; i < ar.length; i++) {
+        var main = document.createElement("div");
+        main.classList.add("result_wrapper", "trs", "cursor", "trsButtons", "noimg");
+        main.title = ar[i].snippet.title;
+
+        main.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[i].snippet.resourceId.videoId);
+
+        main.onclick = function(event) {
+          videoNav = true;
+          getURL(event.currentTarget.getAttribute("data-url"), true);
+        };
+
+        var thumbnail = document.createElement("div");
+        thumbnail.classList.add("thumbnail", "img", "trs");
+        // thumbnail.style.backgroundImage = "url('" + data[i].thumbnail[data[i].thumbnail.length - 1].url + "')";
+        thumbnail.style.backgroundColor = "#3f3f3f";
+
+        // const thumbnailUrl = data[i].thumbnail[data[i].thumbnail.length - 1].url;
+        const thumbs = ar[i].snippet.thumbnails;
+        const thumbnailUrl =
+            (thumbs.maxres && thumbs.maxres.url) ||
+            (thumbs.standard && thumbs.standard.url) ||
+            (thumbs.high && thumbs.high.url) ||
+            (thumbs.medium && thumbs.medium.url) ||
+            (thumbs.default && thumbs.default.url);
+
+        thumbnailImages[thumbnailImages.length] = new Image();
+        thumbnailImages[thumbnailImages.length - 1].src = thumbnailUrl;
+        thumbnailImages[thumbnailImages.length - 1].style.display = "none"; // hide initially
+
+        const thisIndex = thumbnailImages.length - 1;
+        thumbnailImages[thisIndex].onload = function () {
+          loadThumbnail(thisIndex, thumbnailUrl, s);
+        };
+
+        var title = document.createElement("h5");
+        title.innerHTML = ar[i].snippet.title;
+        title.classList.add("overflow", "resultTitle");
+
+        var channelTitle = document.createElement("p");
+        channelTitle.innerHTML = ar[i].snippet.videoOwnerChannelTitle; 
+        channelTitle.classList.add("overflow", "resultChannelTitle");
+
+        var date = document.createElement("p");
+        date.innerHTML = timeAgo(ar[i].snippet.publishedAt);
+        date.classList.add("resultDate");
+
+        main.appendChild(thumbnail);
+        main.appendChild(title);
+        main.appendChild(channelTitle);
+        textDiv.appendChild(date);
+        main.appendChild(textDiv);
+      }
+    }
+
     var decoded, user, youtube, token, expiryTime;
     async function getUserData() {
       const params = new URLSearchParams(window.location.search);
@@ -1106,10 +1162,13 @@
         var likedWrap = document.querySelector(".wrapper.profile .liked");
         var watchLaterWrap = document.querySelector(".wrapper.profile .watchLater");
 
+        var likedVideos = [];
+
         document.querySelector('#profileSignIn .img').classList.add("signedIn");
         document.querySelector('#profileSignIn .img').style.backgroundImage = "url(" + localStorage.getItem("picture") + ")";
 
-        fetch("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=LL&maxResults=50", {
+        // liked videos list
+        fetch("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=LL&maxResults=100", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem('access_token')
           }
@@ -1117,6 +1176,9 @@
         .then(response => response.json())
         .then(data => {
           console.log("Liked Videos:", data.items);
+          likedVideos = data.items;
+
+          showPlaylist(likedVideos, likedWrap);
         })
         .catch(error => {
           console.error("Error fetching liked videos:", error);
