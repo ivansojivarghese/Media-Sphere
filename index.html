@@ -1109,7 +1109,9 @@
         textDiv.appendChild(date);
         main.appendChild(textDiv);
 
-        el.appendChild(main);
+        if (!title.includes("Deleted")) {
+          el.appendChild(main);
+        }
       }
     }
 
