@@ -555,6 +555,9 @@
               </div>
             </div>
             <div class="wrapper profile">
+              <div class="liked"></div>
+              <div class="watchLater" style="display: none;"></div>
+              <div class="playlists" style="display: none;"></div>
               <div class="nav">
                 <div class="likedBtn cursor trs trsButtons noimg" title="Liked Videos">
                   <div class="img"></div>
@@ -1100,8 +1103,24 @@
           await refreshAccessToken();
         }
 
+        var likedWrap = document.querySelector(".wrapper.profile .liked");
+        var watchLaterWrap = document.querySelector(".wrapper.profile .watchLater");
+
         document.querySelector('#profileSignIn .img').classList.add("signedIn");
         document.querySelector('#profileSignIn .img').style.backgroundImage = "url(" + localStorage.getItem("picture") + ")";
+
+        fetch("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=LL&maxResults=50", {
+          headers: {
+            Authorization: "Bearer " + access_token
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Liked Videos:", data.items);
+        })
+        .catch(error => {
+          console.error("Error fetching liked videos:", error);
+        });
 
         if (!localStorage.getItem("mediaURL")) {
           document.getElementById('profileSignIn').onclick = () => {
