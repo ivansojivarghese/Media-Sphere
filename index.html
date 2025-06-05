@@ -1085,7 +1085,7 @@
 
         const thisIndex = thumbnailImages.length - 1;
         thumbnailImages[thisIndex].onload = function () {
-          loadThumbnail(thisIndex, thumbnailUrl, true);
+          loadThumbnail(thisIndex, thumbnailUrl, true, true);
         };
 
         var title = document.createElement("h5");
@@ -1171,7 +1171,7 @@
         document.querySelector('#profileSignIn .img').style.backgroundImage = "url(" + localStorage.getItem("picture") + ")";
 
         // liked videos list
-        fetch("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=LL&maxResults=100", {
+        fetch("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=LL&maxResults=50", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem('access_token')
           }

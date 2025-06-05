@@ -844,7 +844,11 @@
 
     function loadThumbnail(j, url, s, m) {
       if (s) {
-        var thumbnail = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail")[j];
+        if (m) {
+          var thumbnail = document.querySelectorAll(".wrapper.profile .result_wrapper .thumbnail")[j];
+        } else {
+          var thumbnail = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail")[j];
+        }
       } else {
         var thumbnail = document.querySelectorAll(".wrapper.search .result_wrapper .thumbnail")[j];
       }
