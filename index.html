@@ -1178,6 +1178,7 @@
         var watchLaterWrap = document.querySelector(".wrapper.profile .watchLater");
 
         var likedVideos = [];
+        var watchLaterVideos = [];
 
         document.querySelector('#profileSignIn .img').classList.add("signedIn");
         document.querySelector('#profileSignIn .img').style.backgroundImage = "url(" + localStorage.getItem("picture") + ")";
@@ -1194,6 +1195,23 @@
           likedVideos = data.items;
 
           showPlaylist(likedVideos, likedWrap);
+        })
+        .catch(error => {
+          console.error("Error fetching liked videos:", error);
+        });
+
+        // watch later videos list
+        fetch("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=WL&maxResults=50", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem('access_token')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Watch Later Videos:", data.items);
+          watchLaterVideos = data.items;
+
+          showPlaylist(watchLaterVideos, watchLaterWrap);
         })
         .catch(error => {
           console.error("Error fetching liked videos:", error);
