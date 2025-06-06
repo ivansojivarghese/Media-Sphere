@@ -1182,18 +1182,18 @@
 
     function userTabsChange(t) {
       var allbtn = document.querySelectorAll(".wrapper.profile .nav div");
-      var allwrap = document.querySelectorAll(".wrapper.profile < div");
+      var allwrap = document.querySelectorAll(".wrapper.profile > div");
       allbtn.forEach(btn => btn.classList.remove("active"));
       allwrap.forEach(wrap => wrap.style.display = "none");
       if (t === "liked") {
-        var btn = document.querySelectorAll(".wrapper.profile .nav .likedBtn");
-        var wrap = document.querySelectorAll(".wrapper.profile .liked");
+        var btn = document.querySelector(".wrapper.profile .nav .likedBtn");
+        var wrap = document.querySelector(".wrapper.profile .liked");
         btn.classList.add("active");
 
         wrap.style.display = "block";
       } else if (t === "playlists") {
-        var btn = document.querySelectorAll(".wrapper.profile .nav .playlistsBtn");
-        var wrap = document.querySelectorAll(".wrapper.profile .playlists");
+        var btn = document.querySelector(".wrapper.profile .nav .playlistsBtn");
+        var wrap = document.querySelector(".wrapper.profile .playlists");
         btn.classList.add("active");
 
         wrap.style.display = "block";
