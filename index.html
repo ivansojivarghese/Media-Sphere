@@ -1060,13 +1060,17 @@
       getUserData();
     };
 
-    function showPlaylist(ar, el) {
+    function showPlaylist(ar, el, m) {
       for (let i = 0; i < ar.length; i++) {
         var main = document.createElement("div");
         main.classList.add("result_wrapper", "trs", "cursor", "trsButtons", "noimg");
         main.title = ar[i].snippet.title;
 
-        main.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[i].snippet.resourceId.videoId);
+        if (m) {
+          main.setAttribute("data-url", "https://www.youtube.com/playlist?list=" + ar[i].id);
+        } else {
+          main.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[i].snippet.resourceId.videoId);
+        }
 
         main.onclick = function(event) {
           videoNav = true;
@@ -1098,6 +1102,19 @@
           };
         }
 
+        if (m) {
+          var thumbnailIconWrap = document.createElement("div");
+          thumbnailIconWrap.classList.add("thumbnailIconWrap");
+
+          var thumbnailIcon = document.createElement("div");
+          thumbnailIcon.classList.add("thumbnailIcon", "img");
+          thumbnailIcon.style.backgroundImage = "url('svg/playlist_play.svg')";
+          // thumbnailIcon.style.backgroundColor = "#3f3f3f";
+
+          thumbnailIconWrap.appendChild(thumbnailIcon);
+          thumbnail.appendChild(thumbnailIconWrap);
+        }
+
         var title = document.createElement("h5");
         title.innerHTML = ar[i].snippet.title;
         title.classList.add("overflow", "resultTitle");
@@ -1107,7 +1124,12 @@
         channelTitle.classList.add("overflow", "resultChannelTitle");
 
         var date = document.createElement("p");
-        date.innerHTML = timeAgo(ar[i].snippet.publishedAt);
+        if (m) {
+          var s = ar[i].contentDetails.itemCount === 1 ? " video" : " videos";
+          date.innerHTML = ar[i].contentDetails.itemCount + s;
+        } else {
+          date.innerHTML = timeAgo(ar[i].snippet.publishedAt);
+        }
         date.classList.add("resultDate");
 
         var textDiv = document.createElement("div");
@@ -1232,7 +1254,7 @@
           console.log("Playlists:", data.items);
           playlistsVideos = data.items;
 
-          showPlaylist(playlistsVideos, playlistsWrap);
+          showPlaylist(playlistsVideos, playlistsWrap, true);
 
         })
         .catch(error => {
