@@ -1182,7 +1182,7 @@
 
     function userTabsChange(t) {
       var allbtn = document.querySelectorAll(".wrapper.profile .nav div");
-      var allwrap = document.querySelectorAll(".wrapper.profile .wrap");
+      var allwrap = document.querySelectorAll(".wrapper.profile .wrapPage");
       allbtn.forEach(btn => btn.classList.remove("active"));
       allwrap.forEach(wrap => wrap.style.display = "none");
       if (t === "liked") {
