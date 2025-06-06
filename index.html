@@ -1222,6 +1222,23 @@
           console.error("Error fetching watch later videos:", error);
         });*/
 
+        fetch("https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&mine=true&maxResults=50", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("access_token")
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Playlists:", data.items);
+          data.items.forEach(playlist => {
+            console.log(playlist.snippet.title, playlist.id);
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching playlists:", error);
+        });
+
+
         if (!localStorage.getItem("mediaURL")) {
           document.getElementById('profileSignIn').onclick = () => {
             openProfile();
