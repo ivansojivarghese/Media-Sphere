@@ -558,9 +558,10 @@
               <div class="liked">
                 <h3>Liked videos</h3>
               </div>
+              <!-- 
               <div class="watchLater" style="display: none;">
                 <h3>Watch Later</h3>
-              </div>
+              </div> -->
               <div class="playlists" style="display: none;">
                 <h3>Playlists</h3>
               </div>
@@ -568,9 +569,10 @@
                 <div class="likedBtn cursor trs trsButtons noimg active" title="Liked Videos">
                   <div class="img"></div>
                 </div>
+                <!-- 
                 <div class="watchBtn cursor trs trsButtons noimg" title="Watch Later">
                   <div class="img"></div>
-                </div>
+                </div> -->
                 <div class="playlistsBtn cursor trs trsButtons noimg" title="Playlists">
                   <div class="img"></div>
                 </div>
@@ -1175,10 +1177,12 @@
         }
 
         var likedWrap = document.querySelector(".wrapper.profile .liked");
-        var watchLaterWrap = document.querySelector(".wrapper.profile .watchLater");
+        // var watchLaterWrap = document.querySelector(".wrapper.profile .watchLater");
+        var playlistsWrap = document.querySelector(".wrapper.profile .playlists");
 
         var likedVideos = [];
-        var watchLaterVideos = [];
+        var playlistsVideos = [];
+        // var watchLaterVideos = [];
 
         document.querySelector('#profileSignIn .img').classList.add("signedIn");
         document.querySelector('#profileSignIn .img').style.backgroundImage = "url(" + localStorage.getItem("picture") + ")";
@@ -1201,6 +1205,7 @@
         });
 
         // watch later videos list
+        /*
         fetch("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=WL&maxResults=50", {
           headers: {
             Authorization: "Bearer " + localStorage.getItem('access_token')
@@ -1214,8 +1219,8 @@
           showPlaylist(watchLaterVideos, watchLaterWrap);
         })
         .catch(error => {
-          console.error("Error fetching liked videos:", error);
-        });
+          console.error("Error fetching watch later videos:", error);
+        });*/
 
         if (!localStorage.getItem("mediaURL")) {
           document.getElementById('profileSignIn').onclick = () => {
