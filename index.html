@@ -1159,6 +1159,9 @@
     }
 
     var decoded, user, youtube, token, expiryTime;
+    var likedVideos = [];
+    var playlistsVideos = [];
+    
     async function getUserData() {
       const params = new URLSearchParams(window.location.search);
       token = params.get('token');
@@ -1213,8 +1216,6 @@
         // var watchLaterWrap = document.querySelector(".wrapper.profile .watchLater");
         var playlistsWrap = document.querySelector(".wrapper.profile .playlists");
 
-        var likedVideos = [];
-        var playlistsVideos = [];
         // var watchLaterVideos = [];
 
         document.querySelector('#profileSignIn .img').classList.add("signedIn");

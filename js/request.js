@@ -846,6 +846,16 @@
     function loadThumbnail(j, url, s, m, k) {
       if (s) {
         if (m) {
+          var r = (likedVideos.length >= playlistsVideos.length) ? true : false;
+          if (r) {
+            if (j - playlistsVideos.length >= 0) {
+              j = j - playlistsVideos.length;
+            } 
+          } else {
+            if (j - likedVideos.length >= 0) {
+              j = j - likedVideos.length;
+            } 
+          }
           if (k) {
             var thumbnail = document.querySelectorAll(".wrapper.profile .playlists .result_wrapper .thumbnail")[j];
           } else {
