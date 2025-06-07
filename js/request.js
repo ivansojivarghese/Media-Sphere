@@ -111,6 +111,8 @@
             // activate media sessions api skip forward button
             // showvideocontrols()
 
+            // show player to select
+
             // add relevant details to localstorage
 
           } else if (q === "false") { // end queue
