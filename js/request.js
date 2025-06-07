@@ -348,7 +348,7 @@
 
           showInputErrorFeedback("Invalid URL. Try again.");
         }
-      } else if (!testForUrl(inp.value)) {
+      } else if (!testForUrl(inp.value) && inp.value) {
 
         loadingSpace.style.display = "block";
         videoInfoElm.info.style.overflow = "hidden";

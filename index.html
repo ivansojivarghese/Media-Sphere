@@ -479,6 +479,9 @@
                 <div id="statusIndicator" class="seekButton" style="display: none;">
                   <div class="trs"></div>
                 </div>
+                <div id="queueButton" class="seekButton trsButtons trs" title="Queue" style="display: none;">
+                  <div class="img trs controlButton"></div>
+                </div>
                 <div id="pipButton" class="seekButton trsButtons trs" title="Picture-in-Picture">
                   <div class="img trs controlButton"></div>
                 </div>
@@ -1161,7 +1164,7 @@
     var decoded, user, youtube, token, expiryTime;
     var likedVideos = [];
     var playlistsVideos = [];
-    
+
     async function getUserData() {
       const params = new URLSearchParams(window.location.search);
       token = params.get('token');

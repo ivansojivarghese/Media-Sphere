@@ -442,6 +442,10 @@ a.noUnderline {
     background-image: url("../svg/search.svg");
 }
 
+#queueButton .img {
+    background-image: url("../svg/playlist_play.svg");
+}
+
 #fullscreenButton .img {
     background-image: url("../svg/fullscreen.svg");
 }
