@@ -104,7 +104,7 @@
           var wrap = document.querySelector("#settingsOptions");
           var contents = u || inp.value;
 
-          if (q) { // start queue
+          if (q === "true") { // start queue
             queueBtn.style.display = "block";
             playForwardButton.style.display = "block";
 
@@ -113,7 +113,7 @@
 
             // add relevant details to localstorage
 
-          } else { // end queue
+          } else if (q === "false") { // end queue
             queueBtn.style.display = "none";
             playForwardButton.style.display = "none";
 
