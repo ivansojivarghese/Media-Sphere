@@ -77,8 +77,10 @@
           }
           videoInfoElm.info.removeEventListener("scroll", ch);
     }
+
+    var queueBtn = document.querySelector("#queueButton");
     
-    function getURL(u, m) { // 
+    function getURL(u, m, q) { // 
 
       videoInfoElm.suggestions.innerHTML = "";
       searchSuggestions = [];
@@ -101,6 +103,18 @@
           var wrapURL = document.querySelector("#urlInput");
           var wrap = document.querySelector("#settingsOptions");
           var contents = u || inp.value;
+
+          if (q) { // start queue
+            queueBtn.style.display = "block";
+            seekForwardButton.style.display = "block";
+
+            
+          } else { // end queue
+            queueBtn.style.display = "none";
+            seekForwardButton.style.display = "none";
+
+            // clear queue
+          }
 
           if (u) {
             // closeVideoInfo();
@@ -984,12 +998,14 @@
     
             if (data[i].type === "video") {
               main.setAttribute("data-url", "https://www.youtube.com/watch?v=" + data[i].videoId);
+              main.setAttribute("data-queue", false);
             } else {
               main.setAttribute("data-url", "https://www.youtube.com/playlist?list=" + data[i].playlistId);
+              main.setAttribute("data-queue", true);
             }
             main.onclick = function(event) {
               videoNav = true;
-              getURL(event.currentTarget.getAttribute("data-url"), true);
+              getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"));
             };
     
             if (data[i].badges && data[i].badges.length) {

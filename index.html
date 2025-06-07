@@ -1071,13 +1071,15 @@
 
         if (m) {
           main.setAttribute("data-url", "https://www.youtube.com/playlist?list=" + ar[i].id);
+          main.setAttribute("data-queue", true);
         } else {
           main.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[i].snippet.resourceId.videoId);
+          main.setAttribute("data-queue", false);
         }
 
         main.onclick = function(event) {
           videoNav = true;
-          getURL(event.currentTarget.getAttribute("data-url"), true);
+          getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"));
         };
 
         var thumbnail = document.createElement("div");
