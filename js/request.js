@@ -106,12 +106,12 @@
 
           if (q) { // start queue
             queueBtn.style.display = "block";
-            seekForwardButton.style.display = "block";
+            playForwardButton.style.display = "block";
 
-            
+
           } else { // end queue
             queueBtn.style.display = "none";
-            seekForwardButton.style.display = "none";
+            playForwardButton.style.display = "none";
 
             // clear queue
           }

@@ -38,6 +38,7 @@
     const seekForwardButton = document.querySelector('#seekForwardButton');
     const seekBackwardButton = document.querySelector('#seekBackwardButton');
     const playPreviousButton = document.querySelector("#skipPreviousButton");
+    const playForwardButton = document.querySelector("#skipForwardButton");
 
     const seekForwardText = document.querySelector('.seekText.forward');
     const seekBackwardText = document.querySelector('.seekText.backward');
