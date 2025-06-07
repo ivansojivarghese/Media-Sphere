@@ -1100,9 +1100,15 @@
 
           thumbnailURLs[thisIndex] = thumbnailUrl;
 
-          thumbnailImages[thisIndex].onload = function () {
-            loadThumbnail(thisIndex, thumbnailURLs[thisIndex], true, true);
-          };
+          if (m) {
+            thumbnailImages[thisIndex].onload = function () {
+              loadThumbnail(thisIndex, thumbnailURLs[thisIndex], true, true, true);
+            };
+          } else {
+            thumbnailImages[thisIndex].onload = function () {
+              loadThumbnail(thisIndex, thumbnailURLs[thisIndex], true, true);
+            };
+          }
         }
 
         if (m) {

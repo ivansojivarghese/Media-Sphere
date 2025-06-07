@@ -843,10 +843,14 @@
     var thumbnailImages = [];
     var thumbnailURLs = [];
 
-    function loadThumbnail(j, url, s, m) {
+    function loadThumbnail(j, url, s, m, k) {
       if (s) {
         if (m) {
-          var thumbnail = document.querySelectorAll(".wrapper.profile .result_wrapper .thumbnail")[j];
+          if (k) {
+            var thumbnail = document.querySelectorAll(".wrapper.profile .playlists .result_wrapper .thumbnail")[j];
+          } else {
+            var thumbnail = document.querySelectorAll(".wrapper.profile .liked .result_wrapper .thumbnail")[j];
+          }
         } else {
           var thumbnail = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail")[j];
         }
