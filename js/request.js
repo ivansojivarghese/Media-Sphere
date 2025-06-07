@@ -841,6 +841,7 @@
     }
 
     var thumbnailImages = [];
+    var thumbnailURLs = [];
 
     function loadThumbnail(j, url, s, m) {
       if (s) {

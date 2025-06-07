@@ -1097,8 +1097,11 @@
           thumbnailImages[thumbnailImages.length - 1].style.display = "none"; // hide initially
 
           const thisIndex = thumbnailImages.length - 1;
+
+          thumbnailURLs[thisIndex] = thumbnailUrl;
+
           thumbnailImages[thisIndex].onload = function () {
-            loadThumbnail(thisIndex, thumbnailUrl, true, true);
+            loadThumbnail(thisIndex, thumbnailURLs[thisIndex], true, true);
           };
         }
 
