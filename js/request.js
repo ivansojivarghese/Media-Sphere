@@ -108,6 +108,10 @@
             queueBtn.style.display = "block";
             playForwardButton.style.display = "block";
 
+            // activate media sessions api skip forward button
+            // showvideocontrols()
+
+            // add relevant details to localstorage
 
           } else { // end queue
             queueBtn.style.display = "none";
@@ -880,6 +884,10 @@
         }
       } else {
         var thumbnail = document.querySelectorAll(".wrapper.search .result_wrapper .thumbnail")[j];
+        if (typeof thumbnail === 'undefined') {
+          j = j - (likedVideos.length + playlistsVideos.length);
+          var thumbnail = document.querySelectorAll(".wrapper.search .result_wrapper .thumbnail")[j];
+        }
       }
       thumbnail.style.opacity = "0";
       setTimeout(function () {
