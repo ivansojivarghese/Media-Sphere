@@ -428,11 +428,12 @@
 
                 const badges = [];
                 // 1. New: uploaded within 7 days
+                /*
                 const now = new Date();
                 const publishedAt = new Date(video.snippet.publishedAt);
                 const ageInDays = (now - publishedAt) / (1000 * 60 * 60 * 24);
                 if (ageInDays <= 7) badges.push("New");
-
+                */
                 // 2. 4K: Has 'maxres' thumbnail and HD flag
                 /*
                 const hasMaxRes = !!thumbs.maxres;

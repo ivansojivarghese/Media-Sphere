@@ -2056,7 +2056,7 @@ function timeAgo(dateString) { // ISO8601 date string to human-readable string c
   }
 
   const months = Math.floor(days / 30);
-  if (months < 12) {
+  if (months <= 12) {
       return `${months} ${months === 1 ? 'month' : 'months'} ago`;
   }
 
