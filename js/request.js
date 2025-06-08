@@ -119,7 +119,7 @@
               
               // Create and append the DOM elements inside the clicked element
               const thumbnailPlay = document.createElement("div");
-              const thumbnailPlayImg = document.createElement("img");
+              const thumbnailPlayImg = document.createElement("div");
               thumbnailPlayImg.classList.add("play", "img");
               thumbnailPlay.classList.add("playing");
 
@@ -128,7 +128,7 @@
               thumbnail.appendChild(thumbnailPlay);
 
               const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-              const scrollInit = Number(event.currentTarget.getAttribute("data-queue")) * 6 * rootFontSize;
+              const scrollInit = Number(event.currentTarget.getAttribute("data-queueIndex")) * 6 * rootFontSize;
               // scroll to current video playing (y)
               queueContainer.scrollTo({
                 top: scrollInit,
@@ -136,7 +136,7 @@
               });
 
               event.currentTarget.classList.add("active");
-              getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"));
+              getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"), event.currentTarget.getAttribute("data-queueIndex"));
             };
           }
 
