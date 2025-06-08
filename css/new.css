@@ -757,7 +757,7 @@ div.thumbnailIcon {
     height: 8rem;
 }
 
-#infoContainer .headSec, #infoContainer .nav {
+#infoContainer .headSec, #infoContainer .nav, .headSec {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -766,10 +766,11 @@ div.thumbnailIcon {
     padding-top: 1rem;
     padding-bottom: 1rem;
     padding-right: calc(env(safe-area-inset-right));
+    padding-left: calc(env(safe-area-inset-left));
     height: 3rem;
 }
 
-#infoContainer .head .cursor, #infoContainer .wrapper.profile .nav .cursor {
+#infoContainer .head .cursor, #infoContainer .wrapper.profile .nav .cursor, #queueList .headSec .cursor {
     height: 2rem;
     width: 3rem;
     padding: 0.75rem 0;
@@ -779,6 +780,14 @@ div.thumbnailIcon {
     /*border-radius: 0.5rem;*/
     border-radius: 50%;
     background-color: #3f3f3f;
+}
+
+#queueList .headSec {
+    justify-content: space-between;
+}
+
+#queueList .headSec .cursor {
+    margin-top: 0;
 }
 
 #infoContainer .wrapper.profile .nav .cursor {
@@ -886,7 +895,7 @@ div.badge:first-child {
     margin: 0 auto;
 }
 
-#infoContainer .closeBtn .img {
+#infoContainer .closeBtn .img, .closeBtn .img {
     background-image: url("../svg/close.svg");
     margin-right: calc(env(safe-area-inset-right));
 }
