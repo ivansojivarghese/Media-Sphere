@@ -117,6 +117,9 @@
 
             d.onclick = function(event) {
               videoNav = true;
+
+              const allQueueThumbnails = document.querySelector("#queueList .videosQueue .queuePicture .playing");
+              allQueueThumbnails.forEach(thumb => thumb.remove());
               
               // Create and append the DOM elements inside the clicked element
               const thumbnailPlay = document.createElement("div");
@@ -204,6 +207,8 @@
             // show player to select - add all videos, thumbails, and info, details 
               // add a flag for likedvideos to start from that array, etc.
               // add getURL links to all inside queue
+
+            // active the radio toggle localstorage for automatic playback (foreground and background) - unless loop is active
 
             // add relevant details to localstorage - esp. for custom created queues, liked and playlists
 
@@ -972,6 +977,11 @@
             } 
           }
           if (k) {
+            /*
+            if (j > playlistsVideos.length) {
+              j = j - playlistsVideos.length;
+            }
+              */
             var thumbnail = document.querySelectorAll(".wrapper.profile .playlists .result_wrapper .thumbnail")[j];
           } else {
             var thumbnail = document.querySelectorAll(".wrapper.profile .liked .result_wrapper .thumbnail")[j];

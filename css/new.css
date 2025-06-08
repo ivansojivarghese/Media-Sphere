@@ -90,6 +90,14 @@ video.secondary {
     div.thumbnailIconWrap {
         padding: 3.5rem 0 !important;
     }
+
+    #queueList {
+        height: 100vh;
+    }
+
+    .videosQueue {
+        height: calc(100vh - 6rem);
+    }
     /*
     #infoContainer .suggestions {
         height: 7rem !important;
