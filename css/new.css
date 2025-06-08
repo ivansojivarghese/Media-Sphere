@@ -513,6 +513,7 @@ h5.queueTitle {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 4; /* Adjust based on how many lines fit in 5rem */
+    line-clamp: 4;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: normal;
