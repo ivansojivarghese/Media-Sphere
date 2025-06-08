@@ -468,6 +468,10 @@
       event.stopPropagation();
       queueElement.style.transform = "";
       queueOpen = false;
+      if (!loading && !videoLoad && !queueOpen && !seeking && !seekingLoad && !longTap) {
+        hideVideoControls();
+        console.log("hideVC");
+      }
     }
 
 /*
