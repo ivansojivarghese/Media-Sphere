@@ -164,6 +164,8 @@
 
       }
     }
+
+    var queueActive = false;
     
     function getURL(u, m, q, k, y) { // 
 
@@ -189,11 +191,13 @@
           var wrap = document.querySelector("#settingsOptions");
           var contents = u || inp.value;
 
-          if (q === "true") { // start queue
+          if (q === "true" && !queueActive) { // start queue
             queueBtn.style.display = "block";
             playForwardButton.style.display = "block";
 
             updateQueue(k, y);
+
+            queueActive = true;
 
             // activate media sessions api skip forward button
 
@@ -203,9 +207,11 @@
 
             // add relevant details to localstorage - esp. for custom created queues, liked and playlists
 
-          } else if (q === "false") { // end queue
+          } else if (q === "false" && queueActive) { // end queue
             queueBtn.style.display = "none";
             playForwardButton.style.display = "none";
+
+            queueActive = false;
 
             // clear queue
           }
