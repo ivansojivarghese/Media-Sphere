@@ -92,11 +92,11 @@ video.secondary {
     }
 
     #queueList {
-        height: 100vh;
+        height: 100vh !important;
     }
 
     .videosQueue {
-        height: calc(100vh - 6rem);
+        height: calc(100vh - 6rem) !important;
     }
     /*
     #infoContainer .suggestions {
