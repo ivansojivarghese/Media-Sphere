@@ -89,7 +89,7 @@
 
           var thumbnail = document.createElement("div");
           var title = document.createElement("h5");
-          thumbnail.classList.add("queuePicture");
+          thumbnail.classList.add("queuePicture", "img");
           title.classList.add("queueTitle");
 
           let thumbUrl = ar[j].snippet.thumbnails.default?.url;
