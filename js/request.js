@@ -977,11 +977,11 @@
             } 
           }
           if (k) {
-            /*
+            
             if (j > playlistsVideos.length) {
               j = j - playlistsVideos.length;
             }
-              */
+            
             var thumbnail = document.querySelectorAll(".wrapper.profile .playlists .result_wrapper .thumbnail")[j];
           } else {
             var thumbnail = document.querySelectorAll(".wrapper.profile .liked .result_wrapper .thumbnail")[j];
