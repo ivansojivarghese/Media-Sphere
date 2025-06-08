@@ -93,7 +93,7 @@
           var title = document.createElement("h5");
           thumbnailPlayImg.classList.add("play", "img");
           thumbnailPlay.classList.add("playing");
-          thumbnail.classList.add("queuePicture", "img");
+          thumbnail.classList.add("queuePicture", "img", "trs");
           title.classList.add("queueTitle");
 
           let thumbUrl = ar[j].snippet.thumbnails.medium?.url;
@@ -102,7 +102,7 @@
           }
           title.innerHTML = ar[j].snippet.title;
 
-          d.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[i].snippet.resourceId.videoId);
+          d.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[j].snippet.resourceId.videoId);
           d.setAttribute("data-queue", true);
           d.setAttribute("data-type", "liked");
 
