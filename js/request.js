@@ -116,6 +116,18 @@
 
             d.onclick = function(event) {
               videoNav = true;
+              
+              // Create and append the DOM elements inside the clicked element
+              const thumbnailPlay = document.createElement("div");
+              const thumbnailPlayImg = document.createElement("img");
+              thumbnailPlayImg.classList.add("play", "img");
+              thumbnailPlay.classList.add("playing");
+
+              const thumbnail = event.currentTarget.querySelector('.thumbnail');
+               thumbnailPlay.appendChild(thumbnailPlayImg);
+              thumbnail.appendChild(thumbnailPlay);
+
+              event.currentTarget.classList.add("active");
               getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"));
             };
           }
