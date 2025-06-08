@@ -105,10 +105,14 @@
           if (Number(y) === j) {
             thumbnailPlay.appendChild(thumbnailPlayImg);
             thumbnail.appendChild(thumbnailPlay);
+            d.classList.add("active");
+          } else {
+
+            // reset
           }
           d.appendChild(thumbnail);
           d.appendChild(title);
-          d.classList.add("queueWrap");
+          d.classList.add("queueWrap", "trs", "trsButtons", "cursor");
 
           if (title.innerHTML.indexOf("Deleted") === -1) {
             queueContainer.appendChild(d);
@@ -116,7 +120,7 @@
         }
       } else if (k === "playlist") {
 
-      } else {
+      } else { // custom queue
 
       }
     }
@@ -152,12 +156,12 @@
             updateQueue(k, y);
 
             // activate media sessions api skip forward button
-            // showvideocontrols()
 
             // show player to select - add all videos, thumbails, and info, details 
               // add a flag for likedvideos to start from that array, etc.
+              // add getURL links to all inside queue
 
-            // add relevant details to localstorage - esp. for custom created queues
+            // add relevant details to localstorage - esp. for custom created queues, liked and playlists
 
           } else if (q === "false") { // end queue
             queueBtn.style.display = "none";
