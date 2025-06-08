@@ -102,14 +102,24 @@
           }
           title.innerHTML = ar[j].snippet.title;
 
+          d.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[i].snippet.resourceId.videoId);
+          d.setAttribute("data-queue", true);
+          d.setAttribute("data-type", "liked");
+
           if (Number(y) === j) {
             thumbnailPlay.appendChild(thumbnailPlayImg);
             thumbnail.appendChild(thumbnailPlay);
             d.classList.add("active");
           } else {
 
-            // reset
+            // reset everything else from other videos in queue
+
+            d.onclick = function(event) {
+              videoNav = true;
+              getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"));
+            };
           }
+
           d.appendChild(thumbnail);
           d.appendChild(title);
           d.classList.add("queueWrap", "trs", "trsButtons", "cursor");
