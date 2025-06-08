@@ -483,6 +483,12 @@ a.noUnderline {
     border: 0.125rem solid #FFF;
 }
 
+.videosQueue {
+    padding: 0 1rem;
+    padding-left: calc(1rem + calc(safe-area-inset-left));
+    padding-right: calc(1rem + calc(safe-area-inset-right));
+}
+
 #queueList {
     width: 100vw;
     height: 60vh;
@@ -491,6 +497,30 @@ a.noUnderline {
     bottom: 0;
     z-index: 10;
     box-shadow: rgba(0, 0, 0, 0.2) 0px -0.21rem 0.53rem;
+}
+
+div.queuePicture {
+    width: 9rem;
+    height: 5rem;
+    display: inline-block;
+    border-radius: 0.5rem;
+}
+
+h5.queueTitle {
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4; /* Adjust based on how many lines fit in 5rem */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    width: calc(100% - 10rem);
+    margin: 0;
+    margin-left: 1rem;
+    height: 5rem;
+    line-height: 1.2rem;
 }
 
 .seekText {

@@ -86,6 +86,8 @@
 
       var thumbnail = document.createElement("div");
       var title = document.createElement("h5");
+      thumbnail.classList.add("queuePicture");
+      title.classList.add("queueTitle");
 
       d.appendChild(thumbnail);
       d.appendChild(title);
