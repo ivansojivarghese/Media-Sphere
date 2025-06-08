@@ -79,6 +79,19 @@
     }
 
     var queueBtn = document.querySelector("#queueButton");
+    var queueContainer = document.querySelector("#queueList .videosQueue");
+
+    function updateQueue() {
+      var d = document.createElement("div");
+
+      var thumbnail = document.createElement("div");
+      var title = document.createElement("h5");
+
+      d.appendChild(thumbnail);
+      d.appendChild(title);
+
+      queueContainer.appendChild(d);
+    }
     
     function getURL(u, m, q) { // 
 
@@ -108,10 +121,12 @@
             queueBtn.style.display = "block";
             playForwardButton.style.display = "block";
 
+            updateQueue();
+
             // activate media sessions api skip forward button
             // showvideocontrols()
 
-            // show player to select
+            // show player to select - add videos and info, details
 
             // add relevant details to localstorage
 
