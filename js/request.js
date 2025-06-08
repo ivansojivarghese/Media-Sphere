@@ -110,7 +110,9 @@
           d.appendChild(title);
           d.classList.add("queueWrap");
 
-          queueContainer.appendChild(d);
+          if (title.innerHTML.indexOf("Deleted") === -1) {
+            queueContainer.appendChild(d);
+          }
         }
       } else if (k === "playlist") {
 
