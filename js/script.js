@@ -457,6 +457,7 @@
 
     queueButton.addEventListener("click", function(event) {
       if (videoControls.classList.contains('visible')) {
+        event.stopPropagation();
         queueElement.style.transform = "none";
       }
     });

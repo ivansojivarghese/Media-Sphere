@@ -92,10 +92,7 @@
           thumbnail.classList.add("queuePicture");
           title.classList.add("queueTitle");
 
-          let thumbUrl = ar[j].snippet.thumbnails.standard?.url 
-            || ar[j].snippet.thumbnails.high?.url 
-            || ar[j].snippet.thumbnails.medium?.url 
-            || ar[j].snippet.thumbnails.default?.url;
+          let thumbUrl = ar[j].snippet.thumbnails.default?.url;
           if (thumbUrl) {
             thumbnail.style.backgroundImage = `url('${thumbUrl}')`;
           }
