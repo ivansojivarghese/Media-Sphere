@@ -81,8 +81,9 @@
     var queueBtn = document.querySelector("#queueButton");
     var queueContainer = document.querySelector("#queueList .videosQueue");
 
-    function updateQueue(ar) {
-      if (ar) {
+    function updateQueue(k) {
+      if (k === "liked") {
+        var ar = likedVideos;
         for (let j = 0; j < ar.length; j++) {
           var d = document.createElement("div");
 
@@ -97,10 +98,12 @@
 
           queueContainer.appendChild(d);
         }
+      } else if (k === "playlist") {
+        
       }
     }
     
-    function getURL(u, m, q) { // 
+    function getURL(u, m, q, k) { // 
 
       videoInfoElm.suggestions.innerHTML = "";
       searchSuggestions = [];
@@ -128,7 +131,7 @@
             queueBtn.style.display = "block";
             playForwardButton.style.display = "block";
 
-            updateQueue();
+            updateQueue(k);
 
             // activate media sessions api skip forward button
             // showvideocontrols()
@@ -1033,13 +1036,15 @@
             if (data[i].type === "video") {
               main.setAttribute("data-url", "https://www.youtube.com/watch?v=" + data[i].videoId);
               main.setAttribute("data-queue", false);
+              main.setAttribute("data-type", "queue");
             } else {
               main.setAttribute("data-url", "https://www.youtube.com/playlist?list=" + data[i].playlistId);
               main.setAttribute("data-queue", true);
+              main.setAttribute("data-type", "playlist");
             }
             main.onclick = function(event) {
               videoNav = true;
-              getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"));
+              getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"));
             };
     
             if (data[i].badges && data[i].badges.length) {

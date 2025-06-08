@@ -536,7 +536,7 @@
                     <div class="img"></div>
                   </div>
                 </div>
-                <div class="videosQueue" style="display: none;"></div>
+                <div class="videosQueue"></div>
               </div>
           </div>
           <div id="infoContainer" class="trs no-tap">
@@ -1083,14 +1083,16 @@
         if (m) {
           main.setAttribute("data-url", "https://www.youtube.com/playlist?list=" + ar[i].id);
           main.setAttribute("data-queue", true);
+          main.setAttribute("data-type", "playlist");
         } else {
           main.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[i].snippet.resourceId.videoId);
           main.setAttribute("data-queue", true);
+          main.setAttribute("data-type", "liked");
         }
 
         main.onclick = function(event) {
           videoNav = true;
-          getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"));
+          getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"));
         };
 
         var thumbnail = document.createElement("div");
