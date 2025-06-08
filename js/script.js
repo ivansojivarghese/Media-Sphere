@@ -32,6 +32,7 @@
     const playPauseButtonImg = document.querySelector('#playPauseButton .img');    
     // const fullscreenButton = document.querySelector('#fullscreenButton');
     // const settingsButton = document.querySelector('#settingsButton');
+    const queueButton = document.querySelector("#queueButton");
     const searchButton = document.querySelector("#searchButton");
     const fitscreenButton = document.querySelector('#fitscreenButton');
     const pipButton = document.querySelector('#pipButton');
@@ -451,6 +452,18 @@
         openSearch(false, true, event);
       }
     });
+
+    const queueElement = document.querySelector("#queueList");
+
+    queueButton.addEventListener("click", function(event) {
+      if (videoControls.classList.contains('visible')) {
+        queueElement.style.transform = "none";
+      }
+    });
+
+    function closeQueueEl() {
+      queueElement.style.transform = "";
+    }
 
 /*
     settingsButton.addEventListener("click", function(event) {

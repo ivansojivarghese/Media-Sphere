@@ -497,6 +497,7 @@ a.noUnderline {
     bottom: 0;
     z-index: 10;
     box-shadow: rgba(0, 0, 0, 0.2) 0px -0.21rem 0.53rem;
+    transform: translateY(100%);
 }
 
 div.queueWrap {
