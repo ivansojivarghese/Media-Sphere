@@ -92,6 +92,9 @@
           thumbnail.classList.add("queuePicture");
           title.classList.add("queueTitle");
 
+          thumbnail.style.backgroundImage = "url(" + ar.snippet.thumbnails.standard.url + ")";
+          title.innerHTML = ar.snippet.title;
+
           d.appendChild(thumbnail);
           d.appendChild(title);
           d.classList.add("queueWrap");
@@ -99,7 +102,9 @@
           queueContainer.appendChild(d);
         }
       } else if (k === "playlist") {
-        
+
+      } else {
+
       }
     }
     
