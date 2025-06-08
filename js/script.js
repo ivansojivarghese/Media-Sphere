@@ -262,7 +262,7 @@
                 console.log("hideLR");
                 loadingRing.style.display = "none";
                 playPauseButton.style.display = "block";
-                if (!seekingLoad && !longTap && !seeking && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad))))) {
+                if (!seekingLoad && !queueOpen && !longTap && !seeking && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad))))) {
                   hideVideoControls();
                   console.log("hideVC");
                 }
@@ -454,16 +454,19 @@
     });
 
     const queueElement = document.querySelector("#queueList");
+    var queueOpen = false;
 
     queueButton.addEventListener("click", function(event) {
       if (videoControls.classList.contains('visible')) {
         event.stopPropagation();
         queueElement.style.transform = "none";
+        queueOpen = true;
       }
     });
 
     function closeQueueEl() {
       queueElement.style.transform = "";
+      queueOpen = false;
     }
 
 /*
@@ -806,7 +809,7 @@
           playPauseButton.title = "Pause";
 
           if (firstPlay) {
-            if (!seekingLoad && !longTap && !seeking) {
+            if (!seekingLoad && !queueOpen && !longTap && !seeking) {
               hideVideoControls();
               console.log("hideVC");
             }
@@ -816,7 +819,7 @@
             controlsHideInt = null;
             if (controlsHideInt === null) {
               controlsHideInt = setTimeout(function() {
-                if (!seekingLoad && !longTap && !seeking && !video.paused) {
+                if (!seekingLoad && !queueOpen && !longTap && !seeking && !video.paused) {
                   hideVideoControls();
                   console.log("hideVC");
                 }
@@ -1045,14 +1048,14 @@
           showVideoControls();
           if (controlsHideInt === null) {
             controlsHideInt = setTimeout(function() { 
-              if (!loading && !video.paused && !videoLoad && !seeking && !seekingLoad) {
+              if (!loading && !queueOpen && !video.paused && !videoLoad && !seeking && !seekingLoad) {
                 hideVideoControls();
                 console.log("hideVC");
               } else if (!loading) {
                 clearTimeout(controlsHideInt);
                 controlsHideInt = null;
                 controlsHideInt = setInterval(function() {
-                  if (!loading && !videoLoad && !seeking && !seekingLoad && !video.paused) {
+                  if (!loading && !queueOpen && !videoLoad && !seeking && !seekingLoad && !video.paused) {
                     hideVideoControls();
                     console.log("hideVC");
                     clearInterval(controlsHideInt);
@@ -1068,7 +1071,7 @@
 
     videoControls.addEventListener("mouseleave", function(event) {
       if ((player && !player.isConnected) || !player) {
-        if (!video.paused && video.src !== "" && interactiveType === "mouse" && !seekingLoad && !longTap && !seeking) {
+        if (!video.paused && !queueOpen && video.src !== "" && interactiveType === "mouse" && !seekingLoad && !longTap && !seeking) {
           clearTimeout(controlsHideInt);
           controlsHideInt = null;
           hideVideoControls();
@@ -1367,14 +1370,14 @@
             if (controlsHideInt === null && !hide) {
               showVideoControls();
               controlsHideInt = setTimeout(function() {
-                if (!loading && !video.paused && !seekingLoad && !longTap && !seeking) {
+                if (!loading && !queueOpen && !video.paused && !seekingLoad && !longTap && !seeking) {
                   hideVideoControls();
                   console.log("hideVC");
                 } else if (loading) {
                   clearTimeout(controlsHideInt);
                   controlsHideInt = null;
                   controlsHideInt = setInterval(function() {
-                    if (!loading && !seekingLoad && !longTap && !seeking && !video.paused) {
+                    if (!loading && !queueOpen && !seekingLoad && !longTap && !seeking && !video.paused) {
                       hideVideoControls();
                       console.log("hideVC");
                       clearInterval(controlsHideInt);
@@ -1390,13 +1393,13 @@
             if (videoControls.classList.contains('visible') && !seeking && !seekingLoad && !video.paused && !loading) {
               if (event.target === playPauseButton || event.target === playPauseButtonImg) { // IF PLAY/PAUSE button clicked
                 setTimeout(function() {
-                  if (!seekingLoad && !longTap && !seeking) {
+                  if (!seekingLoad && !queueOpen && !longTap && !seeking) {
                     hideVideoControls();
                     console.log("hideVC");
                   }
                 }, 1000);
               } else {
-                if (!seekingLoad && !longTap && !seeking) {
+                if (!seekingLoad && !queueOpen && !longTap && !seeking) {
                   hideVideoControls();
                   console.log("hideVC");
                 }
@@ -1405,14 +1408,14 @@
               showVideoControls();
               if (controlsHideInt === null) {
                 controlsHideInt = setTimeout(function() {
-                  if (!loading && !video.paused && !seekingLoad && !longTap && !seeking) {
+                  if (!loading && !queueOpen && !video.paused && !seekingLoad && !longTap && !seeking) {
                     hideVideoControls();
                     console.log("hideVC");
                   } else if (loading) {
                     clearTimeout(controlsHideInt);
                     controlsHideInt = null;
                     controlsHideInt = setInterval(function() {
-                      if (!loading && !seekingLoad && !longTap && !seeking && !video.paused) {
+                      if (!loading && !queueOpen && !seekingLoad && !longTap && !seeking && !video.paused) {
                         hideVideoControls();
                         console.log("hideVC");
                         clearInterval(controlsHideInt);
@@ -2623,7 +2626,7 @@
 
           console.log("audioVideoAlign: paused");
 
-          if ((qualityBestChange || qualityChange) && audio.paused && !seekingLoad && !longTap && !seeking) {
+          if ((qualityBestChange || qualityChange) && audio.paused && !seekingLoad && !longTap && !queueOpen && !seeking) {
             audio.play();
             hideVideoControls();
             console.log("hideVC");
@@ -2849,7 +2852,7 @@
 
             if (controlsHideInt === null && !video.paused) {
               controlsHideInt = setTimeout(function() {
-                if (!seekingLoad && !longTap && !seeking && !video.paused) {
+                if (!seekingLoad && !queueOpen && !longTap && !seeking && !video.paused) {
                   hideVideoControls();
                   console.log("hideVC");
                 }
@@ -2929,7 +2932,7 @@
 
             if (controlsHideInt === null && !video.paused) {
               controlsHideInt = setTimeout(function() {
-                if (!seekingLoad && !longTap && !seeking && !video.paused) {
+                if (!seekingLoad && !queueOpen && !longTap && !seeking && !video.paused) {
                   hideVideoControls();
                   console.log("hideVC");
                 }
@@ -4235,7 +4238,7 @@
             loadingRing.style.display = "none";
             playPauseButton.style.display = "block";
 
-            if (!seekingLoad && !longTap && !seeking) {
+            if (!seekingLoad && !queueOpen && !longTap && !seeking) {
               hideVideoControls();
               console.log("hideVC");
             }
@@ -4352,7 +4355,7 @@
                     loadingRing.style.display = "none";
                     playPauseButton.style.display = "block";
 
-                    if (!seekingLoad && !longTap && !seeking) {
+                    if (!seekingLoad && !queueOpen && !longTap && !seeking) {
                       hideVideoControls();
                       console.log("hideVC");
                     }
@@ -5287,7 +5290,7 @@
           clearTimeout(controlsHideInt);
           controlsHideInt = null;
           setTimeout(function() {
-            if (!seekingLoad && !longTap && !seeking) {
+            if (!seekingLoad && !queueOpen && !longTap && !seeking) {
               hideVideoControls();
               console.log("hideVC");
             }
@@ -5470,11 +5473,11 @@
                 }
                 releaseScreenLock(screenLock);
               });
-              if (!loading && !videoLoad && !seeking && !seekingLoad && !longTap) {
+              if (!loading && !videoLoad && !queueOpen && !seeking && !seekingLoad && !longTap) {
                 hideVideoControls();
                 console.log("hideVC");
               }
-          } else if (video.paused && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && video.src !== "" && videoPlay && (!videoRun || backgroundPlay) && !audioRun) {
+          } else if (video.paused && !queueOpen && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && video.src !== "" && videoPlay && (!videoRun || backgroundPlay) && !audioRun) {
             /*
             if (!loading && !videoLoad && !seeking && !seekingLoad && !longTap) {
               hideVideoControls();
