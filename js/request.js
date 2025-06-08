@@ -91,7 +91,7 @@
           var thumbnailPlay = document.createElement("div");
           var thumbnailPlayImg = document.createElement("div");
           var title = document.createElement("h5");
-          thumbnailPlayImg.classList.add("play");
+          thumbnailPlayImg.classList.add("play", "img");
           thumbnailPlay.classList.add("playing");
           thumbnail.classList.add("queuePicture", "img");
           title.classList.add("queueTitle");
