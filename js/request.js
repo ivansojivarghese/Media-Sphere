@@ -123,7 +123,7 @@
               thumbnailPlayImg.classList.add("play", "img");
               thumbnailPlay.classList.add("playing");
 
-              const thumbnail = event.currentTarget.querySelector('.thumbnail');
+              const thumbnail = event.currentTarget.children[0];
                thumbnailPlay.appendChild(thumbnailPlayImg);
               thumbnail.appendChild(thumbnailPlay);
 
@@ -140,6 +140,11 @@
             queueContainer.appendChild(d);
           }
         }
+
+        // scroll to current video playing (y)
+
+
+
       } else if (k === "playlist") {
 
       } else { // custom queue
