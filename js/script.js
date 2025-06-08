@@ -465,6 +465,7 @@
     });
 
     function closeQueueEl() {
+      event.stopPropagation();
       queueElement.style.transform = "";
       queueOpen = false;
     }

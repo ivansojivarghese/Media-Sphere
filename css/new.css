@@ -488,7 +488,8 @@ a.noUnderline {
     padding-left: calc(1rem + calc(env(safe-area-inset-left)));
     padding-right: calc(1rem + calc(env(safe-area-inset-right)));
     overflow-y: scroll;
-    height: calc(60vh - 5rem);
+    height: calc(60vh - 6rem);
+    margin-top: 1rem;
 }
 
 #queueList {
