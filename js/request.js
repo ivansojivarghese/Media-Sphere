@@ -105,6 +105,7 @@
           d.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[j].snippet.resourceId.videoId);
           d.setAttribute("data-queue", true);
           d.setAttribute("data-type", "liked");
+          d.setAttribute("data-queueIndex", j);
 
           if (Number(y) === j) {
             thumbnailPlay.appendChild(thumbnailPlayImg);
