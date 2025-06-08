@@ -118,7 +118,7 @@
             d.onclick = function(event) {
               videoNav = true;
 
-              const allQueueThumbnails = document.querySelector("#queueList .videosQueue .queuePicture .playing");
+              const allQueueThumbnails = document.querySelectorAll("#queueList .videosQueue .queuePicture .playing");
               allQueueThumbnails.forEach(thumb => thumb.remove());
               
               // Create and append the DOM elements inside the clicked element
@@ -132,7 +132,7 @@
               thumbnail.appendChild(thumbnailPlay);
 
               const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-              const scrollInit = Number(event.currentTarget.getAttribute("data-queueIndex")) * 6 * rootFontSize;
+              const scrollInit = (Number(event.currentTarget.getAttribute("data-queueIndex")) + 1) * 6 * rootFontSize;
               // scroll to current video playing (y)
               queueContainer.scrollTo({
                 top: scrollInit,
