@@ -886,7 +886,7 @@ div.badge:first-child {
     background-image: url("../svg/info.svg");
 }
 
-#infoContainer .head .cursor .img {
+#infoContainer .head .cursor .img, #queueList .cursor .img {
     width: 2rem;
     height: 2rem;
     /*
