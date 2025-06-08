@@ -141,9 +141,13 @@
           }
         }
 
+        const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        const scrollInit = Number(y) * 6 * rootFontSize;
         // scroll to current video playing (y)
-
-
+        queueContainer.scrollTo({
+          top: scrollInit,
+          behavior: "smooth",
+        });
 
       } else if (k === "playlist") {
 
