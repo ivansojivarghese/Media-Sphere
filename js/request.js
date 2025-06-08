@@ -81,14 +81,18 @@
     var queueBtn = document.querySelector("#queueButton");
     var queueContainer = document.querySelector("#queueList .videosQueue");
 
-    function updateQueue(k) {
+    function updateQueue(k, y) {
       if (k === "liked") {
         var ar = likedVideos;
         for (let j = 0; j < ar.length; j++) {
           var d = document.createElement("div");
 
           var thumbnail = document.createElement("div");
+          var thumbnailPlay = document.createElement("div");
+          var thumbnailPlayImg = document.createElement("div");
           var title = document.createElement("h5");
+          thumbnailPlayImg.classList.add("play");
+          thumbnailPlay.classList.add("playing");
           thumbnail.classList.add("queuePicture", "img");
           title.classList.add("queueTitle");
 
@@ -98,6 +102,10 @@
           }
           title.innerHTML = ar[j].snippet.title;
 
+          if (Number(y) === j) {
+            thumbnailPlay.appendChild(thumbnailPlayImg);
+            thumbnail.appendChild(thumbnailPlay);
+          }
           d.appendChild(thumbnail);
           d.appendChild(title);
           d.classList.add("queueWrap");
@@ -111,7 +119,7 @@
       }
     }
     
-    function getURL(u, m, q, k) { // 
+    function getURL(u, m, q, k, y) { // 
 
       videoInfoElm.suggestions.innerHTML = "";
       searchSuggestions = [];
@@ -139,7 +147,7 @@
             queueBtn.style.display = "block";
             playForwardButton.style.display = "block";
 
-            updateQueue(k);
+            updateQueue(k, y);
 
             // activate media sessions api skip forward button
             // showvideocontrols()

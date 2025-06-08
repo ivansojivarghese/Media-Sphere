@@ -513,6 +513,21 @@ div.queuePicture {
     border-radius: 0.5rem;
 }
 
+div.queuePicture div.playing {
+    width: 100%;
+    height: calc(100% - 3rem);
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 0.5rem;
+    padding: 1.5rem 0;
+}
+
+div.queuePicture div.play {
+    width: 2rem;
+    height: 2rem;
+    margin: 0 auto;
+    background-image: url("../svg/play.svg");
+}
+
 h5.queueTitle {
     color: white;
     font-size: 1rem;

@@ -1088,11 +1088,12 @@
           main.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[i].snippet.resourceId.videoId);
           main.setAttribute("data-queue", true);
           main.setAttribute("data-type", "liked");
+          main.setAttribute("data-queueIndex", i);
         }
 
         main.onclick = function(event) {
           videoNav = true;
-          getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"));
+          getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"), event.currentTarget.getAttribute("data-queueIndex"));
         };
 
         var thumbnail = document.createElement("div");
