@@ -92,8 +92,14 @@
           thumbnail.classList.add("queuePicture");
           title.classList.add("queueTitle");
 
-          thumbnail.style.backgroundImage = "url(" + ar[j].snippet.thumbnails.standard.url + ")";
-          title.innerHTML = ar.snippet.title;
+          let thumbUrl = ar[j].snippet.thumbnails.standard?.url 
+            || ar[j].snippet.thumbnails.high?.url 
+            || ar[j].snippet.thumbnails.medium?.url 
+            || ar[j].snippet.thumbnails.default?.url;
+          if (thumbUrl) {
+            thumbnail.style.backgroundImage = `url('${thumbUrl}')`;
+          }
+          title.innerHTML = ar[j].snippet.title;
 
           d.appendChild(thumbnail);
           d.appendChild(title);
