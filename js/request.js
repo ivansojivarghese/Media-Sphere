@@ -132,7 +132,7 @@
               thumbnail.appendChild(thumbnailPlay);
 
               const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-              const scrollInit = (Number(event.currentTarget.getAttribute("data-queueIndex")) - 2) * 6 * rootFontSize;
+              const scrollInit = (Number(event.currentTarget.getAttribute("data-queueIndex")) + 2) * 6 * rootFontSize;
               // scroll to current video playing (y)
               queueContainer.scrollTo({
                 top: scrollInit,
