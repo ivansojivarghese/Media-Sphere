@@ -127,6 +127,14 @@
                thumbnailPlay.appendChild(thumbnailPlayImg);
               thumbnail.appendChild(thumbnailPlay);
 
+              const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+              const scrollInit = Number(event.currentTarget.getAttribute("data-queue")) * 6 * rootFontSize;
+              // scroll to current video playing (y)
+              queueContainer.scrollTo({
+                top: scrollInit,
+                behavior: "smooth",
+              });
+
               event.currentTarget.classList.add("active");
               getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"));
             };
