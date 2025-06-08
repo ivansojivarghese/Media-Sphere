@@ -81,18 +81,23 @@
     var queueBtn = document.querySelector("#queueButton");
     var queueContainer = document.querySelector("#queueList .videosQueue");
 
-    function updateQueue() {
-      var d = document.createElement("div");
+    function updateQueue(ar) {
+      if (ar) {
+        for (let j = 0; j < ar.length; j++) {
+          var d = document.createElement("div");
 
-      var thumbnail = document.createElement("div");
-      var title = document.createElement("h5");
-      thumbnail.classList.add("queuePicture");
-      title.classList.add("queueTitle");
+          var thumbnail = document.createElement("div");
+          var title = document.createElement("h5");
+          thumbnail.classList.add("queuePicture");
+          title.classList.add("queueTitle");
 
-      d.appendChild(thumbnail);
-      d.appendChild(title);
+          d.appendChild(thumbnail);
+          d.appendChild(title);
+          d.classList.add("queueWrap");
 
-      queueContainer.appendChild(d);
+          queueContainer.appendChild(d);
+        }
+      }
     }
     
     function getURL(u, m, q) { // 
@@ -128,9 +133,10 @@
             // activate media sessions api skip forward button
             // showvideocontrols()
 
-            // show player to select - add videos and info, details
+            // show player to select - add all videos, thumbails, and info, details 
+              // add a flag for likedvideos to start from that array, etc.
 
-            // add relevant details to localstorage
+            // add relevant details to localstorage - esp. for custom created queues
 
           } else if (q === "false") { // end queue
             queueBtn.style.display = "none";

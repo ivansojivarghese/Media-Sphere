@@ -499,6 +499,10 @@ a.noUnderline {
     box-shadow: rgba(0, 0, 0, 0.2) 0px -0.21rem 0.53rem;
 }
 
+div.queueWrap {
+    margin-bottom: 1rem;
+}
+
 div.queuePicture {
     width: 9rem;
     height: 5rem;
@@ -510,7 +514,7 @@ h5.queueTitle {
     color: white;
     font-size: 1rem;
     font-weight: bold;
-    display: -webkit-box;
+    display: inline-block;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 4; /* Adjust based on how many lines fit in 5rem */
     line-clamp: 4;
@@ -522,6 +526,7 @@ h5.queueTitle {
     margin-left: 1rem;
     height: 5rem;
     line-height: 1.2rem;
+    padding-top: 0.5rem;
 }
 
 .seekText {
