@@ -92,7 +92,7 @@
           thumbnail.classList.add("queuePicture");
           title.classList.add("queueTitle");
 
-          thumbnail.style.backgroundImage = "url(" + ar.snippet.thumbnails.standard.url + ")";
+          thumbnail.style.backgroundImage = "url(" + ar[j].snippet.thumbnails.standard.url + ")";
           title.innerHTML = ar.snippet.title;
 
           d.appendChild(thumbnail);
