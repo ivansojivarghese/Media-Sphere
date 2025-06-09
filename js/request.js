@@ -132,7 +132,8 @@
               thumbnail.appendChild(thumbnailPlay);
 
               const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-              const scrollInit = (Number(event.currentTarget.getAttribute("data-queueIndex")) + 1) * 6 * rootFontSize;
+              // const scrollInit = (Number(event.currentTarget.getAttribute("data-queueIndex")) + 1) * 6 * rootFontSize;
+              const scrollInit = ((Number(event.currentTarget.getAttribute("data-queueIndex"))) * 6 * rootFontSize) + (rootFontSize * (Number(event.currentTarget.getAttribute("data-queueIndex")) / (5/3)));
               // scroll to current video playing (y)
               queueContainer.scrollTo({
                 top: scrollInit,
@@ -154,7 +155,8 @@
         }
 
         const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-        const scrollInit = Number(y + 1) * 6 * rootFontSize;
+        // const scrollInit = Number(y + 1) * 6 * rootFontSize;
+         const scrollInit = ((Number(y)) * 6 * rootFontSize) + (rootFontSize * (Number(y) / (5/3)));
         // scroll to current video playing (y)
         queueContainer.scrollTo({
           top: scrollInit,
