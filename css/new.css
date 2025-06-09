@@ -833,6 +833,10 @@ div.thumbnailIcon {
     height: 3rem;
 }
 
+#infoContainer .headSec {
+    padding-left: 0 !important;
+}
+
 #infoContainer .head .cursor, #infoContainer .wrapper.profile .nav .cursor, #queueList .headSec .cursor {
     height: 2rem;
     width: 3rem;
@@ -956,7 +960,7 @@ div.badge:first-child {
     /*
     margin-right: 0.35rem;
     margin-left: calc(100% - 0.9rem - 2rem + 0.35rem); */
-    margin: 0 auto !important;
+    margin: 0 auto;
 }
 
 #infoContainer .closeBtn .img, .closeBtn .img {
