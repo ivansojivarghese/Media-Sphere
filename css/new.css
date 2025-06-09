@@ -956,7 +956,7 @@ div.badge:first-child {
     /*
     margin-right: 0.35rem;
     margin-left: calc(100% - 0.9rem - 2rem + 0.35rem); */
-    margin: 0 auto;
+    margin: 0 auto !important;
 }
 
 #infoContainer .closeBtn .img, .closeBtn .img {
