@@ -981,10 +981,10 @@
           if (k) {
             
             do {
-              if (j > playlistsVideos.length) {
+              if (j >= playlistsVideos.length) {
                 j = j - playlistsVideos.length;
               }
-            } while (j > playlistsVideos.length);
+            } while (j >= playlistsVideos.length);
             
             var thumbnail = document.querySelectorAll(".wrapper.profile .playlists .result_wrapper .thumbnail")[j];
           } else {
