@@ -223,7 +223,7 @@
             // active the radio toggle localstorage for automatic playback (foreground and background) - unless loop is active
               // shuffle mode for random playback??
 
-            // add relevant details to localstorage - esp. for custom created queues, liked and playlists
+            // add relevant details to localstorage for easy retrieval - esp. for custom created queues, liked and playlists
 
           } else if (q === "false" && queueActive) { // end queue
             queueBtn.style.display = "none";

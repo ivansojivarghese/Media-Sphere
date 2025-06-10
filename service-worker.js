@@ -101,7 +101,8 @@ const assets = [
   'svg/liked.svg',
   'svg/watch.svg',
   'svg/playlists.svg',
-  'svg/shuffle.svg'
+  'svg/shuffle.svg',
+  'svg/audio.svg'
 ];
 
 const cacheItems = [...assets, ...fonts];

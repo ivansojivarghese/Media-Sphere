@@ -201,6 +201,10 @@ video.seeking {
     background-image: url("../svg/radio.svg");
 }
 
+.audio .img {
+    background-image: url("../svg/audio.svg");
+}
+
 .nextSpan {
     background: var(--predicate_col);
     padding: 0 0.5rem;
