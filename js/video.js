@@ -1109,6 +1109,10 @@ async function getParams(id, time, a, b) {
 
           }, 1000);
 
+          if (queueActive) {
+            playNext();
+          }
+
           loading = false;
 
         } else {
