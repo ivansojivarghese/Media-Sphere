@@ -468,7 +468,7 @@
       event.stopPropagation();
       queueElement.style.transform = "";
       queueOpen = false;
-      if (!loading && !videoLoad && !queueOpen && !seeking && !seekingLoad && !longTap) {
+      if (!loading && !videoLoad && !queueOpen && !seeking && !seekingLoad && !longTap && !video.paused) {
         hideVideoControls();
         console.log("hideVC");
       }
@@ -2791,6 +2791,31 @@
       }
     }
 
+    function playNext(m) {
+      // if ((player && !player.isConnected) || !player) {
+        if ((videoControls.classList.contains('visible') || m) && video.src !== "" && !qualityBestChange && !qualityChange && !audioVideoAligning) {
+
+          // go to the next video in index of queue
+          var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+          var activeIndex = Array.from(queueListEl).findIndex(el => el.classList.contains('active'));
+
+          queueListEl[activeIndex + 1].click();
+        }
+        /*
+      } else {
+        
+        // FIRST INSTANCE
+        // Set the player's current time to 0
+        player.currentTime = 0;
+
+        // Send the seek command to the player
+        playerController.seek();
+
+        // SECOND INSTANCE
+
+      }*/
+    }
+
     function seekSecondsOutput(s) {
       // Convert the number to a string to handle each digit
       const numberStr = s.toString();
@@ -2975,6 +3000,10 @@
 
     playPreviousButton.addEventListener('click', function(event) {
       playPrevious();
+    });
+
+    playForwardButton.addEventListener('click', function(event) {
+      playNext();
     });
 
     seekForwardButton.addEventListener('click', function(event) {

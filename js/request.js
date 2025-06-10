@@ -204,7 +204,7 @@
 
             queueActive = true;
 
-            // activate media sessions api skip forward button
+            // activate media sessions api skip forward button + normal skip forward button
 
             // show player to select - add all videos, thumbails, and info, details 
               // add a flag for likedvideos to start from that array, etc.
