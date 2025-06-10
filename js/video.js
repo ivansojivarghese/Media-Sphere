@@ -25,6 +25,7 @@ var videoInfoElm = {
   views : document.querySelector("#infoContainer p.views"),
 
   replay : document.querySelector("#infoContainer div.replay"),
+  audio : document.querySelector("#infoContainer div.audio"),
   radio : document.querySelector("#infoContainer div.radio"),
   cast : document.querySelector("#infoContainer div.cast"),
   gCast : document.querySelector("google-cast-launcher"),

@@ -83,6 +83,7 @@
 
     var videoLoop = false;
     var radioLoop = false;
+    var audioMode = false;
 
     var appUnload = false;
 
@@ -2188,6 +2189,16 @@
       } else {
         videoLoop = false;
         videoInfoElm.replay.classList.remove("active");
+      }
+    }
+
+    function audioModeToggle() {
+      if (!audioMode) {
+        audioMode = true;
+        videoInfoElm.audio.classList.add("active");
+      } else {
+        audioMode = false;
+        videoInfoElm.audio.classList.remove("active");
       }
     }
 
