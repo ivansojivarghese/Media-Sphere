@@ -3163,7 +3163,7 @@ if (videoLoadLoop === null) {
 
 if (localStorage.getItem('radioLoop') === "true") {
   radioLoop = true;
-  videoInfoElm.radio.classList.add("active");
+  // videoInfoElm.radio.classList.add("active");
 }
 
 setInterval(() => {

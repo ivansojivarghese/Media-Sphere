@@ -80,10 +80,12 @@
 
     var queueBtn = document.querySelector("#queueButton");
     var queueContainer = document.querySelector("#queueList .videosQueue");
+    var queueArr = [];
 
     function updateQueue(k, y) {
       if (k === "liked") {
         var ar = likedVideos;
+        queueArr = likedVideos;
         for (let j = 0; j < ar.length; j++) {
           var d = document.createElement("div");
 
@@ -215,6 +217,8 @@
                 updatePositionState(); 
               }
             });
+
+            radioToggle();
 
             // active the radio toggle localstorage for automatic playback (foreground and background) - unless loop is active
               // shuffle mode for random playback??

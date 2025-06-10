@@ -984,10 +984,20 @@
               audio.currentTime = 0;
             }
           } else if (radioLoop) {
-            if (backgroundPlay) {
-              // JUST PLAY AUDIO
-            } else {
-              getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
+
+            // go to the next video in index of queue
+            var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+            var activeIndex = Array.from(queueListEl).findIndex(el => el.classList.contains('active'));
+
+            if (activeIndex + 1) {
+
+              if (backgroundPlay) {
+                // JUST PLAY AUDIO
+              } else {
+                // getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
+                playNext();
+              }
+
             }
           }
         }
@@ -1037,10 +1047,19 @@
           audio.currentTime = 0;
         }
       } else if (radioLoop) {
-        if (backgroundPlay) {
-          // JUST PLAY AUDIO
-        } else {
-          getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
+
+        // go to the next video in index of queue
+        var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+        var activeIndex = Array.from(queueListEl).findIndex(el => el.classList.contains('active'));
+
+        if (activeIndex + 1) {
+        
+          if (backgroundPlay) {
+            // JUST PLAY AUDIO
+          } else {
+            // getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
+            playNext();
+          }
         }
       }
   });
@@ -5044,15 +5063,29 @@
         }
 
         if ((video.currentTime > (video.duration - 30)) && (video.currentTime < (video.duration - 5)) && radioLoop && !videoLoop && !backgroundPlay && !readyForNext) {
-          videoInfoElm.title.innerHTML = "<span class='nextSpan'>NEXT</span>" + relatedContent.data[0].title;
-          if (relatedContent.data[0].channelTitle) {
-            videoInfoElm.channelTitle.innerHTML = relatedContent.data[0].channelTitle;
-          } else {
-            videoInfoElm.channelTitle.innerHTML = relatedContent.data[0].channelHandle;
-          }
-          showVideoControls();
+          
+          var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+          var activeIndex = Array.from(queueListEl).findIndex(el => el.classList.contains('active'));
 
-          readyForNext = true;
+          if (activeIndex + 1) {
+            
+            // videoInfoElm.title.innerHTML = "<span class='nextSpan'>NEXT</span>" + relatedContent.data[0].title;
+            videoInfoElm.title.innerHTML = "<span class='nextSpan'>NEXT</span>" + queueArr[activeIndex + 1].snippet.title;
+            
+            /*
+            if (relatedContent.data[0].channelTitle) {
+              videoInfoElm.channelTitle.innerHTML = relatedContent.data[0].channelTitle;
+            } else {
+              videoInfoElm.channelTitle.innerHTML = relatedContent.data[0].channelHandle;
+            }*/
+
+            videoInfoElm.channelTitle.innerHTML = queueArr[activeIndex + 1].snippet.videoOwnerChannelTitle;
+
+            showVideoControls();
+
+            readyForNext = true;
+
+          }
         }
 
         const videoTitleLink = document.querySelector("#infoContainer h5.videoTitle a");
@@ -5122,7 +5155,14 @@
 
       if ((audio.currentTime > (audio.duration - 30)) && (audio.currentTime < (audio.duration - 5)) && radioLoop && !videoLoop && backgroundPlay && !readyForNext) {
 
-        readyForNext = true;
+        // go to the next video in index of queue
+        var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+        var activeIndex = Array.from(queueListEl).findIndex(el => el.classList.contains('active'));
+
+        if (activeIndex + 1) {
+          readyForNext = true;
+        }
+        
       }
 
       audioProgressPercentile = (audio.currentTime / audio.duration);
@@ -5726,13 +5766,21 @@
           audio.currentTime = 0;
         }
       } else if (radioLoop && readyForNext) {
-        readyForNext = false;
-        if (backgroundPlay && audio.currentTime === audio.duration) {
 
-          // JUST PLAY AUDIO
+        // go to the next video in index of queue
+        var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+        var activeIndex = Array.from(queueListEl).findIndex(el => el.classList.contains('active'));
 
-        } else if (video.currentTime === video.duration) {
-          getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
+        if (activeIndex + 1) {
+        
+          readyForNext = false;
+          if (backgroundPlay && audio.currentTime === audio.duration) {
+
+            // JUST PLAY AUDIO
+
+          } else if (video.currentTime === video.duration) {
+            getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
+          }
         }
       }
 
