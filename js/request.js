@@ -216,13 +216,12 @@
               }
             });
 
-            // activate media sessions api skip forward button + normal skip forward button
-
             // show player to select - add all videos, thumbails, and info, details 
               // add a flag for likedvideos to start from that array, etc.
               // add getURL links to all inside queue
 
             // active the radio toggle localstorage for automatic playback (foreground and background) - unless loop is active
+              // shuffle mode for random playback??
 
             // add relevant details to localstorage - esp. for custom created queues, liked and playlists
 

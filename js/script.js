@@ -2769,23 +2769,48 @@
       if ((player && !player.isConnected) || !player) {
         if ((videoControls.classList.contains('visible') || m) && video.src !== "" && !qualityBestChange && !qualityChange && !audioVideoAligning) {
 
-          // FIRST INSTANCE (seek to the front)
-          video.currentTime = 0;
-          // videoSec.currentTime = 0;
-          audio.currentTime = 0;
-          videoEnd = false;
+          if (video.currentTime <= 5 || audio.currentTime <= 5){
 
-          // SECOND INSTANCE - play a previous track in playlist (from the beginning)
+            // go to the next video in index of queue
+            var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+            var activeIndex = Array.from(queueListEl).findIndex(el => el.classList.contains('active'));
+
+            if (activeIndex - 1 >= 0) {
+              queueListEl[activeIndex - 1].click();
+            }
+
+          } else {
+
+            // FIRST INSTANCE (seek to the front)
+            video.currentTime = 0;
+            // videoSec.currentTime = 0;
+            audio.currentTime = 0;
+            videoEnd = false;
+
+          }
+          // SECOND INSTANCE - play a previous track in playlist (from the beginning) - if duration less than 5 sec into video
+
         }
       } else {
         
-        // FIRST INSTANCE
-        // Set the player's current time to 0
-        player.currentTime = 0;
+        if (player.currentTime <= 5) {
+          
+          // go to the next video in index of queue
+          var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+          var activeIndex = Array.from(queueListEl).findIndex(el => el.classList.contains('active'));
 
-        // Send the seek command to the player
-        playerController.seek();
+          if (activeIndex - 1 >= 0) {
+            queueListEl[activeIndex - 1].click();
+          }
 
+        } else {
+          // FIRST INSTANCE
+          // Set the player's current time to 0
+          player.currentTime = 0;
+
+          // Send the seek command to the player
+          playerController.seek();
+        }
         // SECOND INSTANCE
 
       }
@@ -2799,7 +2824,9 @@
           var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
           var activeIndex = Array.from(queueListEl).findIndex(el => el.classList.contains('active'));
 
-          queueListEl[activeIndex + 1].click();
+          if (activeIndex + 1) {
+            queueListEl[activeIndex + 1].click();
+          }
         }
         /*
       } else {
