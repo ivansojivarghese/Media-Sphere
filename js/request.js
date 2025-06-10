@@ -207,6 +207,15 @@
 
             queueActive = true;
 
+            navigator.mediaSession.setActionHandler('nexttrack', function() {
+              // Your logic to skip to the next track
+              if (!qualityBestChange && !qualityChange) { 
+                // console.log('Next track triggered');
+                playNext(true); 
+                updatePositionState(); 
+              }
+            });
+
             // activate media sessions api skip forward button + normal skip forward button
 
             // show player to select - add all videos, thumbails, and info, details 
