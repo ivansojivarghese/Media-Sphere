@@ -120,6 +120,9 @@
 
               const allQueueThumbnails = document.querySelectorAll("#queueList .videosQueue .queuePicture .playing");
               allQueueThumbnails.forEach(thumb => thumb.remove());
+
+              const queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+              queueListEl.forEach(el => el.classList.remove("active"));
               
               // Create and append the DOM elements inside the clicked element
               const thumbnailPlay = document.createElement("div");
