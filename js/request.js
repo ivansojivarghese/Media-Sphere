@@ -115,7 +115,7 @@
 
             // reset everything else from other videos in queue
 
-            d.onclick = function(event) {
+            d.addEventListener('click', function(event) {
               videoNav = true;
 
               const allQueueThumbnails = document.querySelectorAll("#queueList .videosQueue .queuePicture .playing");
@@ -145,7 +145,7 @@
 
               event.currentTarget.classList.add("active");
               getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"), event.currentTarget.getAttribute("data-queueIndex"));
-            };
+            });
           }
 
           d.appendChild(thumbnail);
@@ -215,10 +215,6 @@
                 updatePositionState(); 
               }
             });
-
-            // show player to select - add all videos, thumbails, and info, details 
-              // add a flag for likedvideos to start from that array, etc.
-              // add getURL links to all inside queue
 
             // active the radio toggle localstorage for automatic playback (foreground and background) - unless loop is active
               // shuffle mode for random playback??
