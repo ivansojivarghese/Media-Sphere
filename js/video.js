@@ -3167,6 +3167,11 @@ if (localStorage.getItem('radioLoop') === "true") {
   // videoInfoElm.radio.classList.add("active");
 }
 
+if (localStorage.getItem('audioMode') === "true") {
+  audioMode = true;
+  // 
+}
+
 setInterval(() => {
   if (videoInfoElm.gCast.style.display !== "none") {
     videoInfoElm.cast.style.display = "";

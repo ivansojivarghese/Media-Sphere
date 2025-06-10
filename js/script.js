@@ -2195,9 +2195,11 @@
     function audioModeToggle() {
       if (!audioMode) {
         audioMode = true;
+        localStorage.setItem('audioMode', "true"); 
         videoInfoElm.audio.classList.add("active");
       } else {
         audioMode = false;
+        localStorage.setItem('audioMode', "false"); 
         videoInfoElm.audio.classList.remove("active");
       }
     }
