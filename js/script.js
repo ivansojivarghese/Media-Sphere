@@ -1650,6 +1650,7 @@
           video.classList.add("side-by-side");
           videoSec.classList.add("side-by-side");
           videoControls.classList.add("side-by-side");
+          queueElement.classList.add("side-by-side");
           videoInfoElm.main.classList.add("side");
           videoInfoElm.textStuff.classList.add("side");
         }
@@ -1657,6 +1658,7 @@
         video.classList.remove("side-by-side");
         videoSec.classList.remove("side-by-side");
         videoControls.classList.remove("side-by-side");
+        queueElement.classList.remove("side-by-side");
         videoInfoElm.main.classList.remove("side");
         videoInfoElm.textStuff.classList.remove("side");
       }
@@ -1684,6 +1686,7 @@
         video.classList.add("side-by-side");
         videoSec.classList.add("side-by-side");
         videoControls.classList.add("side-by-side");
+        queueElement.classList.add("side-by-side");
         videoInfoElm.main.classList.add("side");
         videoInfoElm.textStuff.classList.add("side");
       }
@@ -1804,6 +1807,7 @@
         video.classList.add("side-by-side");
         videoSec.classList.add("side-by-side");
         videoControls.classList.add("side-by-side");
+        queueElement.classList.add("side-by-side");
         videoInfoElm.main.classList.add("side");
         videoInfoElm.textStuff.classList.add("side");
       }
@@ -1948,6 +1952,7 @@
         video.classList.add("side-by-side");
         videoSec.classList.add("side-by-side");
         videoControls.classList.add("side-by-side");
+        queueElement.classList.add("side-by-side");
         videoInfoElm.main.classList.add("side");
         videoInfoElm.textStuff.classList.add("side");
       }
@@ -2049,6 +2054,7 @@
         video.classList.remove("side-by-side");
         videoSec.classList.remove("side-by-side");
         videoControls.classList.remove("side-by-side");
+        queueElement.classList.remove("side-by-side");
         videoInfoElm.main.classList.remove("side");
         videoInfoElm.textStuff.classList.remove("side");
       }
