@@ -1001,6 +1001,7 @@ div.badge:first-child {
 
 #infoContainer .suggestions.float {
     position: fixed;
+    width: calc(21rem - 1.2rem - 1.2rem - 1rem - calc(env(safe-area-inset-right))) !important;
 }
 
 #infoContainer .suggestions .suggestionBox {

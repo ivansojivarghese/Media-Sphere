@@ -652,6 +652,13 @@ const updateSuggestionsList = () => {
         e = totalHeight;
     }
 
+    if (videoInfoElm.infoHeadSec.classList.contains("ext")) {
+      e -= (4 * rootFontSize);
+      videoInfoElm.suggestions.style.top = "9rem";
+    } else {
+      videoInfoElm.suggestions.style.top = "";
+    }
+
     // videoInfoElm.suggestions.style.height = r + "rem";
     videoInfoElm.suggestions.style.height = e + "px";
     if (!searchQueried) {
