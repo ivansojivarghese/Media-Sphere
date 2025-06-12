@@ -1819,6 +1819,7 @@
       inp.classList.remove("op");
       inp.classList.remove("op2");
       clearBtn.classList.remove("float");
+      videoInfoElm.infoHeadSec.classList.remove("ext");
       setTimeout(function() {
         if (!searchBtnClick) {
           inp.classList.remove("float");

@@ -601,7 +601,7 @@
                   <p>Query</p>
                 </div>
               </div>
-              <input class="" type="url" id="urlBar" placeholder="" name="" autocapitalize="off" enterkeyhint="go" inputmode="url">
+              <input class="" type="url" id="urlBar" placeholder="" name="" autocapitalize="off" autocomplete="off" enterkeyhint="go" inputmode="url">
               <span class="clear-btn cursor" onclick="clearInput(true)" title="Clear input" style="display: none;">×</span>
               <p class="inputError"></p>
               <div class="suggestions"></div>
@@ -1254,6 +1254,8 @@
           console.log("Liked Videos:", data.items);
           likedVideos = data.items;
 
+          // show a skeleton
+
           showPlaylist(likedVideos, likedWrap);
         })
         .catch(error => {
@@ -1287,6 +1289,8 @@
         .then(data => {
           console.log("Playlists:", data.items);
           playlistsVideos = data.items;
+
+          // show a skeleton
 
           showPlaylist(playlistsVideos, playlistsWrap, true);
 
