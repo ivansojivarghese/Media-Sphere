@@ -756,12 +756,16 @@ div.thumbnailIcon {
     }
 
     .wrapper.search input.float {
-        width: calc(21rem - 1.2rem - 1.2rem - 2.4rem - 2.7rem - calc(env(safe-area-inset-right))) !important;
+        width: calc(21rem - 1.2rem - 1.2rem - 2.7rem - calc(env(safe-area-inset-right))) !important;
     }
 
     #infoContainer .nav {
         left: auto !important;
         right: calc(0rem + calc(env(safe-area-inset-right))) !important;
+    }
+
+    #infoContainer .suggestions.float {
+        width: calc(21rem - 1.2rem - 1.2rem + 1rem - calc(env(safe-area-inset-right))) !important;
     }
 }
 
@@ -1001,7 +1005,7 @@ div.badge:first-child {
 
 #infoContainer .suggestions.float {
     position: fixed;
-    width: calc(21rem - 1.2rem - 1.2rem - 1rem - calc(env(safe-area-inset-right))) !important;
+    width: calc(21rem - 1.2rem - 1.2rem - 0.7rem - calc(env(safe-area-inset-right))) !important;
 }
 
 #infoContainer .suggestions .suggestionBox {
@@ -1219,7 +1223,8 @@ input[type="search"]::-webkit-search-cancel-button {
     /*z-index: 8;*/
     z-index: 100;
     top: 5rem;
-    right: 1rem;
+    /*right: 1rem;*/
+    right: calc(1rem + calc(env(safe-area-inset-right)));
 }
 
 .wrapper.search input[type="submit"] {
