@@ -2491,6 +2491,7 @@ var isMusic = false; //
 
 function resetVideoInfo() {
   videoInfoElm.replay.style.display = "none";
+  videoInfoElm.audio.style.display = "none";
   // videoInfoElm.radio.style.display = "none";
   videoInfoElm.cast.style.display = "none";
   videoInfoElm.autoResBtn.style.display = "none";
@@ -2523,6 +2524,7 @@ function resetVideoInfo() {
 
 function abstractVideoInfo() {
   videoInfoElm.replay.style.display = "block";
+  videoInfoElm.audio.style.display = "block";
   // videoInfoElm.radio.style.display = "block";
   videoInfoElm.cast.style.display = "block";
   videoInfoElm.autoResBtn.style.display = "block";
