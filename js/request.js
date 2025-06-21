@@ -739,6 +739,9 @@
             
             if (d) {
               displaySearchResults(true, null, "div.wrapper.search ");
+
+              loadingSpace.style.display = "none";
+              videoInfoElm.info.style.overflow = "";
             }
 
             // perform search for longer videos
@@ -747,8 +750,7 @@
             }
           }
 
-          loadingSpace.style.display = "none";
-          videoInfoElm.info.style.overflow = "";
+          
 
         })
         .catch((error) => {
@@ -884,6 +886,9 @@
               
               if (d) {
                 displaySearchResults(true, null, "div.wrapper.search ");
+
+                loadingSpace.style.display = "none";
+                videoInfoElm.info.style.overflow = "";
               }
 
               // perform search for longer videos
@@ -892,8 +897,7 @@
               }
             }
 
-            loadingSpace.style.display = "none";
-            videoInfoElm.info.style.overflow = "";
+            
 
           })
           .catch((error) => {
@@ -963,6 +967,9 @@
               
               if (d) {
                 displaySearchResults(true, null, "div.wrapper.search ");
+
+                loadingSpace.style.display = "none";
+                videoInfoElm.info.style.overflow = "";
               }
 
               // perform search for longer videos
@@ -971,8 +978,7 @@
               }
             }
 
-            loadingSpace.style.display = "none";
-            videoInfoElm.info.style.overflow = "";
+            
 
           })
           .catch((error) => {
