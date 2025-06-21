@@ -1058,7 +1058,12 @@
         localStorage.setItem('expiryTime', expiryTime);
       } else {
         console.error("Failed to refresh token", data);
+
+        // Check for specific error reasons
+      if (data.error === "invalid_grant" || data.error === "invalid_request") {
+        client.requestCode();
       }
+
     }
 
     var profileUserData = {};
