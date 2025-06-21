@@ -14,7 +14,7 @@
     var searchResults = null;
     var hashtagResults = null;
 
-    var maxQuery = 20;
+    var maxQuery = 10;
     var API_KEY = "AIzaSyAtcIpyHJI05qb0cIo4wdMVYfuC-Z9bQQI";
 
 /*
@@ -636,7 +636,7 @@
 
     var searchQueried = false;
 
-    async function searchQuery(q) {
+    async function searchQuery(q, d) {
 
       searchQueried = true;
 
@@ -657,7 +657,7 @@
           }
         };*/
 
-        var url, headers, type, sort;
+        var url, headers, type, sort, duration;
         const accessToken = localStorage.getItem("access_token");
         if (queryType.value) {
           type = '&type=' + queryType.value;
@@ -669,11 +669,16 @@
         } else {
           sort = '';
         }
+        if (!d) {
+          duration = 'medium';
+        } else {
+          duration = 'long';
+        }
 
         const videoIds = [];
         const playlistIds = [];
 
-        url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
+        url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&videoDuration=${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
           fetch(url)
           .then(response => response.json())
           .then(async data => {
@@ -697,8 +702,23 @@
 
           // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
 
-          searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
-          console.log(searchResults);
+          if (!d) {
+            searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+            console.log(searchResults);
+          } else {
+            const tempResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+            // console.log(tempResults);
+            // Combine both arrays
+            searchResults = [...searchResults, ...tempResults];
+
+            // Shuffle the combined array (Fisher–Yates shuffle)
+            for (let i = searchResults.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [searchResults[i], searchResults[j]] = [searchResults[j], searchResults[i]];
+            }
+
+            console.log(searchResults);
+          }
 
           searchResults = searchResults.filter(item => {
             const tags = item.snippet?.tags || [];
@@ -717,6 +737,11 @@
           } else {
             
             displaySearchResults(true, null, "div.wrapper.search ");
+
+            // perform search for longer videos
+            if (!d) {
+              searchQuery(q, true);
+            }
           }
 
           loadingSpace.style.display = "none";
@@ -782,7 +807,7 @@
           }
         };*/
 
-        var url, headers, type, sort;
+        var url, headers, type, sort, duration;
         const accessToken = localStorage.getItem("access_token");
         if (queryType.value) {
           type = '&type=' + queryType.value;
@@ -793,6 +818,11 @@
           sort = '&order=' + querySort.value;
         } else {
           sort = '';
+        }
+        if (!d) {
+          duration = 'medium';
+        } else {
+          duration = 'long';
         }
 
         const videoIds = [];
@@ -805,7 +835,7 @@
             'Accept': 'application/json'
           };
 
-          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
+          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&videoDuration=${duration}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
           fetch(url, { headers })
           .then(response => response.json())
           .then(async data => {
@@ -821,8 +851,23 @@
 
             // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
 
-            searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
-            console.log(searchResults);
+            if (!d) {
+              searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+              console.log(searchResults);
+            } else {
+              const tempResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+              // console.log(tempResults);
+              // Combine both arrays
+              searchResults = [...searchResults, ...tempResults];
+
+              // Shuffle the combined array (Fisher–Yates shuffle)
+              for (let i = searchResults.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [searchResults[i], searchResults[j]] = [searchResults[j], searchResults[i]];
+              }
+
+              console.log(searchResults);
+            }
 
             hideInputErrorFeedback();
 
@@ -834,6 +879,11 @@
             } else {
               
               displaySearchResults(true, null, "div.wrapper.search ");
+
+              // perform search for longer videos
+              if (!d) {
+                searchQuery(q, true);
+              }
             }
 
             loadingSpace.style.display = "none";
@@ -854,7 +904,7 @@
           });
 
         } else { // without user personalization
-          url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
+          url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&videoDuration=${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
           fetch(url)
           .then(response => response.json())
           .then(async data => {
@@ -878,8 +928,23 @@
 
             // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
 
-            searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
-            console.log(searchResults);
+            if (!d) {
+              searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+              console.log(searchResults);
+            } else {
+              const tempResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+              // console.log(tempResults);
+              // Combine both arrays
+              searchResults = [...searchResults, ...tempResults];
+
+              // Shuffle the combined array (Fisher–Yates shuffle)
+              for (let i = searchResults.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [searchResults[i], searchResults[j]] = [searchResults[j], searchResults[i]];
+              }
+
+              console.log(searchResults);
+            }
 
             hideInputErrorFeedback();
 
@@ -891,6 +956,11 @@
             } else {
               
               displaySearchResults(true, null, "div.wrapper.search ");
+
+              // perform search for longer videos
+              if (!d) {
+                searchQuery(q, true);
+              }
             }
 
             loadingSpace.style.display = "none";
