@@ -737,7 +737,9 @@
             showInputErrorFeedback("No results found. Try again.");
           } else {
             
-            displaySearchResults(true, null, "div.wrapper.search ");
+            if (d) {
+              displaySearchResults(true, null, "div.wrapper.search ");
+            }
 
             // perform search for longer videos
             if (!d) {
@@ -880,7 +882,9 @@
               showInputErrorFeedback("No results found. Try again.");
             } else {
               
-              displaySearchResults(true, null, "div.wrapper.search ");
+              if (d) {
+                displaySearchResults(true, null, "div.wrapper.search ");
+              }
 
               // perform search for longer videos
               if (!d) {
@@ -957,7 +961,9 @@
               showInputErrorFeedback("No results found. Try again.");
             } else {
               
-              displaySearchResults(true, null, "div.wrapper.search ");
+              if (d) {
+                displaySearchResults(true, null, "div.wrapper.search ");
+              }
 
               // perform search for longer videos
               if (!d) {
