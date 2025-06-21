@@ -662,7 +662,8 @@
         if (queryType.value) {
           type = '&type=' + queryType.value;
         } else {
-          type = '&type=video,playlist';
+          // type = '&type=video,playlist';
+          type = '&type=video';
         }
         if (querySort.value) {
           sort = '&order=' + querySort.value;
@@ -812,7 +813,8 @@
         if (queryType.value) {
           type = '&type=' + queryType.value;
         } else {
-          type = '&type=video,playlist';
+          // type = '&type=video,playlist';
+          type = '&type=video';
         }
         if (querySort.value) {
           sort = '&order=' + querySort.value;
