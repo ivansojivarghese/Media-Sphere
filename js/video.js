@@ -938,8 +938,10 @@ async function getParams(id, time, a, b) {
       getScreenLock();
 
       loading = true;
-      loadingRing.style.display = "block";
-      playPauseButton.style.display = "none";
+      if (!audioMode) {
+        loadingRing.style.display = "block";
+        playPauseButton.style.display = "none";
+      }
 
       showVideoControls();
 
