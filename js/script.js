@@ -1150,8 +1150,12 @@
         [children[i], children[j]] = [children[j], children[i]];
       }
 
-      // Remove and re-append in new order
-      children.forEach(child => parent.appendChild(child));
+      // Re-append in new order & update data-queueindex
+      children.forEach((child, index) => {
+        // child.dataset.queueindex = index; // OR: 
+        child.setAttribute('data-queueindex', index);
+        parent.appendChild(child);
+      });
     }
 
     document.addEventListener('fullscreenchange', function() {
