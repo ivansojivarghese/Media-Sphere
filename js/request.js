@@ -672,9 +672,10 @@
         }
         
         if (!d) {
-          duration = '&videoDuration=medium';
+          duration = '&videoDuration=short';
         } else {
-          duration = '&videoDuration=long';
+          duration = '&videoDuration=medium';
+          // and 'long'
         }
         // duration = '';
 
@@ -832,6 +833,7 @@
           duration = '&videoDuration=medium';
         } else {
           duration = '&videoDuration=long';
+          // and 'long'
         }
         // duration = '';
 
