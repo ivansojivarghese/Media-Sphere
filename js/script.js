@@ -308,7 +308,7 @@
       if (!casted) {
         if (videoControls.classList.contains('visible') && !audioVideoAligning && !qualityChange && !qualityBestChange && (!videoErr && !audioErr)) {
 
-          if (((video.paused && video.src !== "") || (video.src === "" && audioMode)) && videoPlay && (!videoRun || backgroundPlay) && !audioRun) {
+          if (video.paused && video.src !== "" && videoPlay && (!videoRun || backgroundPlay) && !audioRun) {
 
             playPauseManual = true;
 
