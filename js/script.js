@@ -3338,79 +3338,81 @@
       }
 
       // Check buffer threshold and optimize if below limit
-      if (currentBuffer < MOD_BUFFER_THRESHOLD) {
-        if (!suspendTimeout) {
-          console.log("Buffering more data due to low buffer availability.");
+      if (!audioMode) {
+        if (currentBuffer < MOD_BUFFER_THRESHOLD) {
+          if (!suspendTimeout) {
+            console.log("Buffering more data due to low buffer availability.");
 
-          // Call a lower-quality load function or take another action
-          // loadLowerQuality(); // Uncomment if this function exists
+            // Call a lower-quality load function or take another action
+            // loadLowerQuality(); // Uncomment if this function exists
 
-          // getVideoFromBuffer();
+            // getVideoFromBuffer();
 
-          if (video.paused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange)) { // at initial
+            if (video.paused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange)) { // at initial
+              console.log("play");
+              // video.play();
+              if (backgroundPlay) {
+                audio.play();
+              } else {
+                video.play();
+                // videoSec.play();
+              }
+            } else if (autoLoad) {
+              
+              endLoad();
+              setTimeout(function() {
+                console.log("hideLR");
+                loadingRing.style.display = "none";
+                playPauseButton.style.display = "block";
+                // reset the loader
+                setTimeout(function() {
+                  resetLoad();
+                }, 10);
+              }, 1000);
+
+            } else {
+              if (resumeInterval === null) {
+                resumeInterval = setInterval(() => {
+                  var buffered = video.buffered;
+                  if (buffered.length > 0 && video.paused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
+                    console.log("play", seeking, seekingLoad);
+                    video.play();
+                    // videoSec.play();
+                    clearInterval(resumeInterval);
+                    resumeInterval = null;
+                  }
+                }, 1000);
+              }
+            }
+
+            // Set timeout to avoid immediate re-triggering
+            suspendTimeout = setTimeout(() => {
+              suspendTimeout = null; // Reset timeout after the cooldown period
+            }, 3000); // Throttle buffer check every 3 seconds
+          }
+        } else {
+          if (video.paused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange || ((audio.buffered.length && backgroundPlay && (bufferLoad || loading || seekingLoad || bufferingDetected)) || (video.buffered.length && audio.buffered.length && !backgroundPlay && bufferLoad && (!loading || pipEnabled) && !bufferingDetected && !seeking && !seekingLoad && framesStuck)))) { 
             console.log("play");
             // video.play();
             if (backgroundPlay) {
               audio.play();
-            } else {
+            } else if (!backgroundPlayManual) {
               video.play();
               // videoSec.play();
             }
           } else if (autoLoad) {
-            
+
             endLoad();
-            setTimeout(function() {
-              console.log("hideLR");
-              loadingRing.style.display = "none";
-              playPauseButton.style.display = "block";
-              // reset the loader
               setTimeout(function() {
-                resetLoad();
-              }, 10);
-            }, 1000);
-
-          } else {
-            if (resumeInterval === null) {
-              resumeInterval = setInterval(() => {
-                var buffered = video.buffered;
-                if (buffered.length > 0 && video.paused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
-                  console.log("play", seeking, seekingLoad);
-                  video.play();
-                  // videoSec.play();
-                  clearInterval(resumeInterval);
-                  resumeInterval = null;
-                }
+                console.log("hideLR");
+                loadingRing.style.display = "none";
+                playPauseButton.style.display = "block";
+                // reset the loader
+                setTimeout(function() {
+                  resetLoad();
+                }, 10);
               }, 1000);
-            }
           }
-
-          // Set timeout to avoid immediate re-triggering
-          suspendTimeout = setTimeout(() => {
-            suspendTimeout = null; // Reset timeout after the cooldown period
-          }, 3000); // Throttle buffer check every 3 seconds
-        }
-      } else {
-        if (video.paused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange || ((audio.buffered.length && backgroundPlay && (bufferLoad || loading || seekingLoad || bufferingDetected)) || (video.buffered.length && audio.buffered.length && !backgroundPlay && bufferLoad && (!loading || pipEnabled) && !bufferingDetected && !seeking && !seekingLoad && framesStuck)))) { 
-          console.log("play");
-          // video.play();
-          if (backgroundPlay) {
-            audio.play();
-          } else if (!backgroundPlayManual) {
-            video.play();
-            // videoSec.play();
-          }
-        } else if (autoLoad) {
-
-          endLoad();
-            setTimeout(function() {
-              console.log("hideLR");
-              loadingRing.style.display = "none";
-              playPauseButton.style.display = "block";
-              // reset the loader
-              setTimeout(function() {
-                resetLoad();
-              }, 10);
-            }, 1000);
         }
       }
     }
@@ -3438,7 +3440,7 @@
 
       // var player = new cast.framework.RemotePlayer();
 
-      if ((player && !player.isConnected) || !player) {
+      if (((player && !player.isConnected) || !player) && !audioMode) {
 
         console.error(`Error loading: ${audio}`);
         audioErr = true;
@@ -5590,7 +5592,7 @@
           backgroundPlay = true;
         } else if (document.visibilityState === 'visible' && !autoLoad) {
 
-          if (backgroundPlay && videoEnd && !playPauseButton.classList.contains("repeat")) {
+          if (backgroundPlay && videoEnd && !audioMode && !playPauseButton.classList.contains("repeat")) {
             video.currentTime = audio.currentTime;
             // videoSec.currentTime = audio.currentTime;
 
