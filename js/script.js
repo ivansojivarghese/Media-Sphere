@@ -2484,7 +2484,7 @@
           } 
         }
 
-        if (videoEnd && (Math.abs(video.currentTime - audio.currentTime) < 1) && video.paused && audio.paused && video.currentTime && audio.currentTime) {
+        if (videoEnd && !audioMode && (Math.abs(video.currentTime - audio.currentTime) < 1) && video.paused && audio.paused && video.currentTime && audio.currentTime) {
           playPauseButton.classList.remove('playing');
           playPauseButton.classList.add('repeat');
           playPauseButton.title = "Replay";
