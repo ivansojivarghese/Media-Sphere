@@ -2919,7 +2919,7 @@
 
     function playNext(m) {
       // if ((player && !player.isConnected) || !player) {
-        if ((videoControls.classList.contains('visible') || m) && (video.src !== "" && audioMode) && !qualityBestChange && !qualityChange && !audioVideoAligning) {
+        if ((videoControls.classList.contains('visible') || m) && (video.src !== "" || audioMode) && !qualityBestChange && !qualityChange && !audioVideoAligning) {
 
           // go to the next video in index of queue
           var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
