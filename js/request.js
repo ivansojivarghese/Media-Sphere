@@ -610,7 +610,7 @@
  
     function parseDuration(iso) {
       const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-      if (!match) return '';
+      if (!match || !iso) return '';
       const [ , h = 0, m = 0, s = 0 ] = match.map(v => parseInt(v || 0, 10));
       const parts = h ? [h, String(m).padStart(2, '0'), String(s).padStart(2, '0')] :
                         [m, String(s).padStart(2, '0')];
