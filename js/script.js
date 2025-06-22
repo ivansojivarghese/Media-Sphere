@@ -2829,7 +2829,7 @@
 
     function playPrevious(m) {
       if ((player && !player.isConnected) || !player) {
-        if ((videoControls.classList.contains('visible') || m) && video.src !== "" && !qualityBestChange && !qualityChange && !audioVideoAligning) {
+        if ((videoControls.classList.contains('visible') || m) && (video.src !== "" || audioMode) && !qualityBestChange && !qualityChange && !audioVideoAligning) {
 
           if (video.currentTime <= 5 || audio.currentTime <= 5){
 
@@ -2880,7 +2880,7 @@
 
     function playNext(m) {
       // if ((player && !player.isConnected) || !player) {
-        if ((videoControls.classList.contains('visible') || m) && video.src !== "" && !qualityBestChange && !qualityChange && !audioVideoAligning) {
+        if ((videoControls.classList.contains('visible') || m) && (video.src !== "" && audioMode) && !qualityBestChange && !qualityChange && !audioVideoAligning) {
 
           // go to the next video in index of queue
           var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
@@ -5531,7 +5531,7 @@
                 pipEnabled = true;
                 backgroundPlayManual = false;
               });
-          } else if (video.paused && !pipEnabled) {
+          } else if (video.paused && !pipEnabled && !audioMode) {
             audio.volume = 0; // prevent accidental leakage 
           }
           backgroundPlay = true;
