@@ -3263,10 +3263,10 @@
     const BUFFER_THRESHOLD_AUDIO = 0; 
 
     function updateVideoLoad() {
-      const buffered = (!backgroundPlay) ? video.buffered : audio.buffered;
-      const liveTime = (!backgroundPlay) ? video.currentTime : audio.currentTime;
+      const buffered = (!backgroundPlay && !audioMode) ? video.buffered : audio.buffered;
+      const liveTime = (!backgroundPlay && !audioMode) ? video.currentTime : audio.currentTime;
 
-      const MOD_BUFFER_THRESHOLD = (!backgroundPlay) ? BUFFER_THRESHOLD : BUFFER_THRESHOLD_AUDIO;
+      const MOD_BUFFER_THRESHOLD = (!backgroundPlay && !audioMode) ? BUFFER_THRESHOLD : BUFFER_THRESHOLD_AUDIO;
       
       // Ensure there’s at least one buffered range
       if (buffered.length === 0) {
