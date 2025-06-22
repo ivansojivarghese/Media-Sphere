@@ -3440,7 +3440,7 @@
 
       // var player = new cast.framework.RemotePlayer();
 
-      if (((player && !player.isConnected) || !player) && !audioMode) {
+      if ((player && !player.isConnected) || !player) {
 
         console.error(`Error loading: ${audio}`);
         audioErr = true;
@@ -3553,7 +3553,7 @@
 
       // var player = new cast.framework.RemotePlayer();
 
-      if ((player && !player.isConnected) || !player) {
+      if (((player && !player.isConnected) || !player) && !audioMode) {
 
         console.error(`Error loading: ${video}`);
         videoErr = true;
