@@ -1027,6 +1027,7 @@
 
               if (backgroundPlay) {
                 // JUST PLAY AUDIO
+                playNext();
               } else {
                 // getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
                 playNext();
@@ -1090,6 +1091,7 @@
         
           if (backgroundPlay) {
             // JUST PLAY AUDIO
+            playNext();
           } else {
             // getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
             playNext();
@@ -5881,9 +5883,11 @@
           if (backgroundPlay && audio.currentTime === audio.duration) {
 
             // JUST PLAY AUDIO
+            playNext();
 
           } else if (video.currentTime === video.duration) {
-            getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
+            // getURL("https://www.youtube.com/watch?v=" + relatedContent.data[0].videoId, true);
+            playNext();
           }
         }
       }
