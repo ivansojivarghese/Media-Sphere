@@ -1801,7 +1801,9 @@ function getOptimalVideo(time, a, b) {
         imageAmbientChange = true;
         
         if (!casted) {
-          video.src = targetVideo.url; 
+          if (!audioMode) {
+            video.src = targetVideo.url; 
+          }
           // videoSec.src = targetVideo.url; 
           // videoSec.src = supportedVideoSources[supportedVideoSources.length - 1].url;
 
