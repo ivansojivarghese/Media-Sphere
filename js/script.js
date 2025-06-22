@@ -2825,7 +2825,7 @@
 
     function playPrevious(m) {
       if ((player && !player.isConnected) || !player) {
-        if ((videoControls.classList.contains('visible') || m) && (video.src !== "" || audioMode) && !qualityBestChange && !qualityChange && !audioVideoAligning) {
+        if ((videoControls.classList.contains('visible') || m) && video.src !== "" && !qualityBestChange && !qualityChange && !audioVideoAligning) {
 
           if (video.currentTime <= 5 || audio.currentTime <= 5){
 
@@ -2876,7 +2876,7 @@
 
     function playNext(m) {
       // if ((player && !player.isConnected) || !player) {
-        if ((videoControls.classList.contains('visible') || m) && (video.src !== "" || audioMode) && !qualityBestChange && !qualityChange && !audioVideoAligning) {
+        if ((videoControls.classList.contains('visible') || m) && video.src !== "" && !qualityBestChange && !qualityChange && !audioVideoAligning) {
 
           // go to the next video in index of queue
           var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
@@ -2931,7 +2931,7 @@
       maxTime = video.duration < maxTime ? video.duration : maxTime;
 
       if ((player && !player.isConnected) || !player) {
-        if ((videoControls.classList.contains('visible') || m) && ((video.src !== "" && (video.currentTime < (video.duration - skipTime))) || (audioMode && (audio.currentTime < (audio.duration - skipTime)))) && !qualityBestChange && !qualityChange && !audioVideoAligning && seekAllow) {
+        if ((videoControls.classList.contains('visible') || m) && video.src !== "" && /*!videoEnd*/ (video.currentTime < (video.duration - skipTime)) && !qualityBestChange && !qualityChange && !audioVideoAligning && seekAllow) {
 
             playPauseButton.classList.remove('repeat');
             playPauseButton.title = "Play";
@@ -3008,7 +3008,7 @@
       maxTime = video.duration < maxTime ? video.duration : maxTime;
 
       if ((player && !player.isConnected) || !player) {
-        if ((videoControls.classList.contains('visible') || m) && ((video.src !== "" && (video.currentTime > (skipTime))) || (audioMode && (audio.currentTime > (skipTime)))) && !qualityBestChange && !qualityChange && !audioVideoAligning && seekAllow) {
+        if ((videoControls.classList.contains('visible') || m) && video.src !== "" && (video.currentTime > (skipTime)) && !qualityBestChange && !qualityChange && !audioVideoAligning && seekAllow) {
             //backwardSkippedTime = 0;
             //seekBackwardTextSec.innerHTML = backwardSkippedTime;
 
