@@ -2251,7 +2251,8 @@
           });
         // }, 100);
 
-        // video.src = "";
+        video.pause();
+        video.src = "";
       } else {
         audioMode = false;
         localStorage.setItem('audioMode', "false"); 
@@ -3570,7 +3571,7 @@
             getURL();
           }
 
-        } else { 
+        } else if (!audioMode) { 
           playPauseButton.classList.remove('playing');
           playPauseButton.classList.add('repeat');
           playPauseButton.title = "Replay";
