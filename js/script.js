@@ -906,7 +906,7 @@
     audio.addEventListener('pause', function () {
 
       if (audioMode) {
-        playPauseButton.classList.add('repeat');
+        playPauseButton.classList.remove('playing');
         playPauseButton.title = "Play";
       }
 
