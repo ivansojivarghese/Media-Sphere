@@ -877,7 +877,7 @@
         // audio.pause();
         // videoPause = false;
 
-        if (document.visibilityState === "visible" && appUnload !== null) {
+        if (document.visibilityState === "visible" && appUnload !== null && !audioMode) {
           audio.pause();
           // videoPause = false;
 
@@ -2678,7 +2678,7 @@
       audioTimes[audioTimes.length] = aT;
       videoTimes[videoTimes.length] = vT;
 
-      if (!video.paused && (!isMusic || (isMusic && CVactivityScore > 0.2)) /*&& !networkError */ && !seekingLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && (!loading || qualityBestChange || qualityChange) && !bufferingDetected && !framesStuck && (audioCtx && ((typeof audioCtx.playoutStats !== 'undefined' && audioCtx.playoutStats.maximumLatency) || (typeof audioCtx.playoutStats === 'undefined')) && audioCtx.baseLatency && audioCtx.outputLatency)) {
+      if (!video.paused && !audioMode && (!isMusic || (isMusic && CVactivityScore > 0.2)) /*&& !networkError */ && !seekingLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && (!loading || qualityBestChange || qualityChange) && !bufferingDetected && !framesStuck && (audioCtx && ((typeof audioCtx.playoutStats !== 'undefined' && audioCtx.playoutStats.maximumLatency) || (typeof audioCtx.playoutStats === 'undefined')) && audioCtx.baseLatency && audioCtx.outputLatency)) {
         
         var maxLatency = (typeof audioCtx.playoutStats !== 'undefined') ? audioCtx.playoutStats.maximumLatency : (audioCtx.baseLatency && audioCtx.outputLatency) ? 0 : 100;
 
