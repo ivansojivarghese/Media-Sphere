@@ -2277,11 +2277,11 @@
       if (!radioLoop) {
         radioLoop = true;
         localStorage.setItem('radioLoop', "true"); 
-        videoInfoElm.radio.classList.add("active");
+        // videoInfoElm.radio.classList.add("active");
       } else {
         radioLoop = false;
         localStorage.setItem('radioLoop', "false"); 
-        videoInfoElm.radio.classList.remove("active");
+        // videoInfoElm.radio.classList.remove("active");
       }
     }
 
