@@ -1273,13 +1273,13 @@
     });
 
     document.addEventListener("touchmove", (e) => {
-      if (isDragging && e.touches.length === 1 && (video.src !== "" || (player && player.isConnected))) {
+      if (isDragging && e.touches.length === 1 && ((video.src !== "" || audioMode) || (player && player.isConnected))) {
         videoScrub.style.transitionDuration = "0s";
         videoProgressBar.style.transitionDuration = "0s";
         videoLoadProgressBar.style.transitionDuration = "0s";
 
         // videoScrub.style.transform = "scale(1.2)";
-        var dur = (player && player.isConnected) ? player.duration : video.duration;
+        var dur = (player && player.isConnected) ? player.duration : !audioMode ? video.duration : audio.duration;
 
         const rect = videoBarPlaceholder.getBoundingClientRect();
         const offsetX = e.touches[0].clientX - rect.left;
@@ -1307,13 +1307,13 @@
     });
 
     document.addEventListener("mousemove", (e) => {
-      if (isDragging && (video.src !== "" || (player && player.isConnected))) {
+      if (isDragging && ((video.src !== "" || audioMode) || (player && player.isConnected))) {
         videoScrub.style.transitionDuration = "0s";
         videoProgressBar.style.transitionDuration = "0s";
         videoLoadProgressBar.style.transitionDuration = "0s";
 
         // videoScrub.style.transform = "scale(1.2)";
-        var dur = (player && player.isConnected) ? player.duration : video.duration;
+        var dur = (player && player.isConnected) ? player.duration : !audioMode ? video.duration : audio.duration;
 
         const rect = videoBarPlaceholder.getBoundingClientRect();
         const offsetX = e.clientX - rect.left;
@@ -1341,12 +1341,12 @@
     });
 
     function directSeek(e) {
-      if (!isDragging && (video.src !== "" || (player && player.isConnected))) {
+      if (!isDragging && ((video.src !== "" || audioMode) || (player && player.isConnected))) {
         videoScrub.style.transitionDuration = "0s";
         videoProgressBar.style.transitionDuration = "0s";
         videoLoadProgressBar.style.transitionDuration = "0s";
 
-        var dur = (player && player.isConnected) ? player.duration : video.duration;
+        var dur = (player && player.isConnected) ? player.duration : !audioMode ? video.duration : audio.duration;
 
         const rect = videoBarPlaceholder.getBoundingClientRect();
         const offsetX = e.clientX - rect.left;
