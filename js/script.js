@@ -281,7 +281,7 @@
     function updatePositionState() {
       if ('setPositionState' in navigator.mediaSession && video.duration !== NaN) {
 
-        if (!backgroundPlay || pipEnabled) {
+        if ((!backgroundPlay || pipEnabled) && !audioMode) {
           refSeekTime = video.currentTime;
 
           navigator.mediaSession.setPositionState({
