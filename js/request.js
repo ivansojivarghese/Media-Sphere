@@ -221,7 +221,6 @@
             radioLoop = true;
             localStorage.setItem('radioLoop', "true"); 
 
-            // shuffle mode for random playback??
             // add relevant details to localstorage for easy retrieval - esp. for custom created queues, liked and playlists
 
           } else if (q === "false" && queueActive) { // end queue
@@ -669,14 +668,14 @@
         } else {
           sort = '';
         }
-        
+        /*
         if (!d) {
           duration = '&videoDuration=short';
         } else {
           duration = '&videoDuration=medium';
           // and 'long'
-        }
-        // duration = '';
+        }*/
+        duration = '';
 
         const videoIds = [];
         const playlistIds = [];
@@ -705,6 +704,7 @@
 
           // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
 
+          /*
           if (!d) {
             searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
             console.log(searchResults);
@@ -721,7 +721,9 @@
             }
 
             console.log(searchResults);
-          }
+          }*/
+
+          searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
 
           searchResults = searchResults.filter(item => {
             const tags = item.snippet?.tags || [];
@@ -739,17 +741,18 @@
             showInputErrorFeedback("No results found. Try again.");
           } else {
             
-            if (d) {
+            // if (d) {
               displaySearchResults(true, null, "div.wrapper.search ");
 
               loadingSpace.style.display = "none";
               videoInfoElm.info.style.overflow = "";
-            }
+            // }
 
             // perform search for longer videos
+            /*
             if (!d) {
               searchQuery(q, true);
-            }
+            }*/
           }
 
           
@@ -827,14 +830,14 @@
         } else {
           sort = '';
         }
-        
+        /*
         if (!d) {
           duration = '&videoDuration=medium';
         } else {
           duration = '&videoDuration=long';
           // and 'long'
-        }
-        // duration = '';
+        }*/
+        duration = '';
 
         const videoIds = [];
         const playlistIds = [];
@@ -862,6 +865,7 @@
 
             // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
 
+            /*
             if (!d) {
               searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
               console.log(searchResults);
@@ -879,8 +883,13 @@
 
               console.log(searchResults);
             }
+              */
+
+            searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
 
             hideInputErrorFeedback();
+
+            console.log(searchResults);
 
             if (!searchResults.length) {
             
@@ -889,17 +898,18 @@
               showInputErrorFeedback("No results found. Try again.");
             } else {
               
-              if (d) {
+              // if (d) {
                 displaySearchResults(true, null, "div.wrapper.search ");
 
                 loadingSpace.style.display = "none";
                 videoInfoElm.info.style.overflow = "";
-              }
+              // }
 
               // perform search for longer videos
+              /*
               if (!d) {
                 searchQuery(q, true);
-              }
+              }*/
             }
 
             

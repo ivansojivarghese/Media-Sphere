@@ -279,7 +279,7 @@
     }
 
     function updatePositionState() {
-      if ('setPositionState' in navigator.mediaSession && video.duration !== NaN) {
+      if ('setPositionState' in navigator.mediaSession && (video.duration !== NaN || audioMode)) {
 
         if ((!backgroundPlay || pipEnabled) && !audioMode) {
           refSeekTime = video.currentTime;
