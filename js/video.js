@@ -2647,7 +2647,7 @@ function abstractVideoInfo() {
     p.innerHTML = qualityLabel(supportedVideoSources[j].qualityLabel);
 
     d.addEventListener("click", function(event) {
-      if (!event.currentTarget.classList.contains("active")) {
+      if (!event.currentTarget.classList.contains("active") && !audioMode) {
         autoRes = false;
 
         var label = qualityLabel(event.currentTarget.children[0].innerHTML);
@@ -3189,6 +3189,11 @@ if (localStorage.getItem('audioMode') === "true") {
 
   seekForwardButton.style.opacity = "0.2";
   seekBackwardButton.style.opacity = "0.2";
+
+  videoInfoElm.autoResBtn.style.opacity = "0.2";
+  document.querySelectorAll(".otherResBtn").forEach(el => {
+    el.style.opacity = "0.2";
+  });
 }
 
 setInterval(() => {

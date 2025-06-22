@@ -2237,14 +2237,26 @@
         audioMode = true;
         localStorage.setItem('audioMode', "true"); 
         videoInfoElm.audio.classList.add("active");
+
         seekForwardButton.style.opacity = "0.2";
         seekBackwardButton.style.opacity = "0.2";
+
+        videoInfoElm.autoResBtn.style.opacity = "0.2";
+        document.querySelectorAll(".otherResBtn").forEach(el => {
+          el.style.opacity = "0.2";
+        });
       } else {
         audioMode = false;
         localStorage.setItem('audioMode', "false"); 
         videoInfoElm.audio.classList.remove("active");
+
         seekForwardButton.style.opacity = "";
         seekBackwardButton.style.opacity = "";
+
+        videoInfoElm.autoResBtn.style.opacity = "";
+        document.querySelectorAll(".otherResBtn").forEach(el => {
+          el.style.opacity = "";
+        });
       }
     }
 
@@ -2261,7 +2273,7 @@
     }
 
     function autoResToggle() {
-      if (!autoRes) {
+      if (!autoRes && !audioMode) {
         var activeBtn = document.querySelectorAll(".autoResBtn.active").length ? document.querySelectorAll(".autoResBtn.active") : document.querySelectorAll(".otherResBtn.active");
         // activeBtn.classList.remove("active");
         activeBtn.forEach(btn => btn.classList.remove('active'));
