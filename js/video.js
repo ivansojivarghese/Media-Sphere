@@ -1920,6 +1920,9 @@ function getOptimalVideo(time, a, b) {
 
         if ((a || b === "url") && !videoErr && !audioErr) {
           autoInfoClose = true;
+          if (audioMode) {
+            audio.play();
+          }
         } else {
           autoInfoClose = false;
         }

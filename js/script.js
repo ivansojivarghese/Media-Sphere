@@ -928,6 +928,20 @@
           if (audioMode) {
             playPauseButton.classList.add('playing');
             playPauseButton.title = "Pause";
+
+            if (autoInfoClose && (!pipEnabled && !clickedWithin5Sec)) {
+              if (!isLandscape()) {
+                closeVideoInfo();
+              }
+              autoInfoClose = false;
+            } else if (pipEnabled || clickedWithin5Sec) {
+              autoInfoClose = false;
+
+              if (!searchQueried) { // if not query/url searching
+                loadingSpace.style.display = "";
+                videoInfoElm.info.style.overflow = "";
+              }
+            }
           }
 
           if (!loading && !bufferLoad && !seekingLoad && !bufferingDetected) {
