@@ -2223,10 +2223,14 @@
         audioMode = true;
         localStorage.setItem('audioMode', "true"); 
         videoInfoElm.audio.classList.add("active");
+        seekForwardButton.style.opacity = "0.2";
+        seekBackwardButton.style.opacity = "0.2";
       } else {
         audioMode = false;
         localStorage.setItem('audioMode', "false"); 
         videoInfoElm.audio.classList.remove("active");
+        seekForwardButton.style.opacity = "";
+        seekBackwardButton.style.opacity = "";
       }
     }
 

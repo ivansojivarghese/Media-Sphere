@@ -3181,6 +3181,9 @@ if (localStorage.getItem('radioLoop') === "true") {
 if (localStorage.getItem('audioMode') === "true") {
   audioMode = true;
   videoInfoElm.audio.classList.add("active");
+
+  seekForwardButton.style.opacity = "0.2";
+  seekBackwardButton.style.opacity = "0.2";
 }
 
 setInterval(() => {
