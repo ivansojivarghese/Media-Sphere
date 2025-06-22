@@ -409,7 +409,11 @@
               // }
             }
           } else {
-            audio.play();
+            if (audio.paused) {
+              audio.play();
+            } else {
+              audio.pause();
+            }
           }
 
         } else if (videoErr || audioErr) {
