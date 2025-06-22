@@ -3801,8 +3801,10 @@
       clearTimeout(controlsHideInt);
       controlsHideInt = null;
 
-      loadingRing.style.display = "block";
-      playPauseButton.style.display = "none";
+      if (!audioMode) {
+        loadingRing.style.display = "block";
+        playPauseButton.style.display = "none";
+      }
       showVideoControls();
 
       loading = true;
@@ -3883,8 +3885,10 @@
       clearTimeout(controlsHideInt);
       controlsHideInt = null;
 
-      loadingRing.style.display = "block";
-      playPauseButton.style.display = "none";
+      if (!audioMode) {
+        loadingRing.style.display = "block";
+        playPauseButton.style.display = "none";
+      }
       showVideoControls();
 
       loading = true;
@@ -4727,8 +4731,10 @@
       if ((player && !player.isConnected) || !player) {
         audioRun = true;
 
-        loadingRing.style.display = "block";
-        playPauseButton.style.display = "none";
+        if (!audioMode) {
+          loadingRing.style.display = "block";
+          playPauseButton.style.display = "none";
+        }
         showVideoControls();
       }
     });
