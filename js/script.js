@@ -969,7 +969,7 @@
     });
 
       audio.addEventListener('ended', function() {
-        if (!videoEnd && backgroundPlay) {
+        if ((!videoEnd && backgroundPlay) || audioMode) {
           // playPauseButton.classList.remove('playing');
           // playPauseButton.classList.add('repeat');
 
