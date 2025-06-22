@@ -4009,46 +4009,48 @@
         }
       }*/
 
-      if (!video.paused) {
-        frameArr[frameArr.length] = playbackStats.totalVideoFrames;
-        if (targetVideo.fps) {
-          checkFramesStuck(targetVideo.fps, tps, frameArr);
-        }
-      } 
+      if (!audioMode) {
+        if (!video.paused) {
+          frameArr[frameArr.length] = playbackStats.totalVideoFrames;
+          if (targetVideo.fps) {
+            checkFramesStuck(targetVideo.fps, tps, frameArr);
+          }
+        } 
 
-      if (bufferAllow) {
-        if (bufferMode || bufferingDetected) {
-          var currentTime = new Date().getTime();
-          if (bufferStartTime !== 0) {
-            var elapsedTime = currentTime - bufferStartTime;
-            liveBufferVal[liveBufferIndex] = elapsedTime;
-            if (elapsedTime >= bufferLimits[0] && !bufferModeExe) {
-              bufferCount++;
+        if (bufferAllow) {
+          if (bufferMode || bufferingDetected) {
+            var currentTime = new Date().getTime();
+            if (bufferStartTime !== 0) {
+              var elapsedTime = currentTime - bufferStartTime;
+              liveBufferVal[liveBufferIndex] = elapsedTime;
+              if (elapsedTime >= bufferLimits[0] && !bufferModeExe) {
+                bufferCount++;
+              }
             }
-          }
-          if (((liveBufferVal[liveBufferIndex] >= bufferLimits[2]) || (bufferExceedSuccessive(liveBufferVal, bufferLimits[1], bufferLimitC)) || (bufferingCount[bufferingCount.length - 1] >= bufferLimitC)) && bufferAllow && !qualityChange && !qualityBestChange /*&& !networkError*/ && (video.currentTime > 1) /*&& !bufferLoad*/ && !backgroundPlay) {
+            if (((liveBufferVal[liveBufferIndex] >= bufferLimits[2]) || (bufferExceedSuccessive(liveBufferVal, bufferLimits[1], bufferLimitC)) || (bufferingCount[bufferingCount.length - 1] >= bufferLimitC)) && bufferAllow && !qualityChange && !qualityBestChange /*&& !networkError*/ && (video.currentTime > 1) /*&& !bufferLoad*/ && !backgroundPlay) {
 
-            bufferingCount = [];
-            bufferCount = 0;
+              bufferingCount = [];
+              bufferCount = 0;
 
-            liveBufferVal = [];
-            liveBufferIndex = 0;
+              liveBufferVal = [];
+              liveBufferIndex = 0;
+              bufferModeExe = false;
+              bufferStartTime = 0;
+
+              console.log("buffer video");
+
+              getVideoFromBuffer();
+
+            }
+
+            bufferModeExe = true;
+
+          } else if ((!bufferMode || !bufferingDetected) && bufferModeExe) {
+            if (!bufferMode) {
+              liveBufferIndex++;
+            }
             bufferModeExe = false;
-            bufferStartTime = 0;
-
-            console.log("buffer video");
-
-            getVideoFromBuffer();
-
           }
-
-          bufferModeExe = true;
-
-        } else if ((!bufferMode || !bufferingDetected) && bufferModeExe) {
-          if (!bufferMode) {
-            liveBufferIndex++;
-          }
-          bufferModeExe = false;
         }
       }
     }
