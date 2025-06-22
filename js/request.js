@@ -670,16 +670,18 @@
         } else {
           sort = '';
         }
+        
         if (!d) {
-          duration = 'medium';
+          duration = '&videoDuration=medium';
         } else {
-          duration = 'long';
+          duration = '&videoDuration=long';
         }
+        // duration = '';
 
         const videoIds = [];
         const playlistIds = [];
 
-        url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&videoDuration=${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
+        url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
           fetch(url)
           .then(response => response.json())
           .then(async data => {
@@ -825,11 +827,13 @@
         } else {
           sort = '';
         }
+        
         if (!d) {
-          duration = 'medium';
+          duration = '&videoDuration=medium';
         } else {
-          duration = 'long';
+          duration = '&videoDuration=long';
         }
+        // duration = '';
 
         const videoIds = [];
         const playlistIds = [];
@@ -841,7 +845,7 @@
             'Accept': 'application/json'
           };
 
-          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&videoDuration=${duration}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
+          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}${duration}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
           fetch(url, { headers })
           .then(response => response.json())
           .then(async data => {
@@ -914,7 +918,7 @@
           });
 
         } else { // without user personalization
-          url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}&videoDuration=${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
+          url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
           fetch(url)
           .then(response => response.json())
           .then(async data => {
