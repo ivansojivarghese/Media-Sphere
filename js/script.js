@@ -4683,7 +4683,7 @@
       }
       initialVideoLoadCount++;
 
-      if ((player && !player.isConnected) || !player) {
+      if (((player && !player.isConnected) || !player) && !audioMode) {
         loadingRing.style.display = "block";
         playPauseButton.style.display = "none";
       }
