@@ -2241,6 +2241,7 @@
         seekForwardButton.style.opacity = "0.2";
         seekBackwardButton.style.opacity = "0.2";
 
+        videoInfoElm.autoResLive.style.display = "none";
         videoInfoElm.autoResBtn.style.opacity = "0.2";
         document.querySelectorAll(".otherResBtn").forEach(el => {
           el.style.opacity = "0.2";
@@ -2253,6 +2254,7 @@
         seekForwardButton.style.opacity = "";
         seekBackwardButton.style.opacity = "";
 
+        videoInfoElm.autoResLive.style.display = "";
         videoInfoElm.autoResBtn.style.opacity = "";
         document.querySelectorAll(".otherResBtn").forEach(el => {
           el.style.opacity = "";
