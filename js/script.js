@@ -2870,7 +2870,7 @@
       if ((player && !player.isConnected) || !player) {
         if ((videoControls.classList.contains('visible') || m) && (video.src !== "" || audioMode) && !qualityBestChange && !qualityChange && !audioVideoAligning) {
 
-          if (video.currentTime <= 5 || audio.currentTime <= 5){
+          if (((video.currentTime <= 5 || audio.currentTime <= 5) && !audioMode) || (audioMode && audio.currentTime <= 5)) {
 
             // go to the next video in index of queue
             var queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
