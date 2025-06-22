@@ -1140,6 +1140,20 @@
       }
     });
 
+    function shuffleQueue() {
+      const parent = document.querySelector('.videosQueue');
+      const children = Array.from(parent.children);
+
+      // Fisher-Yates Shuffle
+      for (let i = children.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [children[i], children[j]] = [children[j], children[i]];
+      }
+
+      // Remove and re-append in new order
+      children.forEach(child => parent.appendChild(child));
+    }
+
     document.addEventListener('fullscreenchange', function() {
       if (!document.fullscreenElement) {
         // fullscreenButton.children[0].classList.remove("exit");
@@ -1407,9 +1421,9 @@
         const offsetX = e.clientX - rect.left;
         const width = rect.width;
         const percentage = Math.min(Math.max(offsetX / width, 0), 1);
-        const newTime = secondsToTimeCode(percentage * video.duration);
+        const newTime = secondsToTimeCode(percentage * (video.duration || audio.duration));
 
-        if (video.src !== "") {
+        if (video.src !== "" || audioMode) {
           barElement.setAttribute("title", newTime);
         }
       });
