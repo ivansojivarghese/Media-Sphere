@@ -3657,7 +3657,7 @@
     
     video.addEventListener('waiting', function () { // when playback has stopped because of a temporary lack of data
 
-      if (!isMusic || (isMusic && CVactivityScore > 0.2)) {
+      if ((!isMusic || (isMusic && CVactivityScore > 0.2)) && !audioMode) {
 
         offset = (checkInterval - 20) / 1000;
 
@@ -3707,7 +3707,7 @@
 
     video.addEventListener('stalled', function () { // trying to fetch media data, but data is unexpectedly not forthcoming
 
-      if (!isMusic || (isMusic && CVactivityScore > 0.2)) {
+      if ((!isMusic || (isMusic && CVactivityScore > 0.2)) && !audioMode) {
 
         offset = (checkInterval - 20) / 1000;
 
