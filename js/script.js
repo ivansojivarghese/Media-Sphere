@@ -2930,76 +2930,78 @@
 
       maxTime = video.duration < maxTime ? video.duration : maxTime;
 
-      if ((player && !player.isConnected) || !player) {
-        if ((videoControls.classList.contains('visible') || m) && video.src !== "" && /*!videoEnd*/ (video.currentTime < (video.duration - skipTime)) && !qualityBestChange && !qualityChange && !audioVideoAligning && seekAllow) {
+      if (!audioMode) {
+        if ((player && !player.isConnected) || !player) {
+          if ((videoControls.classList.contains('visible') || m) && video.src !== "" && /*!videoEnd*/ (video.currentTime < (video.duration - skipTime)) && !qualityBestChange && !qualityChange && !audioVideoAligning && seekAllow) {
 
-            playPauseButton.classList.remove('repeat');
-            playPauseButton.title = "Play";
+              playPauseButton.classList.remove('repeat');
+              playPauseButton.title = "Play";
 
-            seeking = true;
-            seekingLoad = true;
-            if (forwardSkippedTime <= (maxTime - skipTime)) {
-              skipTime = 10;
-              forwardSkippedTime += skipTime;
-            } else {
-              skipTime = 0;
-            }
-            seekForwardTextSec.innerHTML = forwardSkippedTime;
-            // seekForwardTextSec.innerHTML = seekSecondsOutput(forwardSkippedTime);
-            clearTimeout(controlsHideInt);
-            clearTimeout(seekForwardHideInt);
-            seekForwardHideInt = null;
-            controlsHideInt = null;
-            seekBackwardText.classList.remove('show');
-            setTimeout(function() {
-              backwardSkippedTime = 0;
-              seekBackwardTextSec.innerHTML = backwardSkippedTime;
-            }, 300);
-            seekForwardText.classList.add('show');
+              seeking = true;
+              seekingLoad = true;
+              if (forwardSkippedTime <= (maxTime - skipTime)) {
+                skipTime = 10;
+                forwardSkippedTime += skipTime;
+              } else {
+                skipTime = 0;
+              }
+              seekForwardTextSec.innerHTML = forwardSkippedTime;
+              // seekForwardTextSec.innerHTML = seekSecondsOutput(forwardSkippedTime);
+              clearTimeout(controlsHideInt);
+              clearTimeout(seekForwardHideInt);
+              seekForwardHideInt = null;
+              controlsHideInt = null;
+              seekBackwardText.classList.remove('show');
+              setTimeout(function() {
+                backwardSkippedTime = 0;
+                seekBackwardTextSec.innerHTML = backwardSkippedTime;
+              }, 300);
+              seekForwardText.classList.add('show');
 
-            if (Number.isFinite(Math.min(video.currentTime + skipTime, video.duration))) {
-              video.currentTime = Math.min(video.currentTime + skipTime, video.duration);
-              // videoSec.currentTime = Math.min(videoSec.currentTime + skipTime, videoSec.duration);
-              audio.currentTime = video.currentTime;
-              refSeekTime = video.currentTime;
-            }
-            // audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration);
+              if (Number.isFinite(Math.min(video.currentTime + skipTime, video.duration))) {
+                video.currentTime = Math.min(video.currentTime + skipTime, video.duration);
+                // videoSec.currentTime = Math.min(videoSec.currentTime + skipTime, videoSec.duration);
+                audio.currentTime = video.currentTime;
+                refSeekTime = video.currentTime;
+              }
+              // audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration);
 
-            if (controlsHideInt === null && !video.paused) {
-              controlsHideInt = setTimeout(function() {
-                if (!seekingLoad && !queueOpen && !longTap && !seeking && !video.paused) {
-                  hideVideoControls();
-                  console.log("hideVC");
-                }
-              }, 3000); // hide controls after 3 sec. if no activity
-            }
-            if (seekForwardHideInt === null) {
-              seekForwardHideInt = setTimeout(function() {
-                seeking = false;
-                seekForwardText.classList.remove('show');
-                forwardSkippedTime = 0;
-                setTimeout(function() {
-                  // forwardSkippedTime = 0;
-                  seekForwardTextSec.innerHTML = forwardSkippedTime;
-                  // seekForwardTextSec.innerHTML = seekSecondsOutput(forwardSkippedTime);
-                }, 300);
-              }, 1000);
-            }
-        } 
-      } else {
-        // Calculate the new time
-        let newTime = player.currentTime + skipTime;
+              if (controlsHideInt === null && !video.paused) {
+                controlsHideInt = setTimeout(function() {
+                  if (!seekingLoad && !queueOpen && !longTap && !seeking && !video.paused) {
+                    hideVideoControls();
+                    console.log("hideVC");
+                  }
+                }, 3000); // hide controls after 3 sec. if no activity
+              }
+              if (seekForwardHideInt === null) {
+                seekForwardHideInt = setTimeout(function() {
+                  seeking = false;
+                  seekForwardText.classList.remove('show');
+                  forwardSkippedTime = 0;
+                  setTimeout(function() {
+                    // forwardSkippedTime = 0;
+                    seekForwardTextSec.innerHTML = forwardSkippedTime;
+                    // seekForwardTextSec.innerHTML = seekSecondsOutput(forwardSkippedTime);
+                  }, 300);
+                }, 1000);
+              }
+          } 
+        } else {
+          // Calculate the new time
+          let newTime = player.currentTime + skipTime;
 
-        // Ensure the new time is not less than 0
-        if (newTime < 0) {
-            newTime = 0;
+          // Ensure the new time is not less than 0
+          if (newTime < 0) {
+              newTime = 0;
+          }
+
+          // Update the player's current time
+          player.currentTime = newTime;
+
+          // Send the seek command to the player
+          playerController.seek();
         }
-
-        // Update the player's current time
-        player.currentTime = newTime;
-
-        // Send the seek command to the player
-        playerController.seek();
       }
     }
 
@@ -3007,79 +3009,81 @@
       
       maxTime = video.duration < maxTime ? video.duration : maxTime;
 
-      if ((player && !player.isConnected) || !player) {
-        if ((videoControls.classList.contains('visible') || m) && video.src !== "" && (video.currentTime > (skipTime)) && !qualityBestChange && !qualityChange && !audioVideoAligning && seekAllow) {
-            //backwardSkippedTime = 0;
-            //seekBackwardTextSec.innerHTML = backwardSkippedTime;
+      if (!audioMode) {
+        if ((player && !player.isConnected) || !player) {
+          if ((videoControls.classList.contains('visible') || m) && video.src !== "" && (video.currentTime > (skipTime)) && !qualityBestChange && !qualityChange && !audioVideoAligning && seekAllow) {
+              //backwardSkippedTime = 0;
+              //seekBackwardTextSec.innerHTML = backwardSkippedTime;
 
-            playPauseButton.classList.remove('repeat');
-            playPauseButton.title = "Play";
-            
-            videoEnd = false;
-            seeking = true;
-            seekingLoad = true;
-            if (backwardSkippedTime <= (maxTime - skipTime)) {
-              skipTime = 10;
-              backwardSkippedTime += skipTime;
-            } else {
-              skipTime = 0;
-            }
-            seekBackwardTextSec.innerHTML = backwardSkippedTime;
-            clearTimeout(controlsHideInt);
-            controlsHideInt = null;
-            clearTimeout(seekBackwardHideInt);
-            seekBackwardHideInt = null;
-            seekForwardText.classList.remove('show');
-            setTimeout(function() {
-              forwardSkippedTime = 0;
-              seekForwardTextSec.innerHTML = forwardSkippedTime;
-              // seekForwardTextSec.innerHTML = seekSecondsOutput(forwardSkippedTime);
-            }, 300);
-            seekBackwardText.classList.add('show');
+              playPauseButton.classList.remove('repeat');
+              playPauseButton.title = "Play";
+              
+              videoEnd = false;
+              seeking = true;
+              seekingLoad = true;
+              if (backwardSkippedTime <= (maxTime - skipTime)) {
+                skipTime = 10;
+                backwardSkippedTime += skipTime;
+              } else {
+                skipTime = 0;
+              }
+              seekBackwardTextSec.innerHTML = backwardSkippedTime;
+              clearTimeout(controlsHideInt);
+              controlsHideInt = null;
+              clearTimeout(seekBackwardHideInt);
+              seekBackwardHideInt = null;
+              seekForwardText.classList.remove('show');
+              setTimeout(function() {
+                forwardSkippedTime = 0;
+                seekForwardTextSec.innerHTML = forwardSkippedTime;
+                // seekForwardTextSec.innerHTML = seekSecondsOutput(forwardSkippedTime);
+              }, 300);
+              seekBackwardText.classList.add('show');
 
-            if (Number.isFinite(Math.max(video.currentTime - skipTime, 0))) {
-              video.currentTime = Math.max(video.currentTime - skipTime, 0);
-              // videoSec.currentTime = Math.max(videoSec.currentTime - skipTime, 0);
-              audio.currentTime = video.currentTime;
-              refSeekTime = video.currentTime;
-            }
-            // audio.currentTime = Math.max(audio.currentTime - skipTime, 0);
+              if (Number.isFinite(Math.max(video.currentTime - skipTime, 0))) {
+                video.currentTime = Math.max(video.currentTime - skipTime, 0);
+                // videoSec.currentTime = Math.max(videoSec.currentTime - skipTime, 0);
+                audio.currentTime = video.currentTime;
+                refSeekTime = video.currentTime;
+              }
+              // audio.currentTime = Math.max(audio.currentTime - skipTime, 0);
 
-            if (controlsHideInt === null && !video.paused) {
-              controlsHideInt = setTimeout(function() {
-                if (!seekingLoad && !queueOpen && !longTap && !seeking && !video.paused) {
-                  hideVideoControls();
-                  console.log("hideVC");
-                }
-              }, 3000); // hide controls after 3 sec. if no activity
-            }
-            if (seekBackwardHideInt === null) {
-              seekBackwardHideInt = setTimeout(function() {
-                seeking = false;
-                seekBackwardText.classList.remove('show');
-                backwardSkippedTime = 0;
-                // seekBackwardTextSec.innerHTML = backwardSkippedTime;
-                setTimeout(function() {
-                  // backwardSkippedTime = 0;
-                  seekBackwardTextSec.innerHTML = backwardSkippedTime;
-                }, 300);
-              }, 1000);
-            }
+              if (controlsHideInt === null && !video.paused) {
+                controlsHideInt = setTimeout(function() {
+                  if (!seekingLoad && !queueOpen && !longTap && !seeking && !video.paused) {
+                    hideVideoControls();
+                    console.log("hideVC");
+                  }
+                }, 3000); // hide controls after 3 sec. if no activity
+              }
+              if (seekBackwardHideInt === null) {
+                seekBackwardHideInt = setTimeout(function() {
+                  seeking = false;
+                  seekBackwardText.classList.remove('show');
+                  backwardSkippedTime = 0;
+                  // seekBackwardTextSec.innerHTML = backwardSkippedTime;
+                  setTimeout(function() {
+                    // backwardSkippedTime = 0;
+                    seekBackwardTextSec.innerHTML = backwardSkippedTime;
+                  }, 300);
+                }, 1000);
+              }
+          }
+        } else {
+          // Calculate the new time
+          let newTime = player.currentTime - skipTime;
+
+          // Ensure the new time is not less than 0
+          if (newTime < 0) {
+              newTime = 0;
+          }
+
+          // Update the player's current time
+          player.currentTime = newTime;
+
+          // Send the seek command to the player
+          playerController.seek();
         }
-      } else {
-        // Calculate the new time
-        let newTime = player.currentTime - skipTime;
-
-        // Ensure the new time is not less than 0
-        if (newTime < 0) {
-            newTime = 0;
-        }
-
-        // Update the player's current time
-        player.currentTime = newTime;
-
-        // Send the seek command to the player
-        playerController.seek();
       }
     }
 
