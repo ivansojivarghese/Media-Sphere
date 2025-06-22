@@ -218,7 +218,8 @@
               }
             });
 
-            radioToggle();
+            radioLoop = true;
+            localStorage.setItem('radioLoop', "true"); 
 
             // active the radio toggle localstorage for automatic playback (foreground and background) - unless loop is active
               // shuffle mode for random playback??
