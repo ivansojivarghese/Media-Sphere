@@ -2243,9 +2243,11 @@
 
         videoInfoElm.autoResLive.style.display = "none";
         videoInfoElm.autoResBtn.style.opacity = "0.2";
-        document.querySelectorAll(".otherResBtn").forEach(el => {
-          el.style.opacity = "0.2";
-        });
+        setTimeout(function() {
+          document.querySelectorAll(".otherResBtn").forEach(el => {
+            el.style.opacity = "0.2";
+          });
+        }, 100);
       } else {
         audioMode = false;
         localStorage.setItem('audioMode', "false"); 
@@ -2256,6 +2258,7 @@
 
         videoInfoElm.autoResLive.style.display = "";
         videoInfoElm.autoResBtn.style.opacity = "";
+        
         document.querySelectorAll(".otherResBtn").forEach(el => {
           el.style.opacity = "";
         });
