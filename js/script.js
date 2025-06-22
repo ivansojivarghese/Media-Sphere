@@ -2251,7 +2251,7 @@
           });
         // }, 100);
 
-        video.src = "";
+        // video.src = "";
       } else {
         audioMode = false;
         localStorage.setItem('audioMode', "false"); 
