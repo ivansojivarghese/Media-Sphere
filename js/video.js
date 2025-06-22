@@ -2646,6 +2646,10 @@ function abstractVideoInfo() {
     d.classList.add("otherResBtn", "resBtn", "trs");
     p.innerHTML = qualityLabel(supportedVideoSources[j].qualityLabel);
 
+    if (audioMode) {
+      d.style.opacity = "0.2";
+    }
+
     d.addEventListener("click", function(event) {
       if (!event.currentTarget.classList.contains("active") && !audioMode) {
         autoRes = false;
