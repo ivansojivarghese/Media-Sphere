@@ -901,6 +901,12 @@
     
     audio.addEventListener('pause', function () {
 
+      if (audioMode) {
+        playPauseButton.classList.remove('playing');
+        playPauseButton.classList.add('repeat');
+        playPauseButton.title = "Play";
+      }
+
       if (!loading && !bufferLoad && !seekingLoad && !bufferingDetected) {
         video.pause();
       }
@@ -915,6 +921,12 @@
       // if (!networkError) {
 
           // videoInfoElm.info.addEventListener("scroll", ch);
+
+          if (audioMode) {
+            playPauseButton.classList.remove('repeat');
+            playPauseButton.classList.add('playing');
+            playPauseButton.title = "Pause";
+          }
 
           if (!loading && !bufferLoad && !seekingLoad && !bufferingDetected) {
             video.play();
