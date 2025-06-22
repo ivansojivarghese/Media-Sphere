@@ -3291,7 +3291,7 @@
 
       // Calculate and log the total buffered percentage
       if (!backgroundPlay) {
-        const bufferedPercentage = (lastBufferedTime / video.duration) * 100;
+        const bufferedPercentage = !audioMode ? (lastBufferedTime / video.duration) * 100 : (lastBufferedTime / audio.duration) * 100;
         console.log(`Total buffered: ${bufferedPercentage.toFixed(2)}%`);
 
         // Update the video load progress bar
@@ -5223,6 +5223,14 @@
       audioProgressPercentile = (audio.currentTime / audio.duration);
       if (!qualityChange && !qualityBestChange) {
         updatePositionState();
+      }
+
+      if (audioMode) {
+        updateVideoLoad();
+
+        videoCurrentTime.textContent = secondsToTimeCode(audio.currentTime);
+        videoProgressPercentile = (audio.currentTime / audio.duration);
+        videoProgressBar.style.transform = `scaleX(${audio.currentTime / audio.duration})`;
       }
     });
 
