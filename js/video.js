@@ -379,7 +379,7 @@ async function sourceCheck(i, m) {
     if (videoSources[i].mimeType && videoSources[i].mimeType.toLowerCase().includes("vp9")) {
       let rawMime = videoSources[i].mimeType
       const estimatedCodec = estimateVp9CodecFromYtdlp(videoSources[i]);
-      mimeType = rawMime.replace(/codecs="?[^";]+"?/, `codecs="${estimatedCodec}"`);
+      mimeType = rawMime.replace(/codecs=("[^"]+"|'[^']+'|[^;]+)/, `codecs="${estimatedCodec}"`);
     } else {
       mimeType = videoSources[i].mimeType;
     }
