@@ -347,13 +347,47 @@ setupSwipeToClose(panel, () => {
   panel.style.transform = "none"; // Or any close action you prefer
 }); */
 
+function estimateVp9CodecFromYtdlp(format) { // REFERENCE: CHATGPT
+  const width = format.width || 0;
+  const height = format.height || 0;
+  const hint = JSON.stringify(format).toLowerCase();
+
+  // 1. Level (resolution-based)
+  const level = (width >= 3840 || height >= 2160) ? "11" :
+                (width >= 2560 || height >= 1440) ? "10" :
+                (width >= 1920 || height >= 1080) ? "09" : "08";
+
+  // 2. Bit Depth Estimation
+  let bitDepth = "08";
+  if (hint.includes("10") || hint.includes("vp9.2") || hint.includes("hdr")) {
+    bitDepth = "10";
+  } else if (hint.includes("12")) {
+    bitDepth = "12";
+  }
+
+  // 3. Profile Estimation (based on bit depth)
+  const profile = (bitDepth === "08") ? "00" : "02";  // assume profile 2 for 10/12-bit
+
+  return `vp09.${profile}.${level}.${bitDepth}`;
+}
+
 async function sourceCheck(i, m) {
   // var mime = replaceSingleWithDoubleQuotes(replaceDoubleQuotes(videoSources[i].mimeType));
   if (m) { // video
+
+    var mimeType = "";
+    if (videoSources[i].mimeType && videoSources[i].mimeType.toLowerCase().includes("vp9")) {
+      let rawMime = videoSources[i].mimeType
+      const estimatedCodec = estimateVp9CodecFromYtdlp(videoSources[i]);
+      mimeType = rawMime.replace(/codecs="?[^";]+"?/, `codecs="${estimatedCodec}"`);
+    } else {
+      mimeType = videoSources[i].mimeType;
+    }
+
     var videoConfiguration = {
       type: "file",
       video: {
-        contentType: videoSources[i].mimeType,
+        contentType: mimeType,
         width: videoSources[i].width,
         height: videoSources[i].height,
         bitrate: videoSources[i].bitrate,
