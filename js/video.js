@@ -358,13 +358,12 @@ function estimateVp9CodecFromYtdlp(format) { // REFERENCE: CHATGPT
                 (width >= 1920 || height >= 1080) ? "09" : "08";
 
   // 2. Bit Depth Estimation
-  let bitDepth = "12";
-  /*
+  let bitDepth = "08";
   if (hint.includes("10") || hint.includes("vp9.2") || hint.includes("hdr")) {
     bitDepth = "10";
   } else if (hint.includes("12")) {
     bitDepth = "12";
-  }*/
+  }
 
   // 3. Profile Estimation (based on bit depth)
   const profile = (bitDepth === "08") ? "00" : "02";  // assume profile 2 for 10/12-bit
