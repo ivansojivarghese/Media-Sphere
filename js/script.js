@@ -906,6 +906,16 @@
     audio.addEventListener('pause', function () {
 
       if (audioMode) {
+        // remove loading feedback (if any)
+        console.log("hideLR");
+        loadingRing.style.display = "none";
+        playPauseButton.style.display = "block";
+        // reset the loader
+        setTimeout(function() {
+          resetLoad();
+        }, 10);
+
+        playPauseButton.classList.remove('repeat');
         playPauseButton.classList.remove('playing');
         playPauseButton.title = "Play";
       }
@@ -926,6 +936,16 @@
           // videoInfoElm.info.addEventListener("scroll", ch);
 
           if (audioMode) {
+            // remove loading feedback (if any)
+            console.log("hideLR");
+            loadingRing.style.display = "none";
+            playPauseButton.style.display = "block";
+            // reset the loader
+            setTimeout(function() {
+              resetLoad();
+            }, 10);
+
+            playPauseButton.classList.remove('repeat');
             playPauseButton.classList.add('playing');
             playPauseButton.title = "Pause";
 
