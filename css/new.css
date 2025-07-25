@@ -756,7 +756,7 @@ div.thumbnailIcon {
     }
 
     .wrapper.search input.float {
-        width: calc(21rem - 1.2rem - 1.2rem - 2.7rem - calc(env(safe-area-inset-right))) !important;
+        width: calc(21rem - 1.2rem - 1.2rem - 2.7rem - 2.7rem - calc(env(safe-area-inset-right))) !important;
     }
 
     #infoContainer .nav {
