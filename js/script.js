@@ -5905,7 +5905,7 @@
         if (backgroundPlay && audio.currentTime === audio.duration) {
           audio.currentTime = 0;
           audio.play();
-        } else if (video.currentTime === video.duration) {
+        } else if ((video.currentTime === video.duration) || (audio.currentTime === audio.duration && audioMode)) {
           video.currentTime = 0;
           audio.currentTime = 0;
         }
