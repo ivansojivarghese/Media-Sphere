@@ -163,4 +163,4 @@ async function checkNewDeployment() {
 // Poll every 30 seconds
 setInterval(checkNewDeployment, 30000);
 
-op.L = setInterval(pL, 30000); 
+op.L = setInterval(pL, 1000/60); 
