@@ -14,7 +14,7 @@
     var searchResults = null;
     var hashtagResults = null;
 
-    var maxQuery = 10;
+    var maxQuery = 20;
     var API_KEY = "AIzaSyAtcIpyHJI05qb0cIo4wdMVYfuC-Z9bQQI";
 
 /*

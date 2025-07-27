@@ -5593,7 +5593,7 @@
             audio.load();
           }
 
-          if (audio.buffered.length && (!videoEnd /*|| (videoEnd && (audio.currentTime < (audio.duration - maxVideoLoad)))*/) && audio.readyState > 2 && !initialVideoLoad && (bufferLoad || loading || seekingLoad || bufferingDetected)) {
+          if (!audioMode && audio.buffered.length && (!videoEnd /*|| (videoEnd && (audio.currentTime < (audio.duration - maxVideoLoad)))*/) && audio.readyState > 2 && !initialVideoLoad && (bufferLoad || loading || seekingLoad || bufferingDetected)) {
             console.log("audio_play in background");
             audio.play();
           }
