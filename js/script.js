@@ -4206,6 +4206,16 @@
 
         }
 
+        const quality = video.getVideoPlaybackQuality();
+              let avgDecode = decodeDurations.length
+        ? decodeDurations.reduce((a, b) => a + b) / decodeDurations.length
+        : 0;
+        // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
+        let decodePressure = performance.now() - decodeStartTime;
+        if (avgDecode > 50 && targetQuality >= 6 && quality.droppedVideoFrames > 5) { // 1440p+
+          targetQuality -= 1; // Drop quality to reduce load
+        }
+
         refSeekTime = video.currentTime;
         // console.log("ref", refSeekTime);
 
@@ -4315,6 +4325,16 @@
 
           targetQuality = newTargetQuality;
           getVideoFromIndex(false); // loop qualities to get video again
+        }
+
+        const quality = video.getVideoPlaybackQuality();
+        let avgDecode = decodeDurations.length
+        ? decodeDurations.reduce((a, b) => a + b) / decodeDurations.length
+        : 0;
+        // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
+        let decodePressure = performance.now() - decodeStartTime;
+        if (avgDecode > 50 && targetQuality >= 6 && quality.droppedVideoFrames > 5) { // 1440p+
+          targetQuality -= 1; // Drop quality to reduce load
         }
 
         refSeekTime = video.currentTime;

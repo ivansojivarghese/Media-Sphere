@@ -1489,9 +1489,23 @@ function getOptimalQuality() {
           tempQuality = videoQuality.length - 1;
         }
       }
+      const qly = video.getVideoPlaybackQuality();
+      let avgDecode = decodeDurations.length
+        ? decodeDurations.reduce((a, b) => a + b) / decodeDurations.length
+        : 0;
       if (initialVideoLoadCount === 0) {
+        // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
+        let decodePressure = performance.now() - decodeStartTime;
+        if (avgDecode > 50 && targetQuality >= 6 && qly.droppedVideoFrames > 5) { // 1440p+
+          targetQuality -= 1; // Drop quality to reduce load
+        }
         return targetQuality;
       } else {
+        // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
+        let decodePressure = performance.now() - decodeStartTime;
+        if (avgDecode > 50 && tempQuality >= 6 && qly.droppedVideoFrames > 5) { // 1440p+
+          tempQuality -= 1; // Drop quality to reduce load
+        }
         return tempQuality;
       }
 }
@@ -1788,6 +1802,9 @@ function generateSimpleGradient(primaryColor) {
   return `linear-gradient(0deg, rgb(0, 0, 0), ${primaryColorString} 50%, rgb(0, 0, 0))`;
 }
 
+let decodeStartTime = 0;
+let decodeDurations = [];
+
 function getOptimalVideo(time, a, b) {
 
   // IDENTIFY VIDEO AND AUDIO SOURCES IN THE FETCH ARRAY RESULT
@@ -1885,6 +1902,21 @@ function getOptimalVideo(time, a, b) {
 
         video.load();
         audio.load();
+
+        video.requestVideoFrameCallback(function monitorDecode(now, metadata) {
+          if (decodeStartTime === 0) decodeStartTime = now;
+          const duration = now - decodeStartTime;
+          decodeDurations.push(duration);
+
+          // keep recent decode durations only
+          if (decodeDurations.length > 30) decodeDurations.shift();
+
+          // Update decodeStartTime for next frame
+          decodeStartTime = now;
+
+          // Loop the callback
+          video.requestVideoFrameCallback(monitorDecode);
+        });
 
         if (time) { // START FROM (if available)
           video.currentTime = time;
