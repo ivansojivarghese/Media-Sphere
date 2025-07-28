@@ -4309,6 +4309,19 @@
 
       var newIndex = getVideoFromIndex(true, newTargetQuality);
 
+      // Estimate time to download 5 seconds of the new target video source
+      const newTargetVideo = targetVideoSources[newIndex];
+      const bitrateKbps = newTargetVideo.bitrate;
+      // const downlinkMbps = networkSpeed; 
+      const requiredBytes = (bitrateKbps * 1000 * 5) / 8; // required video space for 5 sec.
+      const availableBytesPerSec = (networkSpeed * 1000 * 1000) / 8;
+      const estimatedLoadTime = requiredBytes / availableBytesPerSec;
+
+      if (estimatedLoadTime > 1) {
+        console.warn(`Skipping switch to Q${newTargetQuality} – estimated load time: ${estimatedLoadTime.toFixed(2)}s`);
+        return;
+      }
+
       if (((p <= 0 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality < targetQuality) || (newIndex > targetVideoIndex))) || (p > 0 && ((newTargetQuality > targetQuality) || (newIndex < targetVideoIndex)))) && ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
         
         targetVideo = null;
