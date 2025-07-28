@@ -4313,9 +4313,20 @@
       const newTargetVideo = targetVideoSources[newIndex];
       const bitrateKbps = newTargetVideo.bitrate;
       // const downlinkMbps = networkSpeed; 
+      /*
       const requiredBytes = (bitrateKbps * 1000 * 5) / 8; // required video space for 5 sec.
       const availableBytesPerSec = (networkSpeed * 1000 * 1000) / 8;
       const estimatedLoadTime = requiredBytes / availableBytesPerSec;
+      */
+
+      // 5 seconds worth of video data in kilobits
+      const requiredKilobits = bitrateKbps * 5;
+
+      // Convert network speed from Mbps → kbps
+      const networkSpeedKbps = networkSpeed * 1000;
+
+      // Estimated load time in seconds
+      const estimatedLoadTime = requiredKilobits / networkSpeedKbps;
 
       if (estimatedLoadTime > 1) {
         console.warn(`Skipping switch to Q${newTargetQuality} – estimated load time: ${estimatedLoadTime.toFixed(2)}s`);
