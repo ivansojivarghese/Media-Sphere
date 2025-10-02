@@ -3487,7 +3487,7 @@
 
         // UI
 
-        if (audio.error.code && failTimes < maxFailTimes /*&& backgroundPlay*/) {
+        if (audio.error.code /*&& failTimes < maxFailTimes && backgroundPlay*/) {
           audio.load();
           audio.currentTime = video.currentTime;
 
@@ -3600,7 +3600,7 @@
 
         // UI
 
-        if (video.error.code && !backgroundPlay && failTimes < maxFailTimes) {
+        if (video.error.code && !backgroundPlay /*&& failTimes < maxFailTimes*/) {
           failTimes++;
 
           video.load();
