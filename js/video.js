@@ -2116,6 +2116,10 @@ function timeAgo(dateString) { // ISO8601 date string to human-readable string c
   const past = new Date(dateString);
   const seconds = Math.floor((now - past) / 1000);
 
+  if (dateString === null || isNaN(past.getTime())) {
+      return "Unknown";
+  }
+
   if (seconds < 60) {
       return `${seconds} ${seconds === 1 ? 'second' : 'seconds'} ago`;
   }
@@ -2683,6 +2687,10 @@ function abstractVideoInfo() {
     videoInfoElm.views.innerHTML = meta.views + viewsTxt;
   } else {
     videoInfoElm.views.style.display = "none";
+  }
+  if (videoInfoElm.date.innerHTML === "Unknown") {
+    videoInfoElm.date.innerHTML = "";
+    videoInfoElm.date.style.display = "none";
   }
 
   if (!videoInfoElm.autoResBtn.classList.contains("active")) {
