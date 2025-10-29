@@ -1,4 +1,4 @@
-# Media Sphere 🎵🎥
+# Media Sphere 
 
 A modern and customizable media player for audio and video, built with Vue.js and optimized for seamless playback and user experience.
 
