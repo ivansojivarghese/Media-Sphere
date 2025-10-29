@@ -2117,7 +2117,7 @@ function timeAgo(dateString) { // ISO8601 date string to human-readable string c
   const seconds = Math.floor((now - past) / 1000);
 
   if (dateString === null || isNaN(past.getTime())) {
-      return "Unknown date";
+      return "-";
   }
 
   if (seconds < 60) {

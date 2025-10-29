@@ -4329,7 +4329,7 @@
       const estimatedLoadTime = requiredKilobits / networkSpeedKbps;
 
       if (estimatedLoadTime > 1) {
-        console.warn(`Skipping switch to Q${newTargetQuality} – estimated load time: ${estimatedLoadTime.toFixed(2)}s`);
+        // console.warn(`Skipping switch to Q${newTargetQuality} – estimated load time: ${estimatedLoadTime.toFixed(2)}s`);
         // return;
 
         // TO BE IMPLEMENTED: if estimated load time is too high, do not switch to this quality
