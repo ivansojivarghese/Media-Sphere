@@ -1680,7 +1680,7 @@
       }*/
     });
 
-    window.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('DOMContentLoaded', async function() {
       showVideoControls();
       // resetVideoInfo();
 
@@ -1697,6 +1697,17 @@
       if (op.pwa.a) { // if launched as TWA 
         // fullscreenButton.style.display = "none";
       }
+
+      // Load ML model
+      await window.qualitySwitchPredictor.loadModel();
+
+      // Schedule periodic telemetry upload
+      window.videoQualityTelemetry.schedulePeriodicUpload(60000); // every 60 seconds
+
+      // Upload on page unload
+      window.addEventListener('beforeunload', () => {
+        window.videoQualityTelemetry.uploadTelemetry();
+      });
     });
 
     var videoInfoOpen = false;
@@ -4296,7 +4307,7 @@
       }
     }
 
-    function getBestVideo() { // fetch best video according to network conditions - continuous
+    async function getBestVideo() { // fetch best video according to network conditions - continuous
 
       var p = getLoadedPercent();
 
@@ -4328,92 +4339,222 @@
       // Estimated load time in seconds
       const estimatedLoadTime = requiredKilobits / networkSpeedKbps;
 
+      // ========== ML INTEGRATION START ==========
+
+      // REFER TO GITHUB COPILOT CHAT - STEP 5 FOR FURTHER DETAILS
+      
+      // Build feature vector for ML model
+      const featureData = {
+        // Network
+        networkSpeed: networkSpeed,
+        networkBandwidth: networkSpeed, // or separate if available
+        rtt: avgRTT || 0,
+        jitter: avgJitter || 0,
+        packetLoss: avgPacketLoss || 0,
+        downlinkStdDev: downlinkVariability.standardDeviation || 0,
+        networkQuality: determineNetworkQuality(networkSpeed, networkSpeed, avgRTT, avgJitter, avgPacketLoss),
+        
+        // Quality change
+        originalQualityIndex: targetQuality,
+        targetQualityIndex: newTargetQuality,
+        originalBitrate: targetVideo.bitrate,
+        targetBitrate: newTargetVideo.bitrate,
+        originalResolution: targetVideo.height,
+        targetResolution: newTargetVideo.height,
+        originalFps: targetVideo.fps,
+        targetFps: newTargetVideo.fps,
+        
+        // Buffer
+        bufferedSeconds: video.buffered.length > 0 ? 
+          (video.buffered.end(video.buffered.length - 1) - video.currentTime) : 0,
+        videoLoadPercentile: videoLoadPercentile,
+        audioLoadPercentile: audioLoadPercentile,
+        
+        // Device
+        devicePixelRatio: dpr,
+        screenWidth: dWidth,
+        screenHeight: dHeight,
+        deviceType: getDeviceType, // 'mobile', 'tablet', 'desktop'
+        
+        // Playback
+        currentTime: video.currentTime,
+        duration: video.duration,
+        playbackRate: video.playbackRate,
+        droppedFrames: playbackStats ? playbackStats.droppedVideoFrames : 0,
+        totalFrames: playbackStats ? playbackStats.totalVideoFrames : 1,
+        avgDecodeTime: decodeDurations.length > 0 ?
+          decodeDurations.reduce((a,b) => a+b) / decodeDurations.length : 0,
+        cvActivityScore: CVactivityScore,
+        
+        // Context
+        audioMode: audioMode,
+        backgroundPlay: backgroundPlay,
+        autoRes: autoRes
+      };
+
+      // Ask ML model if switch is safe
+      const features = window.videoQualityTelemetry.buildFeatureVector(featureData);
+      const prediction = await window.qualitySwitchPredictor.predictSwitchSuccess(features);
+
+      console.log('ML Prediction:', prediction);
+
+      // Decide whether to switch based on ML or heuristics
+      let shouldSwitch = false;
+      
+      if (prediction.usedML) {
+        shouldSwitch = prediction.shouldSwitch;
+        console.log(`ML says: ${shouldSwitch ? 'SWITCH' : 'STAY'} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)`);
+      } else {
+        // Original heuristic conditions
+        shouldSwitch = (
+          p <= 0 &&
+          (typeof downlinkVariability.standardDeviation === 'undefined' || 
+          downlinkVariability.standardDeviation < 4) &&
+          video.currentTime > minVideoLoad &&
+          video.currentTime < (video.duration - maxVideoLoad) &&
+          autoRes &&
+          autoResInt &&
+          !preventQualityChange
+        );
+      }
+
       if (estimatedLoadTime > 1) {
         // console.warn(`Skipping switch to Q${newTargetQuality} – estimated load time: ${estimatedLoadTime.toFixed(2)}s`);
         // return;
 
-        // TO BE IMPLEMENTED: if estimated load time is too high, do not switch to this quality
+        // TO DO: if estimated load time is too high, do not switch to this quality
         // but rather wait for a better network condition or lower quality video
       }
 
-      if (((p <= 0 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality < targetQuality) || (newIndex > targetVideoIndex))) || (p > 0 && ((newTargetQuality > targetQuality) || (newIndex < targetVideoIndex)))) && ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
-        
-        targetVideo = null;
+      if (shouldSwitch) {
 
-        console.log("prepare new video");
-
-        if (newTargetQuality === targetQuality) {
-
-          targetVideo = targetVideoSources[newIndex];
-          targetVideoIndex = newIndex;
-          targetQuality = newTargetQuality;
-
-        } else {
-
-          targetQuality = newTargetQuality;
-          getVideoFromIndex(false); // loop qualities to get video again
-        }
-
-        const quality = video.getVideoPlaybackQuality();
-        let avgDecode = decodeDurations.length
-        ? decodeDurations.reduce((a, b) => a + b) / decodeDurations.length
-        : 0;
-        // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
-        let decodePressure = performance.now() - decodeStartTime;
-        if (avgDecode > 50 && targetQuality >= 6 && quality.droppedVideoFrames > 5) { // 1440p+
-          targetQuality -= 1; // Drop quality to reduce load
-        }
-
-        refSeekTime = video.currentTime;
-
-        qualityBestChange = true;
-        qualityChange = true;
-        bufferAllow = false;
-        /*
-        video.pause();
-        audio.pause(); // pause content
-        */
-        console.log("audio_pause");
-
-        if ((!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !preventRefetch && video.src !== targetVideo.url) {
+        if (((p <= 0 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality < targetQuality) || (newIndex > targetVideoIndex))) || (p > 0 && ((newTargetQuality > targetQuality) || (newIndex < targetVideoIndex)))) && ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
           
-          video.pause();
-          // videoSec.pause();
-          audio.pause(); // pause content
+          // START TELEMETRY
+          window.videoQualityTelemetry.startQualitySwitch(featureData);
+          const switchStartTime = performance.now();
 
-          console.log("load again");
-          video.src = targetVideo.url; // 'loadstart'
-          // videoSec.src = targetVideo.url; 
+          // TO DO
+          // PERFORM QUALITY CHANGE (upgrade)
+          // MEASURE TIME FROM SWITCH TO PLAYING
+          // IF TIME IS TOO HIGH (ABOVE 1 SEC), REPORT NETWORK STATS TO DATABASE FOR ML
+          // NOTE THE BELOW VARIABLES FOR ML PURPOSES:
+          // determineNetworkQuality(speed, bandwidth, latency, jitter, packetLoss)
+          // ORIGINAL QUALITY INDEX (0 - 8)
+          // TARGET QUALITY INDEX (0 - 8)
+          // ORIGINAL VIDEO BITRATE
+          // TARGET VIDEO BITRATE
+          // FAST: TRUE/FALSE (IF TIME TO PLAY WAS LESS THAN 1 SEC)
 
-          // videoInfoElm.cast.setAttribute("onclick", "castVideoWithAudio('" + video.src + "', '" + audio.src + "')");
-          // videoInfoElm.cast.setAttribute("onclick", "castVideoWithAudio('" + videoDetails.formats["0"].url + "')");
+          targetVideo = null;
 
-          videoInfoElm.expires.innerHTML = getReadableRemainingTime(targetVideo.url);
+          console.log("prepare new video");
 
-          autoResInt = false;
-          setTimeout(function() {
-            autoResInt = true;
-          }, 30000);
+          if (newTargetQuality === targetQuality) {
 
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.ready.then((registration) => {
-              registration.active.postMessage({
-                type: 'SET_VIDEO_URL',
-                url: targetVideo.url, // Pass the extracted URL
-              });
-            });
+            targetVideo = targetVideoSources[newIndex];
+            targetVideoIndex = newIndex;
+            targetQuality = newTargetQuality;
+
+          } else {
+
+            targetQuality = newTargetQuality;
+            getVideoFromIndex(false); // loop qualities to get video again
           }
 
-          videoInfoElm.autoResLive.innerHTML = qualityLabel(targetVideo.qualityLabel);
+          const quality = video.getVideoPlaybackQuality();
+          let avgDecode = decodeDurations.length
+          ? decodeDurations.reduce((a, b) => a + b) / decodeDurations.length
+          : 0;
+          // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
+          let decodePressure = performance.now() - decodeStartTime;
+          if (avgDecode > 50 && targetQuality >= 6 && quality.droppedVideoFrames > 5) { // 1440p+
+            targetQuality -= 1; // Drop quality to reduce load
+          }
 
-          localStorage.setItem('videoURL', video.src); // Set URL to memory state
+          refSeekTime = video.currentTime;
 
-        } else {
-          qualityBestChange = false;
-          qualityChange = false;
-        }
+          qualityBestChange = true;
+          qualityChange = true;
+          bufferAllow = false;
+          /*
+          video.pause();
+          audio.pause(); // pause content
+          */
+          console.log("audio_pause");
 
-      } 
+          if ((!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !preventRefetch && video.src !== targetVideo.url) {
+            
+            video.pause();
+            // videoSec.pause();
+            audio.pause(); // pause content
+
+            console.log("load again");
+            video.src = targetVideo.url; // 'loadstart'
+            // videoSec.src = targetVideo.url; 
+
+            // videoInfoElm.cast.setAttribute("onclick", "castVideoWithAudio('" + video.src + "', '" + audio.src + "')");
+            // videoInfoElm.cast.setAttribute("onclick", "castVideoWithAudio('" + videoDetails.formats["0"].url + "')");
+
+            videoInfoElm.expires.innerHTML = getReadableRemainingTime(targetVideo.url);
+
+            autoResInt = false;
+            setTimeout(function() {
+              autoResInt = true;
+            }, 30000);
+
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.ready.then((registration) => {
+                registration.active.postMessage({
+                  type: 'SET_VIDEO_URL',
+                  url: targetVideo.url, // Pass the extracted URL
+                });
+              });
+            }
+
+            videoInfoElm.autoResLive.innerHTML = qualityLabel(targetVideo.qualityLabel);
+
+            localStorage.setItem('videoURL', video.src); // Set URL to memory state
+
+            // MEASURE TIME TO PLAY
+            const playListener = () => {
+              const switchEndTime = performance.now();
+              const timeToPlay = switchEndTime - switchStartTime;
+              const fast = timeToPlay < 1000;
+
+              console.log(`Switch time: ${timeToPlay.toFixed(0)}ms - ${fast ? 'FAST' : 'SLOW'}`);
+
+              // COMPLETE TELEMETRY
+              window.videoQualityTelemetry.completeQualitySwitch({
+                success: true,
+                rebuffered: false, // track this separately
+                rebufferDuration: 0,
+                droppedFramesAfter: 0
+              });
+
+              video.removeEventListener('playing', playListener);
+            };
+
+            video.addEventListener('playing', playListener, { once: true });
+
+            // Timeout fallback
+            setTimeout(() => {
+              video.removeEventListener('playing', playListener);
+              window.videoQualityTelemetry.completeQualitySwitch({
+                success: false,
+                rebuffered: true,
+                rebufferDuration: (performance.now() - switchStartTime) / 1000
+              });
+            }, 10000); // 10 sec timeout
+
+          } else {
+            qualityBestChange = false;
+            qualityChange = false;
+          }
+
+        } 
+        // ========== ML INTEGRATION END ==========
+      }
 
     }
 
