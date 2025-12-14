@@ -902,6 +902,38 @@
 
   </script>
   <script>
+    // Custom Sign-In Modal Functions
+    let signInCallback = null;
+
+    function showSignInModal(callback) {
+      signInCallback = callback;
+      document.getElementById('signInModal').style.display = 'flex';
+    }
+
+    function hideSignInModal() {
+      document.getElementById('signInModal').style.display = 'none';
+      signInCallback = null;
+    }
+
+    document.getElementById('confirmSignIn').addEventListener('click', () => {
+      hideSignInModal();
+      if (signInCallback) {
+        signInCallback();
+      }
+    });
+
+    document.getElementById('cancelSignIn').addEventListener('click', () => {
+      hideSignInModal();
+    });
+
+    // Close modal if clicking outside
+    document.getElementById('signInModal').addEventListener('click', (e) => {
+      if (e.target.id === 'signInModal') {
+        hideSignInModal();
+      }
+    });
+  </script>
+  <script>
     function isDarkMode() { // dark mode detection
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
@@ -1420,13 +1452,17 @@
 
         if (!localStorage.getItem("mediaURL")) {
           document.getElementById('profileSignIn').onclick = () => {
-            openProfile();
+            showSignInModal(() => {
+              openProfile();
+            });
           };
           videoInfoElm.main.click();
         } else {
           // thumbnailImages = [];
           document.getElementById('profileSignIn').onclick = () => {
-            openProfile();
+            showSignInModal(() => {
+              openProfile();
+            });
           };
         }
 
@@ -1440,7 +1476,9 @@
         console.error('Missing token or data');
 
         document.getElementById('profileSignIn').onclick = () => {
-          client.requestCode();
+          showSignInModal(() => {
+            client.requestCode();
+          });
         };
       }
     }
