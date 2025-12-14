@@ -1224,8 +1224,13 @@
 
         // Check for specific error reasons
         if (data.error === "invalid_grant" || data.error === "invalid_request") {
-          client.requestCode();
+          // client.requestCode();
         }
+
+        // show the confirmsignin modal
+        showSignInModal(() => {
+          client.requestCode();
+        });
       }
 
     }
