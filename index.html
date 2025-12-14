@@ -428,6 +428,103 @@
     @import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
     </style>
     
+    <!-- Custom Modal Styles -->
+    <style>
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .modal-container {
+        animation: slideUp 0.3s ease;
+      }
+
+      @keyframes slideUp {
+        from { 
+          transform: translateY(50px);
+          opacity: 0;
+        }
+        to { 
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-content {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        max-width: 400px;
+        text-align: center;
+        color: white;
+      }
+
+      .modal-content h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .modal-content p {
+        margin: 0 0 2rem 0;
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+      }
+
+      .modal-buttons button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-confirm {
+        background: white;
+        color: #667eea;
+      }
+
+      .btn-confirm:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-cancel {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid white;
+      }
+
+      .btn-cancel:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+      }
+    </style>
+    
     <!-- <script src="https://cdn.jsdelivr.net/npm/@thelevicole/youtube-to-html5-loader@5/dist/YouTubeToHtml5.js"></script> -->
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -439,6 +536,20 @@
     
   </head>
   <body>
+    <!-- Custom Sign-In Confirmation Modal -->
+    <div id="signInModal" class="modal-overlay" style="display: none;">
+      <div class="modal-container">
+        <div class="modal-content">
+          <h3>Sign In Confirmation</h3>
+          <p>Are you sure you want to sign in with Google?</p>
+          <div class="modal-buttons">
+            <button id="confirmSignIn" class="btn-confirm">Yes, Sign In</button>
+            <button id="cancelSignIn" class="btn-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <main>
       <div class="content trs">
         <div id="videoContainer" class="trs">
@@ -788,6 +899,38 @@
           });
         }
 
+  </script>
+  <script>
+    // Custom Sign-In Modal Functions
+    let signInCallback = null;
+
+    function showSignInModal(callback) {
+      signInCallback = callback;
+      document.getElementById('signInModal').style.display = 'flex';
+    }
+
+    function hideSignInModal() {
+      document.getElementById('signInModal').style.display = 'none';
+      signInCallback = null;
+    }
+
+    document.getElementById('confirmSignIn').addEventListener('click', () => {
+      hideSignInModal();
+      if (signInCallback) {
+        signInCallback();
+      }
+    });
+
+    document.getElementById('cancelSignIn').addEventListener('click', () => {
+      hideSignInModal();
+    });
+
+    // Close modal if clicking outside
+    document.getElementById('signInModal').addEventListener('click', (e) => {
+      if (e.target.id === 'signInModal') {
+        hideSignInModal();
+      }
+    });
   </script>
   <script>
     function isDarkMode() { // dark mode detection
@@ -1308,13 +1451,17 @@
 
         if (!localStorage.getItem("mediaURL")) {
           document.getElementById('profileSignIn').onclick = () => {
-            openProfile();
+            showSignInModal(() => {
+              openProfile();
+            });
           };
           videoInfoElm.main.click();
         } else {
           // thumbnailImages = [];
           document.getElementById('profileSignIn').onclick = () => {
-            openProfile();
+            showSignInModal(() => {
+              openProfile();
+            });
           };
         }
 
@@ -1328,7 +1475,9 @@
         console.error('Missing token or data');
 
         document.getElementById('profileSignIn').onclick = () => {
-          client.requestCode();
+          showSignInModal(() => {
+            client.requestCode();
+          });
         };
       }
     }
