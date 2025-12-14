@@ -1472,17 +1472,13 @@
 
         if (!localStorage.getItem("mediaURL")) {
           document.getElementById('profileSignIn').onclick = () => {
-            showSignInModal(() => {
-              openProfile();
-            });
+            openProfile();
           };
           videoInfoElm.main.click();
         } else {
           // thumbnailImages = [];
           document.getElementById('profileSignIn').onclick = () => {
-            showSignInModal(() => {
-              openProfile();
-            });
+            openProfile();
           };
         }
 
