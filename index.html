@@ -512,8 +512,8 @@
 
       .btn-confirm:hover {
         background: #c00000;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(161, 0, 0, 0.4);
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.25rem 0.75rem rgba(161, 0, 0, 0.4);
       }
 
       .btn-cancel {
@@ -523,7 +523,7 @@
 
       .btn-cancel:hover {
         background: #707070;
-        transform: translateY(-2px);
+        transform: translateY(-0.125rem);
       }
     </style>
     
@@ -908,29 +908,48 @@
 
     function showSignInModal(callback) {
       signInCallback = callback;
-      document.getElementById('signInModal').style.display = 'flex';
+      const modal = document.getElementById('signInModal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
     }
 
     function hideSignInModal() {
-      document.getElementById('signInModal').style.display = 'none';
+      const modal = document.getElementById('signInModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
       signInCallback = null;
     }
 
-    document.getElementById('confirmSignIn').addEventListener('click', () => {
-      hideSignInModal();
-      if (signInCallback) {
-        signInCallback();
+    // Wait for DOM to be ready before setting up event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      const confirmBtn = document.getElementById('confirmSignIn');
+      const cancelBtn = document.getElementById('cancelSignIn');
+      const modal = document.getElementById('signInModal');
+
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => {
+          hideSignInModal();
+          if (signInCallback) {
+            signInCallback();
+          }
+        });
       }
-    });
 
-    document.getElementById('cancelSignIn').addEventListener('click', () => {
-      hideSignInModal();
-    });
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          hideSignInModal();
+        });
+      }
 
-    // Close modal if clicking outside
-    document.getElementById('signInModal').addEventListener('click', (e) => {
-      if (e.target.id === 'signInModal') {
-        hideSignInModal();
+      // Close modal if clicking outside
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target.id === 'signInModal') {
+            hideSignInModal();
+          }
+        });
       }
     });
   </script>
