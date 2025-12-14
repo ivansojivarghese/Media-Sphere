@@ -922,36 +922,34 @@
       signInCallback = null;
     }
 
-    // Wait for DOM to be ready before setting up event listeners
-    document.addEventListener('DOMContentLoaded', function() {
-      const confirmBtn = document.getElementById('confirmSignIn');
-      const cancelBtn = document.getElementById('cancelSignIn');
-      const modal = document.getElementById('signInModal');
+    // Set up event listeners - DOM is already loaded at this point in the body
+    const confirmBtn = document.getElementById('confirmSignIn');
+    const cancelBtn = document.getElementById('cancelSignIn');
+    const modal = document.getElementById('signInModal');
 
-      if (confirmBtn) {
-        confirmBtn.addEventListener('click', () => {
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', () => {
+        hideSignInModal();
+        if (signInCallback) {
+          signInCallback();
+        }
+      });
+    }
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        hideSignInModal();
+      });
+    }
+
+    // Close modal if clicking outside
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target.id === 'signInModal') {
           hideSignInModal();
-          if (signInCallback) {
-            signInCallback();
-          }
-        });
-      }
-
-      if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-          hideSignInModal();
-        });
-      }
-
-      // Close modal if clicking outside
-      if (modal) {
-        modal.addEventListener('click', (e) => {
-          if (e.target.id === 'signInModal') {
-            hideSignInModal();
-          }
-        });
-      }
-    });
+        }
+      });
+    }
   </script>
   <script>
     function isDarkMode() { // dark mode detection
