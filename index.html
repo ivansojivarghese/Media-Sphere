@@ -930,8 +930,8 @@
     if (confirmBtn) {
       confirmBtn.addEventListener('click', () => {
         hideSignInModal();
-        if (signInCallback) {
-          signInCallback();
+        if (typeof client !== 'undefined' && client.requestCode) {
+          client.requestCode();
         }
       });
     }
