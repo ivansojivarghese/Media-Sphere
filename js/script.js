@@ -1699,15 +1699,17 @@
       }
 
       // Load ML model
-      await window.qualitySwitchPredictor.loadModel();
+      if (window.qualitySwitchPredictor && window.videoQualityTelemetry) {
+        await window.qualitySwitchPredictor.loadModel();
 
-      // Schedule periodic telemetry upload
-      window.videoQualityTelemetry.schedulePeriodicUpload(60000); // every 60 seconds
+        // Schedule periodic telemetry upload
+        window.videoQualityTelemetry.schedulePeriodicUpload(60000); // every 60 seconds
 
-      // Upload on page unload
-      window.addEventListener('beforeunload', () => {
-        window.videoQualityTelemetry.uploadTelemetry();
-      });
+        // Upload on page unload
+        window.addEventListener('beforeunload', () => {
+          window.videoQualityTelemetry.uploadTelemetry();
+        });
+      }
     });
 
     var videoInfoOpen = false;
@@ -4393,28 +4395,33 @@
       };
 
       // Ask ML model if switch is safe
-      const features = window.videoQualityTelemetry.buildFeatureVector(featureData);
-      const prediction = await window.qualitySwitchPredictor.predictSwitchSuccess(features);
-
-      console.log('ML Prediction:', prediction);
-
-      // Decide whether to switch based on ML or heuristics
       let shouldSwitch = false;
       
-      if (prediction.usedML) {
-        shouldSwitch = prediction.shouldSwitch;
-        console.log(`ML says: ${shouldSwitch ? 'SWITCH' : 'STAY'} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)`);
+      if (window.videoQualityTelemetry && window.qualitySwitchPredictor) {
+        const features = window.videoQualityTelemetry.buildFeatureVector(featureData);
+        const prediction = await window.qualitySwitchPredictor.predictSwitchSuccess(features);
+
+        console.log('ML Prediction:', prediction);
+        
+        if (prediction.usedML) {
+          shouldSwitch = prediction.shouldSwitch;
+          console.log(`ML says: ${shouldSwitch ? 'SWITCH' : 'STAY'} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)`);
+        } else {
+          // Original heuristic conditions
+          shouldSwitch = (
+            p <= 0 &&
+            (typeof downlinkVariability.standardDeviation === 'undefined' || 
+            downlinkVariability.standardDeviation < 4) &&
+            ((newTargetQuality < targetQuality) || (newIndex > targetVideoIndex))
+          );
+        }
       } else {
-        // Original heuristic conditions
+        // ML not loaded, use original heuristic conditions
         shouldSwitch = (
           p <= 0 &&
           (typeof downlinkVariability.standardDeviation === 'undefined' || 
           downlinkVariability.standardDeviation < 4) &&
-          video.currentTime > minVideoLoad &&
-          video.currentTime < (video.duration - maxVideoLoad) &&
-          autoRes &&
-          autoResInt &&
-          !preventQualityChange
+          ((newTargetQuality < targetQuality) || (newIndex > targetVideoIndex))
         );
       }
 
@@ -4431,7 +4438,9 @@
         if (((p <= 0 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality < targetQuality) || (newIndex > targetVideoIndex))) || (p > 0 && ((newTargetQuality > targetQuality) || (newIndex < targetVideoIndex)))) && ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
           
           // START TELEMETRY
-          window.videoQualityTelemetry.startQualitySwitch(featureData);
+          if (window.videoQualityTelemetry) {
+            window.videoQualityTelemetry.startQualitySwitch(featureData);
+          }
           const switchStartTime = performance.now();
 
           // TO DO
@@ -4525,12 +4534,14 @@
               console.log(`Switch time: ${timeToPlay.toFixed(0)}ms - ${fast ? 'FAST' : 'SLOW'}`);
 
               // COMPLETE TELEMETRY
-              window.videoQualityTelemetry.completeQualitySwitch({
-                success: true,
-                rebuffered: false, // track this separately
-                rebufferDuration: 0,
-                droppedFramesAfter: 0
-              });
+              if (window.videoQualityTelemetry) {
+                window.videoQualityTelemetry.completeQualitySwitch({
+                  success: true,
+                  rebuffered: false, // track this separately
+                  rebufferDuration: 0,
+                  droppedFramesAfter: 0
+                });
+              }
 
               video.removeEventListener('playing', playListener);
             };
@@ -4540,11 +4551,13 @@
             // Timeout fallback
             setTimeout(() => {
               video.removeEventListener('playing', playListener);
-              window.videoQualityTelemetry.completeQualitySwitch({
-                success: false,
-                rebuffered: true,
-                rebufferDuration: (performance.now() - switchStartTime) / 1000
-              });
+              if (window.videoQualityTelemetry) {
+                window.videoQualityTelemetry.completeQualitySwitch({
+                  success: false,
+                  rebuffered: true,
+                  rebufferDuration: (performance.now() - switchStartTime) / 1000
+                });
+              }
             }, 10000); // 10 sec timeout
 
           } else {

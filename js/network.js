@@ -58,6 +58,10 @@ var jitterVal = 0,
     packetLossVal = 0,
     rttVal = 0;
 
+var avgRTT = 0,
+    avgJitter = 0,
+    avgPacketLoss = 0;
+
 /////
 
 const pingsCount = 10;
