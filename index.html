@@ -1495,6 +1495,10 @@
       } else {
         console.error('Missing token or data');
 
+        showSignInModal(() => {
+          client.requestCode();
+        });
+
         document.getElementById('profileSignIn').onclick = () => {
           showSignInModal(() => {
             client.requestCode();
