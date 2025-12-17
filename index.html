@@ -908,22 +908,21 @@
     let signInCallback = null;
 
     function showSignInModal(callback) {
-      signInCallback = callback;
-      const modal = document.getElementById('signInModal');
-      if (modal) {
-        modal.style.display = 'flex';
-      }
-      // Check if modal was acknowledged in the last 24 hours
+      // Check if modal was acknowledged in the last 24 hours BEFORE showing
       const ack = localStorage.getItem('signInModalAcknowledged');
       if (ack) {
         try {
           const { time } = JSON.parse(ack);
           if (Date.now() - time < 24 * 60 * 60 * 1000) {
-            // Suppress modal
-            if (typeof callback === 'function') return;
+            // Suppress modal entirely
             return;
           }
         } catch (e) {}
+      }
+      signInCallback = callback;
+      const modal = document.getElementById('signInModal');
+      if (modal) {
+        modal.style.display = 'flex';
       }
     }
 
@@ -932,10 +931,7 @@
       if (modal) {
         modal.style.display = 'none';
       }
-        signInCallback = null;
-        // Set localStorage flag to suppress modal for 24 hours
-        const now = Date.now();
-        localStorage.setItem('signInModalAcknowledged', JSON.stringify({ time: now }));
+      signInCallback = null;
     }
 
     // Set up event listeners - DOM is already loaded at this point in the body
@@ -954,6 +950,8 @@
 
     if (cancelBtn) {
       cancelBtn.addEventListener('click', () => {
+        // Set localStorage flag to suppress modal for 24 hours ONLY on explicit No
+        localStorage.setItem('signInModalAcknowledged', JSON.stringify({ time: Date.now() }));
         hideSignInModal();
       });
     }
