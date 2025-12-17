@@ -913,6 +913,18 @@
       if (modal) {
         modal.style.display = 'flex';
       }
+      // Check if modal was acknowledged in the last 24 hours
+      const ack = localStorage.getItem('signInModalAcknowledged');
+      if (ack) {
+        try {
+          const { time } = JSON.parse(ack);
+          if (Date.now() - time < 24 * 60 * 60 * 1000) {
+            // Suppress modal
+            if (typeof callback === 'function') return;
+            return;
+          }
+        } catch (e) {}
+      }
     }
 
     function hideSignInModal() {
@@ -920,7 +932,10 @@
       if (modal) {
         modal.style.display = 'none';
       }
-      signInCallback = null;
+        signInCallback = null;
+        // Set localStorage flag to suppress modal for 24 hours
+        const now = Date.now();
+        localStorage.setItem('signInModalAcknowledged', JSON.stringify({ time: now }));
     }
 
     // Set up event listeners - DOM is already loaded at this point in the body
