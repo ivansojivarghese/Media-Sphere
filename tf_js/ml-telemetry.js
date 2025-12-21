@@ -193,12 +193,21 @@ class VideoQualityTelemetry {
     
     const batch = this.events.splice(0, this.maxBatchSize);
     
+    // Get user from localStorage or default to 'guest'
+    let user = 'guest';
+    const customURL = localStorage.getItem('customURL');
+    if (customURL && customURL.startsWith('@')) {
+      user = customURL.substring(1); // Remove '@' prefix
+    } else if (customURL) {
+      user = customURL;
+    }
+    
     try {
       await fetch(this.uploadEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user: 'ivansojivarghese', // or get from auth
+          user: user,
           batch: batch,
           version: '1.0'
         })
