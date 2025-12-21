@@ -4316,7 +4316,7 @@
       var preventRefetch = false;
       
       var newTargetQuality = getOptimalQuality();
-      if (p <= 0) {
+      if (p >= 0.1) {
         newTargetQuality = getRegressionQuality(newTargetQuality , targetQuality);
       }
 
@@ -4409,7 +4409,7 @@
         } else {
           // Original heuristic conditions
           shouldSwitch = (
-            p <= 0 &&
+            p >= 0.1 &&
             (typeof downlinkVariability.standardDeviation === 'undefined' || 
             downlinkVariability.standardDeviation < 4) &&
             ((newTargetQuality < targetQuality) || (newIndex > targetVideoIndex))
@@ -4418,7 +4418,7 @@
       } else {
         // ML not loaded, use original heuristic conditions
         shouldSwitch = (
-          p <= 0 &&
+          p >= 0.1 &&
           (typeof downlinkVariability.standardDeviation === 'undefined' || 
           downlinkVariability.standardDeviation < 4) &&
           ((newTargetQuality < targetQuality) || (newIndex > targetVideoIndex))
@@ -4435,7 +4435,7 @@
 
       if (shouldSwitch) {
 
-        if (((p <= 0 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality < targetQuality) || (newIndex > targetVideoIndex))) || (p > 0 && ((newTargetQuality > targetQuality) || (newIndex < targetVideoIndex)))) && ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
+        if (((p >= 0.1 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality < targetQuality) || (newIndex > targetVideoIndex))) || (p >= 0.1 && ((newTargetQuality > targetQuality) || (newIndex < targetVideoIndex)))) && ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
           
           // START TELEMETRY
           if (window.videoQualityTelemetry) {
