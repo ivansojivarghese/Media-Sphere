@@ -7,6 +7,17 @@ class VideoQualityTelemetry {
     this.maxBatchSize = 50;
     // this.uploadEndpoint = '/api/telemetry'; // Your backend endpoint
     this.uploadEndpoint = 'https://rest-server-psi.vercel.app/api/telemetry'; // Your backend endpoint
+    
+    // Register upload triggers once
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        this.uploadTelemetry();
+      }
+    });
+
+    window.addEventListener('beforeunload', () => {
+      this.uploadTelemetry();
+    });
   }
 
   // Start tracking a quality switch
@@ -102,21 +113,8 @@ class VideoQualityTelemetry {
     this.events.push(this.currentSwitch);
     this.currentSwitch = null;
     
-    // Upload if batch is full
-    /*
-    if (this.events.length >= this.maxBatchSize) {
-      this.uploadTelemetry();
-    }*/
-
-   document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        window.videoQualityTelemetry.uploadTelemetry();
-      }
-    });
-
-    window.addEventListener('beforeunload', () => {
-      window.videoQualityTelemetry.uploadTelemetry();
-    });
+    // Upload immediately after each quality switch
+    this.uploadTelemetry();
   }
 
   // Calculate estimated load time (same as in your code)
