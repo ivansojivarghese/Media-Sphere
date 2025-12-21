@@ -695,7 +695,10 @@ const updateSuggestionsList = () => {
 
     // videoInfoElm.suggestions.style.height = r + "rem";
     videoInfoElm.suggestions.style.height = e + "px";
-    if (!searchQueried) {
+    if (!searchQueried && !videoInfoElm.suggestions.classList.contains("float")) {
+
+      // if no search queried and no float active in suggestions
+
       videoInfoElm.suggestions.style.display = "block"; 
     }
   }, 1000);
