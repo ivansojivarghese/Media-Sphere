@@ -4558,7 +4558,7 @@
                   rebufferDuration: (performance.now() - switchStartTime) / 1000
                 });
               }
-            }, 10000); // 10 sec timeout
+            }, 1000); // 1 sec timeout
 
           } else {
             qualityBestChange = false;
