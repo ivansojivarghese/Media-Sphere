@@ -63,11 +63,17 @@ class QualitySwitchPredictor {
 
       // result[0] = probability of success
       // result[1] = expected switch time (seconds)
+      const successProb = result[0];
+      const expectedTime = result[1];
+
+      // Telemetry-first: do not block on low confidence
+      // Allow switch even when successProb < minConfidence to collect more data
       return {
-        shouldSwitch: result[0] > this.minConfidence,
-        confidence: result[0],
-        expectedSwitchTime: result[1],
-        usedML: true
+        shouldSwitch: true,
+        confidence: successProb,
+        expectedSwitchTime: expectedTime,
+        usedML: true,
+        reason: successProb < this.minConfidence ? 'low-confidence allow (collecting telemetry)' : 'high-confidence allow'
       };
     } catch (error) {
       console.error('Prediction error:', error);

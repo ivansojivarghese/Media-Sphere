@@ -4405,7 +4405,8 @@
         
         if (prediction.usedML) {
           shouldSwitch = prediction.shouldSwitch;
-          console.log(`🧠 ML Model: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)`);
+          const telemNote = (prediction.reason && prediction.reason.includes('low-confidence')) ? ' | collecting telemetry' : '';
+          console.log(`🧠 ML Model: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)${telemNote}`);
         } else {
           shouldSwitch = prediction.shouldSwitch;
           console.log(`📊 Heuristic: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} - ${prediction.reason || 'checks passed'}`);
