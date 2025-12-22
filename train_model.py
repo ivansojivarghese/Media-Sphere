@@ -170,7 +170,10 @@ def main():
         'mean': scaler.mean_.tolist(),
         'scale': scaler.scale_.tolist()
     }
+    os.makedirs('models/quality-switch-model', exist_ok=True)
     with open('models/scaler_params.json', 'w') as f:
+        json.dump(scaler_params, f)
+    with open('models/quality-switch-model/scaler_params.json', 'w') as f:
         json.dump(scaler_params, f)
     
     # 3. Combine targets

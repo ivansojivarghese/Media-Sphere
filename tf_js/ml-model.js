@@ -5,7 +5,7 @@ class QualitySwitchPredictor {
     this.model = null;
     this.modelUrl = '/models/quality-switch-model/model.json';
     this.scalerParams = null;
-    this.scalerUrl = '/models/scaler_params.json';
+    this.scalerUrl = '/models/quality-switch-model/scaler_params.json';
     this.fallbackToHeuristics = true;
     this.minConfidence = 0.7; // Only switch if model confidence > 70%
   }
@@ -14,7 +14,7 @@ class QualitySwitchPredictor {
   async loadModel() {
     try {
       console.log('Loading TensorFlow.js model...');
-      this.model = await tf.loadLayersModel(this.modelUrl);
+      this.model = await tf.loadGraphModel(this.modelUrl);
       
       // Load scaler parameters
       const scalerResponse = await fetch(this.scalerUrl);
@@ -54,9 +54,9 @@ class QualitySwitchPredictor {
       // Normalize features
       const normalizedFeatures = this.normalizeFeatures(features);
       
-      // features is array of 31 numbers (from buildFeatureVector)
+      // features is array of 27 numbers (from buildFeatureVector)
       const inputTensor = tf.tensor2d([normalizedFeatures], [1, normalizedFeatures.length]);
-      const prediction = this.model.predict(inputTensor);
+      const prediction = this.model.execute(inputTensor);
       const result = await prediction.data();
       inputTensor.dispose();
       prediction.dispose();
@@ -202,3 +202,6 @@ class QualitySwitchPredictor {
 
 // Global instance
 window.qualitySwitchPredictor = new QualitySwitchPredictor();
+
+// Load model when script loads (DOM is already ready since script is at bottom)
+window.qualitySwitchPredictor.loadModel();
