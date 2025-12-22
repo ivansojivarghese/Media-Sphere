@@ -4401,22 +4401,17 @@
         const features = window.videoQualityTelemetry.buildFeatureVector(featureData);
         const prediction = await window.qualitySwitchPredictor.predictSwitchSuccess(features);
 
-        console.log('ML Prediction:', prediction);
+        console.log('Quality Switch Prediction:', prediction);
         
         if (prediction.usedML) {
           shouldSwitch = prediction.shouldSwitch;
-          console.log(`ML says: ${shouldSwitch ? 'SWITCH' : 'STAY'} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)`);
+          console.log(`🧠 ML Model: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)`);
         } else {
-          // Original heuristic conditions
-          shouldSwitch = (
-            p >= 0.1 &&
-            (typeof downlinkVariability.standardDeviation === 'undefined' || 
-            downlinkVariability.standardDeviation < 4) &&
-            ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex))
-          );
+          shouldSwitch = prediction.shouldSwitch;
+          console.log(`📊 Heuristic: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} - ${prediction.reason || 'checks passed'}`);
         }
       } else {
-        // ML not loaded, use original heuristic conditions
+        // Fallback if predictor not initialized
         shouldSwitch = (
           p >= 0.1 &&
           (typeof downlinkVariability.standardDeviation === 'undefined' || 
