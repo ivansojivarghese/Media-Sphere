@@ -4367,12 +4367,15 @@
         targetResolution: newTargetVideo.height,
         originalFps: targetVideo.fps,
         targetFps: newTargetVideo.fps,
+        playQuality : playbackStats.totalVideoFrames ? ((playbackStats.totalVideoFrames - playbackStats.droppedVideoFrames) / playbackStats.totalVideoFrames) : 1,
+        regressionQuality : getRegressionQuality(),
         
         // Buffer
         bufferedSeconds: video.buffered.length > 0 ? 
           (video.buffered.end(video.buffered.length - 1) - video.currentTime) : 0,
         videoLoadPercentile: videoLoadPercentile,
         audioLoadPercentile: audioLoadPercentile,
+        loadedPercent: getLoadedPercent(),
         
         // Device
         devicePixelRatio: dpr,
@@ -4389,9 +4392,6 @@
         avgDecodeTime: decodeDurations.length > 0 ?
           decodeDurations.reduce((a,b) => a+b) / decodeDurations.length : 0,
         cvActivityScore: CVactivityScore,
-        playQuality : playbackStats.totalVideoFrames ? ((playbackStats.totalVideoFrames - playbackStats.droppedVideoFrames) / playbackStats.totalVideoFrames) : 1,
-        regressionQuality : getRegressionQuality(),
-        loadedPercent: getLoadedPercent(),
         
         // Context
         audioMode: audioMode,
