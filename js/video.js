@@ -2114,13 +2114,16 @@ function getMediaSources(sources) {
 }
 */
 
-function timeAgo(dateString) { // ISO8601 date string to human-readable string converter
+function timeAgo(dateString, durationString) { // ISO8601 date string to human-readable string converter
   const now = new Date();
   const past = new Date(dateString);
   const seconds = Math.floor((now - past) / 1000);
 
   if (dateString === null || isNaN(past.getTime())) {
-      return "-";
+      // return "-";
+      videoInfoElm.date.style.fontWeight = "bold";
+      videoInfoElm.date.style.letterSpacing = "0.1rem";
+      return durationString;
   }
 
   if (seconds < 60) {
@@ -2594,6 +2597,9 @@ function resetVideoInfo() {
   videoInfoElm.likes.classList.add("textReset");
   videoInfoElm.views.classList.add("textReset");
 
+  videoInfoElm.date.style.fontWeight = "";
+  videoInfoElm.date.style.letterSpacing = "";
+
   videoInfoElm.date.innerHTML = "";
   videoInfoElm.expires.innerHTML = "";
   videoInfoElm.likes.innerHTML = "";
@@ -2677,7 +2683,7 @@ function abstractVideoInfo() {
   var likesTxt = (likes === 1) ? " like" : " likes";
   var viewsTxt = (metaDetails.viewCountText.indexOf("watching now") !== -1) ? " watching now" : " views";
 
-  videoInfoElm.date.innerHTML = timeAgo(videoDetails.uploadDate);
+  videoInfoElm.date.innerHTML = timeAgo(videoDetails.uploadDate, secondsToTimeCode(Number(videoDetails.lengthSeconds)));
   videoInfoElm.duration.innerHTML = secondsToTimeCode(Number(videoDetails.lengthSeconds));
   videoInfoElm.expires.innerHTML = getReadableRemainingTime(targetVideo.url);
 

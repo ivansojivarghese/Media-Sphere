@@ -22,8 +22,9 @@ class VideoQualityTelemetry {
 
   // Start tracking a quality switch
   startQualitySwitch(data) {
+    console.log('📊 Telemetry: Starting quality switch tracking', data.originalQualityIndex, '→', data.targetQualityIndex);
     this.currentSwitch = {
-      // Identifiers
+      // Identifiers (for database tracking)
       sessionId: this.getSessionId(),
       timestamp: Date.now(),
       
@@ -31,76 +32,84 @@ class VideoQualityTelemetry {
       originalQualityIndex: data.originalQualityIndex,
       originalBitrate: data.originalBitrate,
       originalResolution: data.originalResolution,
-      originalFps: data.originalFps,
+      // originalFps: data.originalFps, // REDUNDANT: constant (always 30)
       
       // Target state
       targetQualityIndex: data.targetQualityIndex,
       targetBitrate: data.targetBitrate,
       targetResolution: data.targetResolution,
-      targetFps: data.targetFps,
+      // targetFps: data.targetFps, // REDUNDANT: constant (always 30)
       
-      // Network metrics (at switch time)
-      networkSpeed: data.networkSpeed, // Mbps
-      networkBandwidth: data.networkBandwidth,
+      // Network metrics (at switch time) - 7 features
+      networkSpeed: data.networkSpeed, // MBps
+      networkBandwidth: data.networkBandwidth, // Mbps
       rtt: data.rtt, // ms
       jitter: data.jitter, // ms
       packetLoss: data.packetLoss, // %
       downlinkStdDev: data.downlinkStdDev,
-      networkQuality: data.networkQuality, // string: "Excellent", "Good", etc.
+      networkQuality: this.mapNetworkQuality(data.networkQuality), // integer 0-4
       
-      // Buffer state
+      // Buffer state - 3 features
       bufferedSeconds: data.bufferedSeconds,
       videoLoadPercentile: data.videoLoadPercentile,
       audioLoadPercentile: data.audioLoadPercentile,
       
-      // Device info
+      // Device info - 3 features (deviceType removed, derived from screen size)
       devicePixelRatio: data.devicePixelRatio,
       screenWidth: data.screenWidth,
       screenHeight: data.screenHeight,
-      deviceType: data.deviceType, // 'mobile', 'tablet', 'desktop'
       
-      // Playback state
+      // Playback state - 4 features
       currentTime: data.currentTime,
       duration: data.duration,
-      playbackRate: data.playbackRate,
+      // playbackRate: data.playbackRate, // REDUNDANT: rarely changes (usually 1.0)
       droppedFrames: data.droppedFrames,
       totalFrames: data.totalFrames,
       avgDecodeTime: data.avgDecodeTime, // ms
       cvActivityScore: data.cvActivityScore,
       
-      // Context
-      audioMode: data.audioMode,
-      backgroundPlay: data.backgroundPlay,
-      autoRes: data.autoRes,
+      // Context - REDUNDANT: low variance
+      // audioMode: data.audioMode,
+      // backgroundPlay: data.backgroundPlay,
+      // autoRes: data.autoRes,
       
       // Timing (to be filled on complete)
       switchStartTime: performance.now(),
       switchEndTime: null,
       timeToPlay: null,
       
+      // Derived metrics
+      bitrateRatio: null, // calculated on complete
+      estimatedLoadTime: null, // calculated on complete
+      
       // Outcome (to be filled)
       success: null,
       rebuffered: null,
       rebufferDuration: null,
-      droppedFramesAfter: null,
-      switchBackQuality: null
+      droppedFramesAfter: null
+      // switchBackQuality: null // REDUNDANT: usually null
     };
   }
 
   // Complete the quality switch tracking
   completeQualitySwitch(outcome) {
-    if (!this.currentSwitch) return;
+    if (!this.currentSwitch) {
+      console.warn('⚠️ Telemetry: No active switch to complete');
+      return;
+    }
+    
+    console.log('📊 Telemetry: Completing switch -', outcome.rebuffered ? 'REBUFFERED' : 'SUCCESS', `(${this.currentSwitch.timeToPlay}ms)`);
     
     this.currentSwitch.switchEndTime = performance.now();
     this.currentSwitch.timeToPlay = this.currentSwitch.switchEndTime - this.currentSwitch.switchStartTime;
-    this.currentSwitch.fast = this.currentSwitch.timeToPlay < 1000; // < 1 second
+    // this.currentSwitch.fast = this.currentSwitch.timeToPlay < 1000; // REMOVED: derived from timeToPlay
     
     // Outcome metrics
-    this.currentSwitch.success = outcome.success;
     this.currentSwitch.rebuffered = outcome.rebuffered || false;
+    this.currentSwitch.success = !outcome.rebuffered; // Derived: success = !rebuffered
     this.currentSwitch.rebufferDuration = outcome.rebufferDuration || 0;
     this.currentSwitch.droppedFramesAfter = outcome.droppedFramesAfter || 0;
-    this.currentSwitch.switchBackQuality = outcome.switchBackQuality || null;
+    // this.currentSwitch.switchBackQuality = outcome.switchBackQuality || null; // REMOVED: usually null
     
     // Calculate derived metrics
     this.currentSwitch.bitrateRatio = this.currentSwitch.targetBitrate / this.currentSwitch.originalBitrate;
@@ -173,10 +182,9 @@ class VideoQualityTelemetry {
 
   mapNetworkQuality(quality) {
     const map = {
-      'Excellent': 5,
       'Very Good': 4,
       'Good': 3,
-      'Fair': 2,
+      'Average': 2,
       'Bad': 1,
       'Very Bad': 0
     };
@@ -190,8 +198,12 @@ class VideoQualityTelemetry {
 
   // Upload telemetry to server
   async uploadTelemetry() {
-    if (this.events.length === 0) return;
+    if (this.events.length === 0) {
+      console.log('📊 Telemetry: No events to upload');
+      return;
+    }
     
+    console.log(`📊 Telemetry: Uploading ${this.events.length} events...`);
     const batch = this.events.splice(0, this.maxBatchSize);
     
     // Get user from localStorage or default to 'guest'

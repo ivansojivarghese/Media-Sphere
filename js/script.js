@@ -4347,56 +4347,54 @@
       
       // Build feature vector for ML model
       const featureData = {
-        // Network
+        // Network (6 features - high signal)
         networkSpeed: networkSpeed,
-        networkBandwidth: networkBandwidth, // or separate if available
+        networkBandwidth: networkBandwidth,
         rtt: rttVal || 0,
         jitter: jitterVal || 0,
         packetLoss: packetLossVal || 0,
         downlinkStdDev: downlinkVariability.standardDeviation || 0,
-        networkQuality: determineNetworkQuality(networkSpeed, networkBandwidth, rttVal, jitterVal, packetLossVal),
-
-        // const quality = determineNetworkQuality(networkSpeed, networkBandwidth, rttVal, jitterVal, packetLossVal);
+        // networkQuality: determineNetworkQuality(networkSpeed, networkBandwidth, rttVal, jitterVal, packetLossVal), // REDUNDANT: derived
         
-        // Quality change
+        // Quality change (4 features - high signal)
         originalQualityIndex: targetQuality,
         targetQualityIndex: newTargetQuality,
         originalBitrate: targetVideo.bitrate,
         targetBitrate: newTargetVideo.bitrate,
         originalResolution: targetVideo.height,
         targetResolution: newTargetVideo.height,
-        originalFps: targetVideo.fps,
-        targetFps: newTargetVideo.fps,
-        playQuality : playbackStats.totalVideoFrames ? ((playbackStats.totalVideoFrames - playbackStats.droppedVideoFrames) / playbackStats.totalVideoFrames) : 1,
-        regressionQuality : getRegressionQuality(),
+        // originalFps: targetVideo.fps, // REDUNDANT: constant (always 30)
+        // targetFps: newTargetVideo.fps, // REDUNDANT: constant (always 30)
+        // playQuality: playbackStats.totalVideoFrames ? ((playbackStats.totalVideoFrames - playbackStats.droppedVideoFrames) / playbackStats.totalVideoFrames) : 1, // REDUNDANT: not used
+        // regressionQuality: getRegressionQuality(), // REDUNDANT: not used
         
-        // Buffer
+        // Buffer (3 features - high signal)
         bufferedSeconds: video.buffered.length > 0 ? 
           (video.buffered.end(video.buffered.length - 1) - video.currentTime) : 0,
         videoLoadPercentile: videoLoadPercentile,
         audioLoadPercentile: audioLoadPercentile,
-        loadedPercent: getLoadedPercent(),
+        // loadedPercent: getLoadedPercent(), // REDUNDANT: not used in feature vector
         
-        // Device
+        // Device (4 features - high signal)
         devicePixelRatio: dpr,
         screenWidth: dWidth,
         screenHeight: dHeight,
         deviceType: getDeviceType(), // 'mobile', 'tablet', 'desktop'
         
-        // Playback
+        // Playback (4 features - high signal)
         currentTime: video.currentTime,
         duration: video.duration,
-        playbackRate: video.playbackRate,
+        // playbackRate: video.playbackRate, // REDUNDANT: rarely changes (usually 1.0)
         droppedFrames: playbackStats ? playbackStats.droppedVideoFrames : 0,
         totalFrames: playbackStats ? playbackStats.totalVideoFrames : 1,
         avgDecodeTime: decodeDurations.length > 0 ?
           decodeDurations.reduce((a,b) => a+b) / decodeDurations.length : 0,
-        cvActivityScore: CVactivityScore,
+        cvActivityScore: CVactivityScore
         
-        // Context
-        audioMode: audioMode,
-        backgroundPlay: backgroundPlay,
-        autoRes: autoRes
+        // Context features - REDUNDANT: low variance, minimal signal
+        // audioMode: audioMode,
+        // backgroundPlay: backgroundPlay,
+        // autoRes: autoRes
       };
 
       // Ask ML model if switch is safe
@@ -4435,6 +4433,23 @@
       }
 
       if (shouldSwitch) {
+
+        // Debug: check which conditions block switch
+        const conditions = {
+          loadedPercent: p >= 0.05,
+          downlinkStable: typeof downlinkVariability.standardDeviation === 'undefined' || downlinkVariability.standardDeviation < 4,
+          qualityUpOrSameIndex: (newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex),
+          qualityChanged: (newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex)),
+          videoPlaying: !video.paused,
+          audioPlaying: !audio.paused,
+          timeInRange: video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad)),
+          notBackground: !backgroundPlay,
+          notSwitching: !qualityBestChange && !qualityChange && !preventQualityChange,
+          autoResEnabled: autoRes && autoResInt
+        };
+        
+        const allPass = Object.values(conditions).every(v => v);
+        console.log('🔍 Switch conditions:', conditions, 'All pass:', allPass);
 
         if (((p >= 0.05 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex))) || (p >= 0.05 && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex)))) && ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
           
@@ -4537,29 +4552,29 @@
               // COMPLETE TELEMETRY
               if (window.videoQualityTelemetry) {
                 window.videoQualityTelemetry.completeQualitySwitch({
-                  success: true,
-                  rebuffered: false, // track this separately
-                  rebufferDuration: 0,
+                  rebuffered: !fast, // Fast switch (< 1s) = no rebuffer, slow = rebuffered
+                  rebufferDuration: fast ? 0 : timeToPlay / 1000,
                   droppedFramesAfter: 0
                 });
               }
 
+              clearTimeout(timeoutId); // Cancel timeout when play completes
               video.removeEventListener('playing', playListener);
             };
 
             video.addEventListener('playing', playListener, { once: true });
 
-            // Timeout fallback
-            setTimeout(() => {
+            // Timeout fallback (3 seconds for slow switches)
+            const timeoutId = setTimeout(() => {
               video.removeEventListener('playing', playListener);
               if (window.videoQualityTelemetry) {
                 window.videoQualityTelemetry.completeQualitySwitch({
-                  success: false,
-                  rebuffered: true,
-                  rebufferDuration: (performance.now() - switchStartTime) / 1000
+                  rebuffered: true, // timeout = rebuffer
+                  rebufferDuration: (performance.now() - switchStartTime) / 1000,
+                  droppedFramesAfter: 0
                 });
               }
-            }, 1000); // 1 sec timeout
+            }, 3000); // 3 sec timeout
 
           } else {
             qualityBestChange = false;
