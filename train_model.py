@@ -14,7 +14,7 @@ import os
 
 # Feature extraction matching ml-telemetry.js buildFeatureVector()
 def extract_features(event_data):
-    """Extract 31 features from telemetry event"""
+    """Extract 21 features from telemetry event (removed 6 redundant features)"""
     d = event_data
     
     # Network quality mapping
@@ -36,44 +36,44 @@ def extract_features(event_data):
         device_type = 2  # desktop
     
     features = [
-        # Network features (7)
+        # Network features (6) - high signal
         d.get('networkSpeed', 0),
         d.get('networkBandwidth', d.get('networkSpeed', 0)),
         d.get('rtt', 0),
         d.get('jitter', 0),
         d.get('packetLoss', 0),
         d.get('downlinkStdDev', 0),
-        network_quality_map.get(d.get('networkQuality', 'Fair'), 2),
+        # network_quality_map.get(d.get('networkQuality', 'Fair'), 2),  # REDUNDANT: derived
         
-        # Quality change features (4)
+        # Quality change features (4) - high signal
         d.get('targetQualityIndex', 0) - d.get('originalQualityIndex', 0),  # delta
         d.get('bitrateRatio', 1.0),
         d.get('targetBitrate', 0),
         d.get('estimatedLoadTime', 0),
         
-        # Buffer features (3)
+        # Buffer features (3) - high signal
         d.get('bufferedSeconds', 0),
         d.get('videoLoadPercentile', 0),
         d.get('audioLoadPercentile', 0),
         
-        # Device features (4)
+        # Device features (4) - high signal
         d.get('devicePixelRatio', 1.0),
         (d.get('screenWidth', 0) * d.get('screenHeight', 0)) / 1e6,  # megapixels
         device_type,
         d.get('targetResolution', 0) / 1e6,
         
-        # Playback features (6)
+        # Playback features (4) - high signal
         d.get('currentTime', 0) / max(d.get('duration', 1), 1),  # progress
         d.get('droppedFrames', 0) / max(d.get('totalFrames', 1), 1),  # drop rate
         d.get('avgDecodeTime', 0),
         d.get('cvActivityScore', 0),
-        d.get('playbackRate', 1.0),
-        d.get('targetFps', 30),
+        # d.get('playbackRate', 1.0),  # REDUNDANT: rarely changes
+        # d.get('targetFps', 30),  # REDUNDANT: constant (always 30)
         
-        # Context features (3)
-        1.0 if d.get('audioMode', False) else 0.0,
-        1.0 if d.get('backgroundPlay', False) else 0.0,
-        1.0 if d.get('autoRes', True) else 0.0
+        # Context features - REDUNDANT: low variance
+        # 1.0 if d.get('audioMode', False) else 0.0,
+        # 1.0 if d.get('backgroundPlay', False) else 0.0,
+        # 1.0 if d.get('autoRes', True) else 0.0
     ]
     
     return np.array(features, dtype=np.float32)

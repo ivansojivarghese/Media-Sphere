@@ -117,54 +117,57 @@ class VideoQualityTelemetry {
     this.uploadTelemetry();
   }
 
-  // Calculate estimated load time (same as in your code)
-  calculateEstimatedLoadTime(bitrateKbps, networkSpeedMbps) {
+  // Calculate estimated load time
+  // bitrateBps: target bitrate in BITS per second (not kilobits!)
+  // networkSpeedMBps: network speed in MEGABYTES per second
+  calculateEstimatedLoadTime(bitrateBps, networkSpeedMBps) {
+    const bitrateKbps = bitrateBps / 1000; // bps → Kbps
     const requiredKilobits = bitrateKbps * 5; // 5 seconds of video
-    const networkSpeedKbps = networkSpeedMbps * 1000;
+    const networkSpeedKbps = networkSpeedMBps * 8 * 1000; // MBps → Kbps
     return requiredKilobits / networkSpeedKbps; // seconds
   }
 
   // Build feature vector for ML model
   buildFeatureVector(data) {
     return [
-      // Network features (11 features)
+      // Network features (6 features) - high signal
       data.networkSpeed,
       data.networkBandwidth || data.networkSpeed,
       data.rtt,
       data.jitter,
       data.packetLoss,
       data.downlinkStdDev,
-      this.mapNetworkQuality(data.networkQuality),
+      // this.mapNetworkQuality(data.networkQuality), // REDUNDANT: derived from other network metrics
       
-      // Quality change features (4 features)
+      // Quality change features (4 features) - high signal
       data.targetQualityIndex - data.originalQualityIndex, // quality delta
       data.targetBitrate / data.originalBitrate, // bitrate ratio
       data.targetBitrate,
       this.calculateEstimatedLoadTime(data.targetBitrate, data.networkSpeed),
       
-      // Buffer features (3 features)
+      // Buffer features (3 features) - high signal
       data.bufferedSeconds,
       data.videoLoadPercentile,
       data.audioLoadPercentile,
       
-      // Device features (4 features)
+      // Device features (4 features) - high signal
       data.devicePixelRatio,
       data.screenWidth * data.screenHeight / 1e6, // megapixels
       this.mapDeviceType(data.deviceType),
       data.targetResolution / 1e6, // target megapixels
       
-      // Playback features (6 features)
+      // Playback features (4 features) - high signal
       data.currentTime / data.duration, // progress
       data.droppedFrames / Math.max(data.totalFrames, 1), // drop rate
       data.avgDecodeTime,
       data.cvActivityScore,
-      data.playbackRate,
-      data.targetFps,
+      // data.playbackRate, // REDUNDANT: rarely changes (usually 1.0)
+      // data.targetFps, // REDUNDANT: constant (always 30)
       
-      // Context features (3 features)
-      data.audioMode ? 1 : 0,
-      data.backgroundPlay ? 1 : 0,
-      data.autoRes ? 1 : 0
+      // Context features - REDUNDANT: low variance, minimal signal
+      // data.audioMode ? 1 : 0, // rarely varies
+      // data.backgroundPlay ? 1 : 0, // rarely varies
+      // data.autoRes ? 1 : 0 // usually always true
     ];
   }
 
