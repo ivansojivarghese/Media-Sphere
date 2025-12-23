@@ -4349,12 +4349,14 @@
       const featureData = {
         // Network
         networkSpeed: networkSpeed,
-        networkBandwidth: networkSpeed, // or separate if available
-        rtt: avgRTT || 0,
-        jitter: avgJitter || 0,
-        packetLoss: avgPacketLoss || 0,
+        networkBandwidth: networkBandwidth, // or separate if available
+        rtt: rttVal || 0,
+        jitter: jitterVal || 0,
+        packetLoss: packetLossVal || 0,
         downlinkStdDev: downlinkVariability.standardDeviation || 0,
-        networkQuality: determineNetworkQuality(networkSpeed, networkSpeed, avgRTT, avgJitter, avgPacketLoss),
+        networkQuality: determineNetworkQuality(networkSpeed, networkBandwidth, rttVal, jitterVal, packetLossVal),
+
+        // const quality = determineNetworkQuality(networkSpeed, networkBandwidth, rttVal, jitterVal, packetLossVal);
         
         // Quality change
         originalQualityIndex: targetQuality,
