@@ -2001,7 +2001,7 @@
 
       } else {
         setTimeout(function() {
-          if ((searchResults !== null && getDeviceType === "desktop") || (searchResults === null)) {
+          if ((searchResults !== null && getDeviceType() === "desktop") || (searchResults === null)) {
             inp.focus();
           }
         }, 100);
@@ -4378,7 +4378,7 @@
         devicePixelRatio: dpr,
         screenWidth: dWidth,
         screenHeight: dHeight,
-        deviceType: getDeviceType, // 'mobile', 'tablet', 'desktop'
+        deviceType: getDeviceType(), // 'mobile', 'tablet', 'desktop'
         
         // Playback
         currentTime: video.currentTime,
@@ -4389,6 +4389,9 @@
         avgDecodeTime: decodeDurations.length > 0 ?
           decodeDurations.reduce((a,b) => a+b) / decodeDurations.length : 0,
         cvActivityScore: CVactivityScore,
+        playQuality : playbackStats.totalVideoFrames ? ((playbackStats.totalVideoFrames - playbackStats.droppedVideoFrames) / playbackStats.totalVideoFrames) : 1,
+        regressionQuality : getRegressionQuality(),
+        loadedPercent: getLoadedPercent(),
         
         // Context
         audioMode: audioMode,

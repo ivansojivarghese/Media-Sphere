@@ -1728,7 +1728,7 @@
         inp.inputMode = "search";
         inp.enterkeyhint = "search";
         if (e !== "query") {
-          if ((searchResults !== null && getDeviceType === "desktop") || (searchResults === null)) {
+          if ((searchResults !== null && getDeviceType() === "desktop") || (searchResults === null)) {
             inp.focus();
           }
         }
@@ -1743,7 +1743,7 @@
         inp.type = "url";
         inp.inputMode = "url";
         inp.enterkeyhint = "go";
-        if ((searchResults !== null && getDeviceType === "desktop") || (searchResults === null)) {
+        if ((searchResults !== null && getDeviceType() === "desktop") || (searchResults === null)) {
           inp.focus();
         }
       }
