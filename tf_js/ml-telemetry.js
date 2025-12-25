@@ -23,6 +23,7 @@ class VideoQualityTelemetry {
   // Start tracking a quality switch
   startQualitySwitch(data) {
     console.log('📊 Telemetry: Starting quality switch tracking', data.originalQualityIndex, '→', data.targetQualityIndex);
+    console.log('🔍 DEBUG networkQuality:', data.networkQuality, '→ mapped to:', this.mapNetworkQuality(data.networkQuality));
     this.currentSwitch = {
       // Identifiers (for database tracking)
       sessionId: this.getSessionId(),
@@ -48,6 +49,7 @@ class VideoQualityTelemetry {
       packetLoss: data.packetLoss, // %
       downlinkStdDev: data.downlinkStdDev,
       networkQuality: this.mapNetworkQuality(data.networkQuality), // integer 0-4
+      networkQualityRaw: data.networkQuality, // DEBUG: store raw value
       
       // Buffer state - 3 features
       bufferedSeconds: data.bufferedSeconds,
@@ -146,7 +148,7 @@ class VideoQualityTelemetry {
       data.jitter,
       data.packetLoss,
       data.downlinkStdDev,
-      // this.mapNetworkQuality(data.networkQuality), // REDUNDANT: derived from other network metrics
+      // this.mapNetworkQuality(data.networkQuality), // REMOVED: model trained without this (21 features total)
       
       // Quality change features (4 features) - high signal
       data.targetQualityIndex - data.originalQualityIndex, // quality delta
@@ -188,7 +190,14 @@ class VideoQualityTelemetry {
       'Bad': 1,
       'Very Bad': 0
     };
-    return map[quality] || 2;
+    if (typeof quality === 'string' && Object.prototype.hasOwnProperty.call(map, quality)) {
+      return map[quality];
+    } else {
+      if (quality !== undefined && quality !== null && quality !== '') {
+        console.warn('⚠️ mapNetworkQuality: Unrecognized value:', quality, '- falling back to 2 (Average)');
+      }
+      return 2;
+    }
   }
 
   mapDeviceType(type) {

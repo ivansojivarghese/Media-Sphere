@@ -4354,7 +4354,7 @@
         jitter: jitterVal || 0,
         packetLoss: packetLossVal || 0,
         downlinkStdDev: downlinkVariability.standardDeviation || 0,
-        // networkQuality: determineNetworkQuality(networkSpeed, networkBandwidth, rttVal, jitterVal, packetLossVal), // REDUNDANT: derived
+        networkQuality: determineNetworkQuality(networkSpeed, networkBandwidth, rttVal, jitterVal, packetLossVal), // REDUNDANT: derived
         
         // Quality change (4 features - high signal)
         originalQualityIndex: targetQuality,
