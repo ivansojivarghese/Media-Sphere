@@ -148,12 +148,16 @@ video.seeking {
     background-color: transparent;
 }
 
-.trsButtons:not(.noimg):active .img {
+.trsButtons:not(.noimg):not(.queueWrap):active .img {
     transform: scale(0.9);
 }
 
-.trsButtons:not(.active):not(.result_wrapper):active, .resBtn:not(.active):not(.result_wrapper):active, .trsButtons.cursor:not(.active):not(.result_wrapper):active {
+.trsButtons:not(.active):not(.result_wrapper):not(.queueWrap):active, .resBtn:not(.active):not(.result_wrapper):not(.queueWrap):active, .trsButtons.cursor:not(.active):not(.result_wrapper):not(.queueWrap):active {
     transform: scale(0.9);
+}
+
+.queueWrap:not(.active):active .queuePicture {
+    transform: scale(0.95);
 }
 
 .result_wrapper:not(.active):active .thumbnail {

@@ -120,6 +120,21 @@
             d.addEventListener('click', function(event) {
               videoNav = true;
 
+              // const nowPlayingInQueue = document.querySelector(".queueWrap.active");
+              const dataURL = event.currentTarget.getAttribute("data-url");
+              const likedVideosButtons = document.querySelectorAll(".wrapper.profile .liked .result_wrapper");
+              likedVideosButtons.forEach(btn => {
+                if (btn.getAttribute("data-url") === dataURL) {
+                  btn.classList.add("active");
+                  btn.children[0].children[0].style.display = "block";
+                  btn.style.pointerEvents = "none";
+                } else {
+                  btn.classList.remove("active");
+                  btn.children[0].children[0].style.display = "none";
+                  btn.style.pointerEvents = "";
+                }
+              });
+
               const allQueueThumbnails = document.querySelectorAll("#queueList .videosQueue .queuePicture .playing");
               allQueueThumbnails.forEach(thumb => thumb.remove());
 
@@ -133,7 +148,7 @@
               thumbnailPlay.classList.add("playing");
 
               const thumbnail = event.currentTarget.children[0];
-               thumbnailPlay.appendChild(thumbnailPlayImg);
+              thumbnailPlay.appendChild(thumbnailPlayImg);
               thumbnail.appendChild(thumbnailPlay);
 
               const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
@@ -158,6 +173,22 @@
             queueContainer.appendChild(d);
           }
         }
+
+        const nowPlayingInQueue = document.querySelector(".queueWrap.active");
+        const dataURL = nowPlayingInQueue.getAttribute("data-url");
+        
+        const likedVideosButtons = document.querySelectorAll(".wrapper.profile .liked .result_wrapper");
+        likedVideosButtons.forEach(btn => {
+          if (btn.getAttribute("data-url") === dataURL) {
+            btn.classList.add("active");
+            btn.children[0].children[0].style.display = "block";
+            btn.style.pointerEvents = "none";
+          } else {
+            btn.classList.remove("active");
+            btn.children[0].children[0].style.display = "none";
+            btn.style.pointerEvents = "";
+          }
+        });
 
         const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
         // const scrollInit = Number(y + 1) * 6 * rootFontSize;
@@ -222,6 +253,51 @@
             localStorage.setItem('radioLoop', "true"); 
 
             // add relevant details to localstorage for easy retrieval - esp. for custom created queues, liked and playlists
+
+          } else if (q === "true" && queueActive) { // update queue
+
+            // updateQueue(k, y);
+
+            // 
+
+            /*
+            videoNav = true;
+
+            const allQueueThumbnails = document.querySelectorAll("#queueList .videosQueue .queuePicture .playing");
+            allQueueThumbnails.forEach(thumb => thumb.remove());
+
+            const queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+            queueListEl.forEach(el => el.classList.remove("active"));
+            
+            // Create and append the DOM elements inside the clicked element
+            const thumbnailPlay = document.createElement("div");
+            const thumbnailPlayImg = document.createElement("div");
+            thumbnailPlayImg.classList.add("play", "img");
+            thumbnailPlay.classList.add("playing");
+
+            var tgt;
+            queueListEl.forEach(el => {
+              if (el.getAttribute("data-queueindex") === y) {
+                tgt = el;
+              }
+            });
+
+            const thumbnail = tgt.children[0];
+            thumbnailPlay.appendChild(thumbnailPlayImg);
+            thumbnail.appendChild(thumbnailPlay);
+
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            // const scrollInit = (Number(event.currentTarget.getAttribute("data-queueIndex")) + 1) * 6 * rootFontSize;
+            const scrollInit = ((Number(tgt.getAttribute("data-queueIndex"))) * 6 * rootFontSize) + (rootFontSize * (Number(tgt.getAttribute("data-queueIndex")) / (5/3)));
+            // scroll to current video playing (y)
+            queueContainer.scrollTo({
+              top: scrollInit,
+              behavior: "smooth",
+            });
+
+            tgt.classList.add("active");
+            getURL(tgt.getAttribute("data-url"), true, tgt.getAttribute("data-queue"), tgt.getAttribute("data-type"), tgt.getAttribute("data-queueIndex"));
+            */
 
           } else if (q === "false" && queueActive) { // end queue
             queueBtn.style.display = "none";

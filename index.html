@@ -1357,6 +1357,26 @@
         var textDiv = document.createElement("div");
         textDiv.classList.add("resultText");
 
+        var thumbnailNowPlaying = document.createElement("div");
+        thumbnailNowPlaying.classList.add("nowPlaying");
+        thumbnail.appendChild(thumbnailNowPlaying);
+
+        /*
+        if (videoDetails.id === data[i].videoId) {
+          thumbnailNowPlaying.style.display = "block";
+          main.classList.add("active");
+          // prevent event click on thumbnail
+          main.style.pointerEvents = "none";
+        } else { // remove playing icon
+          thumbnailNowPlaying.style.display = "";
+          main.classList.remove("active");
+          main.style.pointerEvents = "";
+        }*/
+
+        var thumbnailNowPlayingImg = document.createElement("div");
+        thumbnailNowPlayingImg.classList.add("play", "img");
+        thumbnailNowPlaying.appendChild(thumbnailNowPlayingImg);
+
         main.appendChild(thumbnail);
         main.appendChild(title);
         if (!m) {

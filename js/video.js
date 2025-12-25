@@ -1864,12 +1864,12 @@ function getOptimalVideo(time, a, b) {
           // videoSec.src = supportedVideoSources[supportedVideoSources.length - 1].url;
 
           for (var j = supportedAudioSources.length - 1; j >= 0; j--) {
-            if (supportedAudioSources[j].audioTrack) {
-              if (supportedAudioSources[j].audioTrack.audioIsDefault) {
+            if (supportedAudioSources[j].audioTrack) { // if audio track available (dubbing, etc.)
+              if (supportedAudioSources[j].audioTrack.displayName.toLowerCase().indexOf("original") !== -1) {
                 audio.src = supportedAudioSources[j].url;
                 break;
               }
-            } else {
+            } else { // original audio
               audio.src = supportedAudioSources[j].url;
               break;
             }
