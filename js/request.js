@@ -1237,6 +1237,21 @@
             main.onclick = function(event) {
               videoNav = true;
               getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"));
+              
+              // set playing icon to thumbnail
+              event.currentTarget.classList.add("active");
+              event.currentTarget.children[0].children[0].style.display = "block";
+              event.currentTarget.style.pointerEvents = "none";
+
+              // remove playing icon from other thumbnail
+              const allResults = document.querySelectorAll(".wrapper.search .result_wrapper");
+              allResults.forEach((el) => {
+                if (el !== event.currentTarget) {
+                  el.classList.remove("active");
+                  el.children[0].children[0].style.display = "none";
+                  el.style.pointerEvents = "";
+                }
+              });
             };
     
             if (data[i].badges && data[i].badges.length) {
@@ -1258,6 +1273,24 @@
             thumbnail.classList.add("thumbnail", "img", "trs");
             // thumbnail.style.backgroundImage = "url('" + data[i].thumbnail[data[i].thumbnail.length - 1].url + "')";
             thumbnail.style.backgroundColor = "#3f3f3f";
+
+            var thumbnailNowPlaying = document.createElement("div");
+            thumbnailNowPlaying.classList.add("nowPlaying");
+            thumbnail.appendChild(thumbnailNowPlaying);
+            if (videoDetails.id === data[i].videoId) {
+              thumbnailNowPlaying.style.display = "block";
+              main.classList.add("active");
+              // prevent event click on thumbnail
+              main.style.pointerEvents = "none";
+            } else { // remove playing icon
+              thumbnailNowPlaying.style.display = "";
+              main.classList.remove("active");
+              main.style.pointerEvents = "";
+            }
+
+            var thumbnailNowPlayingImg = document.createElement("div");
+            thumbnailNowPlayingImg.classList.add("play", "img");
+            thumbnailNowPlaying.appendChild(thumbnailNowPlayingImg);
 
             // const thumbnailUrl = data[i].thumbnail[data[i].thumbnail.length - 1].url;
             const thumbnailUrl = data[i].thumbnail;

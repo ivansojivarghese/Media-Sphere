@@ -2972,7 +2972,8 @@ function formatURLsToGenericLink(text) {
 
   //////////////////////////////////////////////////////////////////
 
-  const urlRegex = /\b(?:https?:\/\/|www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}(\/[^\s<]*)?(?=\s|<br>|$)/g;
+  // Negative lookbehind (?<!@) ensures URLs preceded by '@' are not matched
+  const urlRegex = /(?<!@)\b(?:https?:\/\/|www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}(\/[^\s<]*)?(?=\s|<br>|$)/g;
 
   return text.replace(urlRegex, (url) => {
     /*
@@ -3173,9 +3174,10 @@ function formatDescription(text) {
   const textWithHashtags = highlightHashtags(textWithPhones);
 
   // Format mentions after other rules
-  const textWithMentions = formatMentions(textWithHashtags);
+  // const textWithMentions = formatMentions(textWithHashtags);
 
-  return textWithMentions;
+  // return textWithMentions;
+  return textWithHashtags;
 }
 
   var vidDes = videoDetails.description;

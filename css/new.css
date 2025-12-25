@@ -152,8 +152,13 @@ video.seeking {
     transform: scale(0.9);
 }
 
-.trsButtons:not(.active):active, .resBtn:not(.active):active, .trsButtons.cursor:not(.active):active {
+.trsButtons:not(.active):not(.result_wrapper):active, .resBtn:not(.active):not(.result_wrapper):active, .trsButtons.cursor:not(.active):not(.result_wrapper):active {
     transform: scale(0.9);
+}
+
+.result_wrapper:not(.active):active .thumbnail {
+    transform: scale(0.95);
+    border-radius: 0.5rem;
 }
 
 /*
@@ -187,6 +192,13 @@ video.seeking {
     background-image: url("../svg/play.svg");
     width: 2rem;
     height: 2rem;
+}
+
+.play {
+    background-image: url("../svg/play.svg");
+    width: 2rem;
+    height: 2rem;
+    margin: 0 auto;
 }
 
 #playPauseButton.playing .img { /* pause button */
@@ -797,6 +809,18 @@ div.thumbnailIcon {
     border-radius: 0.5rem;
     width: 90%;
     margin-bottom: 0.5rem;
+}
+
+div.nowPlaying {
+    width: 4rem;
+    height: 2rem;
+    background: var(--predicate_col);
+    position: absolute;
+    right: 1rem;
+    top: 9rem;
+    border-radius: 3rem;
+    box-shadow: 0 0.12rem 0.24rem rgba(0, 0, 0, 0.18),  0 0.06rem 0.12rem rgba(255, 255, 255, 0.06) inset; 
+    display: none;
 }
 
 #infoContainer .head, #infoContainer .nav {
