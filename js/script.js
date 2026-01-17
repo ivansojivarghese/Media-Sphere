@@ -4316,7 +4316,7 @@
       var preventRefetch = false;
       
       var newTargetQuality = getOptimalQuality();
-      if (p >= 0.05) {
+      if (p >= 0.00) {
         newTargetQuality = getRegressionQuality(newTargetQuality , targetQuality);
       }
 
@@ -4417,7 +4417,7 @@
       } else {
         // Fallback if predictor not initialized
         shouldSwitch = (
-          p >= 0.05 &&
+          p >= 0.00 &&
           (typeof downlinkVariability.standardDeviation === 'undefined' || 
           downlinkVariability.standardDeviation < 4) &&
           ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex))
@@ -4436,7 +4436,7 @@
 
         // Debug: check which conditions block switch
         const conditions = {
-          loadedPercent: p >= 0.05,
+          loadedPercent: p >= 0.00,
           downlinkStable: typeof downlinkVariability.standardDeviation === 'undefined' || downlinkVariability.standardDeviation < 4,
           qualityUpOrSameIndex: (newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex),
           qualityChanged: (newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex)),
@@ -4451,7 +4451,7 @@
         const allPass = Object.values(conditions).every(v => v);
         console.log('🔍 Switch conditions:', conditions, 'All pass:', allPass);
 
-        if (((p >= 0.05 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex))) || (p >= 0.05 && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex)))) && ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
+        if (((p >= 0.00 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex))) || (p >= 0.00 && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex)))) && ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
           
           // START TELEMETRY
           if (window.videoQualityTelemetry) {
