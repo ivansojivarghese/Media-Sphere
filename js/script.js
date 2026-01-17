@@ -4438,21 +4438,24 @@
         const conditions = {
           loadedPercent: p >= 0.00,
           downlinkStable: typeof downlinkVariability.standardDeviation === 'undefined' || downlinkVariability.standardDeviation < 4,
-          qualityUpOrSameIndex: (newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex),
-          qualityChanged: (newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex)),
+          // qualityUpOrSameIndex: (newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex),
+          // qualityChanged: (newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex)),
+          qualityChangeOrUpgrade: ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) || ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex)),
           videoPlaying: !video.paused,
           audioPlaying: !audio.paused,
           timeInRange: video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad)),
           notBackground: !backgroundPlay,
           notSwitching: !qualityBestChange && !qualityChange && !preventQualityChange,
-          autoResEnabled: autoRes && autoResInt
+          autoResEnabled: autoRes /*&& autoResInt*/
         };
         
         const allPass = Object.values(conditions).every(v => v);
         console.log('🔍 Switch conditions:', conditions, 'All pass:', allPass);
 
-        if (((p >= 0.00 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex))) || (p >= 0.00 && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex)))) && ((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
-          
+        // if (((p >= 0.00 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex))) || (p >= 0.00 && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex)))) && (((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) || ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
+        
+        if (allPass) {
+
           // START TELEMETRY
           if (window.videoQualityTelemetry) {
             window.videoQualityTelemetry.startQualitySwitch(featureData);

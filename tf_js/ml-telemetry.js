@@ -100,11 +100,12 @@ class VideoQualityTelemetry {
       return;
     }
     
-    console.log('📊 Telemetry: Completing switch -', outcome.rebuffered ? 'REBUFFERED' : 'SUCCESS', `(${this.currentSwitch.timeToPlay}ms)`);
-    
+    // Calculate timing first
     this.currentSwitch.switchEndTime = performance.now();
     this.currentSwitch.timeToPlay = this.currentSwitch.switchEndTime - this.currentSwitch.switchStartTime;
     // this.currentSwitch.fast = this.currentSwitch.timeToPlay < 1000; // REMOVED: derived from timeToPlay
+    
+    console.log('📊 Telemetry: Completing switch -', outcome.rebuffered ? 'REBUFFERED' : 'SUCCESS', `(${this.currentSwitch.timeToPlay.toFixed(2)}ms)`);
     
     // Outcome metrics
     this.currentSwitch.rebuffered = outcome.rebuffered || false;
