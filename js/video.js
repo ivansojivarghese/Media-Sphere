@@ -2973,7 +2973,8 @@ function formatURLsToGenericLink(text) {
   //////////////////////////////////////////////////////////////////
 
   // Negative lookbehind (?<!@) ensures URLs preceded by '@' are not matched
-  const urlRegex = /(?<!@)\b(?:https?:\/\/|www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}(\/[^\s<]*)?(?=\s|<br>|$)/g;
+  // Requires http://, https://, or www. prefix to avoid false positives like 'word.word'
+  const urlRegex = /(?<!@)\b(?:https?:\/\/|www\.)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}(\/[^\s<]*)?(?=\s|<br>|$)/g;
 
   return text.replace(urlRegex, (url) => {
     /*
