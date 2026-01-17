@@ -1320,14 +1320,26 @@
               event.currentTarget.style.pointerEvents = "none";
 
               // remove playing icon from other thumbnail
-              const allResults = document.querySelectorAll(".wrapper.search .result_wrapper");
-              allResults.forEach((el) => {
-                if (el !== event.currentTarget) {
-                  el.classList.remove("active");
-                  el.children[0].children[0].style.display = "none";
-                  el.style.pointerEvents = "";
-                }
-              });
+              // if (curTab === 'search') {
+                const allResults = document.querySelectorAll(".wrapper.search .result_wrapper");
+                allResults.forEach((el) => {
+                  if (el !== event.currentTarget) {
+                    el.classList.remove("active");
+                    el.children[0].children[0].style.display = "none";
+                    el.style.pointerEvents = "";
+                  }
+                });
+                /*
+              } else if (curTab === 'profile') {
+                const allResults = document.querySelectorAll(".wrapper.profile .result_wrapper");
+                allResults.forEach((el) => {
+                  if (el !== event.currentTarget) {
+                    el.classList.remove("active");
+                    el.children[0].children[0].style.display = "none";
+                    el.style.pointerEvents = "";
+                  }
+                });
+              }*/
             };
     
             if (data[i].badges && data[i].badges.length) {

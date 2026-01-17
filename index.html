@@ -1288,6 +1288,43 @@
         main.onclick = function(event) {
           videoNav = true;
           getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"), event.currentTarget.getAttribute("data-queueIndex"));
+          
+          // set playing icon to thumbnail
+          event.currentTarget.classList.add("active");
+          event.currentTarget.children[0].children[0].style.display = "block";
+          event.currentTarget.style.pointerEvents = "none";
+
+          const allResults = document.querySelectorAll(".wrapper.profile .liked .result_wrapper");
+          allResults.forEach((el) => {
+            if (el !== event.currentTarget) {
+              el.classList.remove("active");
+              el.children[0].children[0].style.display = "none";
+              el.style.pointerEvents = "";
+            }
+          });
+
+          const queueListEl = document.querySelectorAll(".videosQueue .queueWrap");
+          queueListEl.forEach(el => el.classList.remove("active"));
+          queueListEl.forEach(el => {
+            if (el.children[0].children[0] !== undefined) {
+              if (el.children[0].children[0].classList.contains("playing")) {
+                el.children[0].children[0].remove();
+              }
+            }
+          });
+
+          queueListEl.forEach(el => {
+            if (el.getAttribute("data-url") === event.currentTarget.getAttribute("data-url")) {
+              el.classList.add("active");
+
+              var thumbnailNowPlayingImg = document.createElement("div");
+              thumbnailNowPlayingImg.classList.add("play", "img");
+              var thumbnailNowPlaying = document.createElement("div");
+              thumbnailNowPlaying.classList.add("playing");
+              thumbnailNowPlaying.appendChild(thumbnailNowPlayingImg);
+              el.children[0].appendChild(thumbnailNowPlaying);
+            }
+          });
         };
 
         var thumbnail = document.createElement("div");
