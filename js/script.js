@@ -636,7 +636,7 @@
 
     video.addEventListener('play', function () {
 
-      // videoInfoElm.info.addEventListener("scroll", ch);
+      videoInfoElm.info.addEventListener("scroll", ch);
 
       if (videoPlay) {
 
@@ -933,7 +933,7 @@
     audio.addEventListener('play', function () {
       // if (!networkError) {
 
-          // videoInfoElm.info.addEventListener("scroll", ch);
+          videoInfoElm.info.addEventListener("scroll", ch);
 
           if (audioMode) {
             // remove loading feedback (if any)

@@ -216,7 +216,7 @@
       thumbnailImages = [];
       thumbnailLoadLoops = [];
 
-      // videoInfoElm.info.addEventListener("scroll", ch);
+      videoInfoElm.info.addEventListener("scroll", ch);
 
       videoInfoElm.suggestions.style.display = "";
 
@@ -1177,7 +1177,8 @@
             var thumbnail = document.querySelectorAll(".wrapper.profile .liked .result_wrapper .thumbnail")[j];
           }
         } else {
-          var thumbnail = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail")[j];
+          // var thumbnail = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail")[j];
+          var thumbnail = document.querySelectorAll(".wrapper.profile .result_wrapper .thumbnail")[j];
         }
       } else {
         var thumbnail = document.querySelectorAll(".wrapper.search .result_wrapper .thumbnail")[j];
