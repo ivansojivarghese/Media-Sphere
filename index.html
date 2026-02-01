@@ -1375,7 +1375,8 @@
         }
 
         var title = document.createElement("h5");
-        title.innerHTML = ar[i].snippet.title;
+        var videoTitle = ar[i].snippet.title || "";
+        title.innerHTML = videoTitle;
         title.classList.add("overflow", "resultTitle");
 
         var channelTitle = document.createElement("p");
@@ -1422,7 +1423,9 @@
         textDiv.appendChild(date);
         main.appendChild(textDiv);
 
-        if (title.innerHTML.indexOf("Deleted") === -1) {
+        var isPrivate = videoTitle.trim().toLowerCase() === "private video";
+        var isDeleted = videoTitle.indexOf("Deleted") !== -1;
+        if (!isPrivate && !isDeleted) {
           el.appendChild(main);
         }
       }

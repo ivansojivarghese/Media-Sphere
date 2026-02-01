@@ -102,7 +102,15 @@
           if (thumbUrl) {
             thumbnail.style.backgroundImage = `url('${thumbUrl}')`;
           }
-          title.innerHTML = ar[j].snippet.title;
+          var videoTitle = ar[j].snippet.title || "";
+          title.innerHTML = videoTitle;
+
+          // Skip rendering private or deleted videos in the queue
+          var isPrivate = videoTitle.trim().toLowerCase() === "private video";
+          var isDeleted = videoTitle.indexOf("Deleted") !== -1;
+          if (isPrivate || isDeleted) {
+            continue;
+          }
 
           d.setAttribute("data-url", "https://www.youtube.com/watch?v=" + ar[j].snippet.resourceId.videoId);
           d.setAttribute("data-queue", true);
@@ -168,27 +176,26 @@
           d.appendChild(thumbnail);
           d.appendChild(title);
           d.classList.add("queueWrap", "trs", "trsButtons", "cursor");
-
-          if (title.innerHTML.indexOf("Deleted") === -1) {
-            queueContainer.appendChild(d);
-          }
+          queueContainer.appendChild(d);
         }
 
-        const nowPlayingInQueue = document.querySelector(".queueWrap.active");
-        const dataURL = nowPlayingInQueue.getAttribute("data-url");
+        const nowPlayingInQueue = document.querySelector(".queueWrap.active") || queueContainer.querySelector(".queueWrap");
+        if (nowPlayingInQueue) {
+          const dataURL = nowPlayingInQueue.getAttribute("data-url");
         
-        const likedVideosButtons = document.querySelectorAll(".wrapper.profile .liked .result_wrapper");
-        likedVideosButtons.forEach(btn => {
-          if (btn.getAttribute("data-url") === dataURL) {
-            btn.classList.add("active");
-            btn.children[0].children[0].style.display = "block";
-            btn.style.pointerEvents = "none";
-          } else {
-            btn.classList.remove("active");
-            btn.children[0].children[0].style.display = "none";
-            btn.style.pointerEvents = "";
-          }
-        });
+          const likedVideosButtons = document.querySelectorAll(".wrapper.profile .liked .result_wrapper");
+          likedVideosButtons.forEach(btn => {
+            if (btn.getAttribute("data-url") === dataURL) {
+              btn.classList.add("active");
+              btn.children[0].children[0].style.display = "block";
+              btn.style.pointerEvents = "none";
+            } else {
+              btn.classList.remove("active");
+              btn.children[0].children[0].style.display = "none";
+              btn.style.pointerEvents = "";
+            }
+          });
+        }
 
         const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
         // const scrollInit = Number(y + 1) * 6 * rootFontSize;

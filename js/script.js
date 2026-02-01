@@ -70,6 +70,7 @@
     var playbackStats;
 
     var playPauseManual = false;
+    var userPaused = false;
 
     // var videoPause = false;
     var videoPlay = true;
@@ -156,6 +157,9 @@
     var qualityBestChange = false;
     var preventQualityChange = false;
     var preventQualityChangeInt = null;
+    // Cooldown for best-quality switching to avoid aggressive jumps
+    const bestSwitchCooldownMs = 60000; // 1 minute
+    let lastBestSwitchTime = 0;
 
     /*
     // videoSec.addEventListener('enterpictureinpicture', (event) => {
@@ -394,6 +398,10 @@
 
             } else {
               // if (videoPause) {
+                // Mark explicit user pause to suppress auto-resume
+                userPaused = true;
+                clearInterval(resumeInterval);
+                resumeInterval = null;
                 audio.pause();
                 video.pause();
                 // videoSec.pause();
@@ -898,6 +906,10 @@
         }
         navigator.mediaSession.playbackState = 'paused';
         releaseScreenLock(screenLock);
+
+        // Stop any pending auto-resume when paused
+        clearInterval(resumeInterval);
+        resumeInterval = null;
     
       }
 
@@ -2466,6 +2478,8 @@
       if (aVcount === 10) { // 1 sec.
         console.log("video: " + video.currentTime + ", audio: " + audio.currentTime + ", difference: " + (video.currentTime - audio.currentTime));
         aVcount = 0;
+
+        console.log("DEBUG: NET, " + networkQuality + ", " + networkSpeed + " Mbps, QAL: " + targetQuality + ", IDX: " + targetVideoIndex);
       } else {
         aVcount++;
       }
@@ -3253,10 +3267,10 @@
         video.style.transitionDuration = "3s";
         video.style.background = "";
 
-        if (resumeInterval === null) {
+        if (resumeInterval === null && !userPaused) {
           resumeInterval = setInterval(() => {
             var buffered = video.buffered;
-            if (buffered.length > 0 && video.paused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
+            if (buffered.length > 0 && video.paused && !userPaused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
               console.log("play", seeking, seekingLoad);
               video.play();
               // videoSec.play();
@@ -3401,7 +3415,7 @@
 
             // getVideoFromBuffer();
 
-            if (video.paused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange)) { // at initial
+            if (video.paused && !userPaused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange)) { // at initial
               console.log("play");
               // video.play();
               if (backgroundPlay) {
@@ -3424,10 +3438,10 @@
               }, 1000);
 
             } else {
-              if (resumeInterval === null) {
+              if (resumeInterval === null && !userPaused) {
                 resumeInterval = setInterval(() => {
                   var buffered = video.buffered;
-                  if (buffered.length > 0 && video.paused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
+                  if (buffered.length > 0 && video.paused && !userPaused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
                     console.log("play", seeking, seekingLoad);
                     video.play();
                     // videoSec.play();
@@ -3444,7 +3458,7 @@
             }, 3000); // Throttle buffer check every 3 seconds
           }
         } else {
-          if (video.paused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange || ((audio.buffered.length && backgroundPlay && (bufferLoad || loading || seekingLoad || bufferingDetected)) || (video.buffered.length && audio.buffered.length && !backgroundPlay && bufferLoad && (!loading || pipEnabled) && !bufferingDetected && !seeking && !seekingLoad && framesStuck)))) { 
+          if (video.paused && !userPaused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange || ((audio.buffered.length && backgroundPlay && (bufferLoad || loading || seekingLoad || bufferingDetected)) || (video.buffered.length && audio.buffered.length && !backgroundPlay && bufferLoad && (!loading || pipEnabled) && !bufferingDetected && !seeking && !seekingLoad && framesStuck)))) { 
             console.log("play");
             // video.play();
             if (backgroundPlay) {
@@ -4191,6 +4205,10 @@
 
           // console.log(targetVideoIndex);
 
+          //preventQualityChange = true
+          //setTimeout(() => { preventQualityChange = false; }, avgInt);
+          //return;
+
           do { // ensure that same res. is not picked again
             index = targetVideoSources[targetVideoIndex + mod] ? (targetVideoIndex + mod) : (targetVideoIndex); // potential need to change/downgrade video quality (by 1 each time)
             if (targetVideoSources[index]) { // if available
@@ -4226,7 +4244,7 @@
         // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
         let decodePressure = performance.now() - decodeStartTime;
         if (avgDecode > 50 && targetQuality >= 6 && quality.droppedVideoFrames > 5) { // 1440p+
-          targetQuality -= 1; // Drop quality to reduce load
+          // targetQuality -= 1; // Drop quality to reduce load
         }
 
         refSeekTime = video.currentTime;
@@ -4236,6 +4254,8 @@
         // resumeInterval = null;
 
         console.log("pause");
+        // Programmatic pause due to quality change; do not treat as user pause
+        userPaused = false;
         video.pause();
         // videoSec.pause();
         audio.pause(); // pause content
@@ -4293,6 +4313,7 @@
       var diff = 0;
       var loadP = 0;
       var playQuality = playbackStats.totalVideoFrames ? ((playbackStats.totalVideoFrames - playbackStats.droppedVideoFrames) / playbackStats.totalVideoFrames) : 1;
+      var result = q;
       if (q > t || q < t) {
         diff = q - t;
         loadP = getLoadedPercent() + 0.1;
@@ -4300,13 +4321,21 @@
         var div = ((quo - 2) * (9 / 35)) + 0.2;
         var val = (Math.abs(Math.round((loadP * diff * (quo / div) * playQuality))));
         if (q > t) {
-          return (t + val);
+          result = (t + val);
         } else {
-          return (t - val);
+          result = (t - val);
         }
-      } else {
-        return q;
       }
+      // Clamp to valid range [0, 8]
+      if (!Number.isFinite(result)) {
+        result = 0;
+      }
+      if (result < 0) {
+        result = 0;
+      } else if (result > 8) {
+        result = 8;
+      }
+      return result;
     }
 
     async function getBestVideo() { // fetch best video according to network conditions - continuous
@@ -4318,6 +4347,34 @@
       var newTargetQuality = getOptimalQuality();
       if (p >= 0.00) {
         newTargetQuality = getRegressionQuality(newTargetQuality , targetQuality);
+      }
+
+      // Limit upward move: step up at most one level per switch
+      if (newTargetQuality > targetQuality) {
+        newTargetQuality = targetQuality + 1;
+      }
+
+      // Limit downward move: step down at most one level per switch
+      if (newTargetQuality < targetQuality) {
+        newTargetQuality = targetQuality - 1;
+      }
+
+      // Minimum floor by network bucket to avoid drastic drops (optional tune)
+      const netBucket = determineNetworkQuality(networkSpeed, networkBandwidth, rttVal, jitterVal, packetLossVal);
+      const floorMap = { 'Very Bad': 0, 'Bad': 1, 'Average': 2, 'Good': 3, 'Very Good': 4 };
+      const minFloor = floorMap[netBucket] ?? 0;
+      if (newTargetQuality < minFloor) {
+        newTargetQuality = minFloor;
+      }
+
+      // Final clamp to valid range [0, 8]
+      if (!Number.isFinite(newTargetQuality)) {
+        newTargetQuality = 0;
+      }
+      if (newTargetQuality < 0) {
+        newTargetQuality = 0;
+      } else if (newTargetQuality > 8) {
+        newTargetQuality = 8;
       }
 
       var newIndex = getVideoFromIndex(true, newTargetQuality);
@@ -4434,6 +4491,9 @@
 
       if (shouldSwitch) {
 
+        // Enforce 60s cooldown between best switches
+        const cooldownOk = (Date.now() - lastBestSwitchTime) >= bestSwitchCooldownMs;
+
         // Debug: check which conditions block switch
         const conditions = {
           loadedPercent: p >= 0.00,
@@ -4446,7 +4506,8 @@
           timeInRange: video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad)),
           notBackground: !backgroundPlay,
           notSwitching: !qualityBestChange && !qualityChange && !preventQualityChange,
-          autoResEnabled: autoRes /*&& autoResInt*/
+          autoResEnabled: autoRes /*&& autoResInt*/,
+          cooldownOk: cooldownOk || p >= 0.05 // bypass cooldown if 5%+ loaded
         };
         
         const allPass = Object.values(conditions).every(v => v);
@@ -4497,7 +4558,7 @@
           // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
           let decodePressure = performance.now() - decodeStartTime;
           if (avgDecode > 50 && targetQuality >= 6 && quality.droppedVideoFrames > 5) { // 1440p+
-            targetQuality -= 1; // Drop quality to reduce load
+            // targetQuality -= 1; // Drop quality to reduce load
           }
 
           refSeekTime = video.currentTime;
@@ -4505,6 +4566,8 @@
           qualityBestChange = true;
           qualityChange = true;
           bufferAllow = false;
+          // Start cooldown right after initiating a switch
+          lastBestSwitchTime = Date.now();
           /*
           video.pause();
           audio.pause(); // pause content
@@ -4656,7 +4719,7 @@
 
       if (!backgroundPlay) {
         getNetworkInfo();
-        // estimateNetworkSpeed();
+        estimateNetworkSpeed();
       }
 
       if (!loading && !bufferingDetected && !framesStuck) {
@@ -4725,6 +4788,8 @@
     });
 
     video.addEventListener('playing', function () { // fired when playback resumes after having been paused or delayed due to lack of data
+      // Reset userPaused on actual playback start
+      userPaused = false;
       
       // videoSec.currentTime = video.currentTime;
 
@@ -4765,7 +4830,7 @@
 
       if (!backgroundPlay) {
         getNetworkInfo();
-        // estimateNetworkSpeed();
+        estimateNetworkSpeed();
       }
 
       audio.play();
@@ -5291,7 +5356,7 @@
             console.log("Not enough buffered data to resume playback. Waiting for more data...");
             // Optionally, you can provide feedback to the user or update UI elements to indicate buffering
 
-            if (video.paused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange)) { // at initial
+            if (video.paused && !userPaused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange)) { // at initial
               console.log("play");
               // video.play();
               if (backgroundPlay) {
@@ -5314,10 +5379,10 @@
               }, 1000);
 
             } else {
-              if (resumeInterval === null) {
+              if (resumeInterval === null && !userPaused) {
                 resumeInterval = setInterval(() => {
                   var buffered = video.buffered;
-                  if (buffered.length > 0 && video.paused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
+                  if (buffered.length > 0 && video.paused && !userPaused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
                     console.log("play", seeking, seekingLoad);
                     video.play();
                     // videoSec.play();
@@ -5331,7 +5396,7 @@
         } else {
           console.log("No buffered data available.");
 
-          if (video.paused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange)) { // at initial
+          if (video.paused && !userPaused && !autoLoad && (initialVideoLoad || qualityBestChange || qualityChange)) { // at initial
             console.log("play");
             // video.play();
             if (backgroundPlay) {
@@ -5354,10 +5419,10 @@
             }, 1000);
             
           } else {
-            if (resumeInterval === null) {
+            if (resumeInterval === null && !userPaused) {
               resumeInterval = setInterval(() => {
                 var buffered = video.buffered;
-                if (buffered.length > 0 && video.paused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
+                if (buffered.length > 0 && video.paused && !userPaused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
                   console.log("play", seeking, seekingLoad);
                   video.play();
                   // videoSec.play();
@@ -5887,7 +5952,7 @@
 
               if (!backgroundPlay) {
                 getNetworkInfo();
-                // estimateNetworkSpeed();
+                estimateNetworkSpeed();
               }
           }
           if (networkParamInt === null) {

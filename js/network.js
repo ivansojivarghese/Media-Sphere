@@ -83,6 +83,8 @@ let pingFileUrl = '../msc/onlineResourceLocator.png';
 
 const estimateNetworkSpeed = async() => { // estimate network speed
 
+    console.log("DEBUG: EST NET");
+
     testFileUrl = (networkQuality === 'Very Good' || networkQuality === 'Good') ? '../msc/networkSpeedEstimator.jpg' : '../msc/networkSpeedEstimator_small.jpg';
     fileSizeInBytes = (networkQuality === 'Very Good' || networkQuality === 'Good') ? 5301699 : 1665126;
 

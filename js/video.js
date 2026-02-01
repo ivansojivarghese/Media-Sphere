@@ -338,6 +338,29 @@ function checkDuplicateQuality(arr, q) {
   return res;
 }
 
+// Keep only one source per height, prefer highest bitrate
+function dedupeByHeightKeepBest(sources) {
+  const bestByHeight = new Map();
+  for (const s of sources) {
+    const h = s.height;
+    const prev = bestByHeight.get(h);
+    if (!prev) {
+      bestByHeight.set(h, s);
+      continue;
+    }
+    // Prefer higher bitrate; tie-breaker: prefer mimeType with 'av1' > 'vp9' > others
+    const prevCodec = (prev.mimeType || '').toLowerCase();
+    const sCodec = (s.mimeType || '').toLowerCase();
+    const codecRank = (c) => c.includes('av1') ? 3 : c.includes('vp9') ? 2 : 1;
+    if ((s.bitrate > prev.bitrate) ||
+        (s.bitrate === prev.bitrate && codecRank(sCodec) > codecRank(prevCodec))) {
+      bestByHeight.set(h, s);
+    }
+  }
+  // Return sorted by height desc for stable indexing
+  return Array.from(bestByHeight.values()).sort((a, b) => b.height - a.height);
+}
+
 // Usage example
 const panel = videoInfoElm.info;
 /*
@@ -1407,6 +1430,10 @@ function getOptimalQuality() {
           networkQualityRange = 0;
         break;
       }
+      // Fallback in case determineNetworkQuality returns unexpected value
+      if (typeof networkQualityRange !== 'number') {
+        networkQualityRange = 0.5; // neutral default
+      }
       // console.log('Network Quality:', quality);  
 
       //////////////
@@ -1452,10 +1479,19 @@ function getOptimalQuality() {
 
       // FINAL SCORE
       if (navigator.connection) {
-        videoStreamScore = rttScore * downlinkScore * saveDataScore * effectiveTypeScore * networkQualityRange * livePerformance;
-        videoStreamScore = (videoStreamScore > 1) ? 1 : videoStreamScore;
+        const lp = Number.isFinite(livePerformance) ? livePerformance : 1;
+        videoStreamScore = rttScore * downlinkScore * saveDataScore * effectiveTypeScore * networkQualityRange * lp;
       } else {
         videoStreamScore = networkQualityRange;
+      }
+      // Normalize and guard against invalid values
+      if (!Number.isFinite(videoStreamScore)) {
+        videoStreamScore = 0.5; // neutral fallback
+      }
+      if (videoStreamScore < 0) {
+        videoStreamScore = 0;
+      } else if (videoStreamScore > 1) {
+        videoStreamScore = 1;
       }
 
       var CVscore = derActivityScoreData.standardDeviation / derActivityScoreData.mean; // Coefficient of Variation 
@@ -1483,12 +1519,22 @@ function getOptimalQuality() {
       // TARGET QUALITY
       if (initialVideoLoadCount === 0) {
         targetQuality = Math.round(videoStreamScore * priorityQuality);
-        if (targetQuality > (videoQuality.length - 1)) {
+        if (!Number.isFinite(targetQuality)) {
+          targetQuality = 0;
+        }
+        if (targetQuality < 0) {
+          targetQuality = 0;
+        } else if (targetQuality > (videoQuality.length - 1)) {
           targetQuality = videoQuality.length - 1;
         }
       } else {
         tempQuality = Math.round(videoStreamScore * priorityQuality);
-        if (tempQuality > (videoQuality.length - 1)) {
+        if (!Number.isFinite(tempQuality)) {
+          tempQuality = 0;
+        }
+        if (tempQuality < 0) {
+          tempQuality = 0;
+        } else if (tempQuality > (videoQuality.length - 1)) {
           tempQuality = videoQuality.length - 1;
         }
       }
@@ -1500,14 +1546,14 @@ function getOptimalQuality() {
         // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
         let decodePressure = performance.now() - decodeStartTime;
         if (avgDecode > 50 && targetQuality >= 6 && qly.droppedVideoFrames > 5) { // 1440p+
-          targetQuality -= 1; // Drop quality to reduce load
+          // targetQuality -= 1; // Drop quality to reduce load
         }
         return targetQuality;
       } else {
         // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
         let decodePressure = performance.now() - decodeStartTime;
         if (avgDecode > 50 && tempQuality >= 6 && qly.droppedVideoFrames > 5) { // 1440p+
-          tempQuality -= 1; // Drop quality to reduce load
+          // tempQuality -= 1; // Drop quality to reduce load
         }
         return tempQuality;
       }
@@ -1573,37 +1619,22 @@ function getVideoFromIndex(m, q, r) {
 
     var compareIndex = -1;
 
-    while (targetVideoSources[compareIndex] === undefined) {
+    while (compareIndex === -1) {
 
       if (!normalVid) {
         specialQuality = Math.round(((q + mod) / (videoQuality.length - 1)) * (specialVideoQuality.length - 1));
       }
       for (i = 0; i < targetVideoSources.length; i++) {
         if ((normalVid && (targetVideoSources[i].height === videoQuality[q + mod]))) {
-
-          var val = q + mod;
-          var point = Math.floor((val / (videoQuality.length - 1)) * targetVideoSources.length);
-          if (!point) {
-            point = 1;
-          }
-          compareIndex = targetVideoSources.length - point;
-
+          compareIndex = i;
           break;
-
         } else if ((!normalVid && (targetVideoSources[i].height === specialVideoQuality[specialQuality]))) {
-
-          var val = specialQuality;
-          var point = Math.floor((val / (videoQuality.length - 1)) * targetVideoSources.length);
-          if (!point) {
-            point = 1;
-          }
-          compareIndex = targetVideoSources.length - point;
-
+          compareIndex = i;
           break;
         }
       }
 
-      if (targetVideoSources[compareIndex] === undefined) {
+      if (compareIndex === -1) {
 
         var quality = normalVid ? q + mod : specialQuality;
         fetchedSources[fetchedSources.length] = normalVid ? q + mod : specialQuality;
@@ -1619,7 +1650,6 @@ function getVideoFromIndex(m, q, r) {
           }
         }
       }
-
     }
 
     return compareIndex;
@@ -1841,6 +1871,9 @@ function getOptimalVideo(time, a, b) {
     if (supportedVideoSources.length && supportedAudioSources.length) {
 
       clearInterval(videoSupportLoop);
+
+      // Dedupe by height to keep a single best variant per resolution
+      supportedVideoSources = dedupeByHeightKeepBest(supportedVideoSources);
 
       checkResolutions();
 
