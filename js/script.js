@@ -4359,12 +4359,37 @@
         newTargetQuality = targetQuality - 1;
       }
 
-      // Minimum floor by network bucket to avoid drastic drops (optional tune)
+      // Minimum floor by network bucket to avoid drastic drops (only prevent drops below floor on poor networks)
       const netBucket = determineNetworkQuality(networkSpeed, networkBandwidth, rttVal, jitterVal, packetLossVal);
       const floorMap = { 'Very Bad': 0, 'Bad': 1, 'Average': 2, 'Good': 3, 'Very Good': 4 };
       const minFloor = floorMap[netBucket] ?? 0;
-      if (newTargetQuality < minFloor) {
+      const isPoorNetwork = (netBucket === 'Bad' || netBucket === 'Very Bad');
+      const preventDropBelowFloor = isPoorNetwork && (targetQuality >= minFloor) && (newTargetQuality < minFloor);
+      if (preventDropBelowFloor) {
         newTargetQuality = minFloor;
+      }
+
+      // If floor does not apply, rely on networkSpeed alone to set target (simple mapping)
+      if (!preventDropBelowFloor) {
+        const getQualityFromSpeed = (speed) => {
+          if (!Number.isFinite(speed) || speed <= 0) return 0;
+          if (speed < 0.5) return 0;        // 144p
+          if (speed < 0.7) return 1;        // 240p
+          if (speed < 1.1) return 2;        // 360p
+          if (speed < 2.5) return 3;        // 480p
+          if (speed < 5) return 4;          // 720p
+          if (speed < 10) return 5;         // 1080p
+          if (speed < 20) return 6;         // 1440p
+          if (speed < 100) return 7;        // 2160p
+          return 8;                         // 4320p
+        };
+        newTargetQuality = getQualityFromSpeed(networkSpeed);
+        // Reapply step-wise change limits
+        if (newTargetQuality > targetQuality) {
+          newTargetQuality = targetQuality + 1;
+        } else if (newTargetQuality < targetQuality) {
+          newTargetQuality = targetQuality - 1;
+        }
       }
 
       // Final clamp to valid range [0, 8]
@@ -5453,6 +5478,24 @@
     var videoProgressPercentile = 0,
         audioProgressPercentile = 0;
 
+    // Cooldown for proactive speed probes when quality is low but buffer is ample
+    const speedProbeCooldownMs = 30000; // 30s
+    let lastSpeedProbeTs = 0;
+
+    function maybeProbeNetworkOnBuffered() {
+      try {
+        const ahead = Math.max(0, (videoLoadPercentile - videoProgressPercentile));
+        const lowQuality = targetQuality <= 1; // really low (0) or low (1)
+        const cooldownOk = (Date.now() - lastSpeedProbeTs) >= speedProbeCooldownMs;
+        if (lowQuality && ahead > 0.25 && cooldownOk && typeof estimateNetworkSpeed === 'function') {
+          estimateNetworkSpeed();
+          lastSpeedProbeTs = Date.now();
+        }
+      } catch (e) {
+        // noop
+      }
+    }
+
     var readyForNext = false;
 
     video.addEventListener('timeupdate', function() {
@@ -5549,6 +5592,8 @@
 
         if ((!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad))))) {
           updateVideoLoad();
+          // If quality is low but buffer is ample, probe network speed eagerly
+          maybeProbeNetworkOnBuffered();
         }
     });
 
