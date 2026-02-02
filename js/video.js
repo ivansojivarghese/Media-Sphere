@@ -338,6 +338,23 @@ function checkDuplicateQuality(arr, q) {
   return res;
 }
 
+// Detect mobile portrait orientation to apply stricter quality caps when Save-Data is enabled
+function isMobilePortrait() {
+  try {
+    var portrait = false;
+    if (screen.orientation && screen.orientation.type) {
+      portrait = screen.orientation.type.indexOf('portrait') !== -1;
+    } else {
+      portrait = (window.innerHeight > window.innerWidth);
+    }
+    var smallWidth = Math.min(window.screen.width, window.screen.height) <= 900;
+    var mobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    return portrait && (smallWidth || mobileUA);
+  } catch (e) {
+    return false;
+  }
+}
+
 // Keep only one source per height, prefer highest bitrate
 function dedupeByHeightKeepBest(sources) {
   const bestByHeight = new Map();
@@ -1527,6 +1544,13 @@ function getOptimalQuality() {
         } else if (targetQuality > (videoQuality.length - 1)) {
           targetQuality = videoQuality.length - 1;
         }
+        // Cap quality to avoid 2K/4K in mobile portrait when Save-Data is on
+        if (navigator.connection && saveData && isMobilePortrait()) {
+          var capQuality = 5; // 1080p max (avoid 1440p/2160p)
+          if (targetQuality > capQuality) {
+            targetQuality = capQuality;
+          }
+        }
       } else {
         tempQuality = Math.round(videoStreamScore * priorityQuality);
         if (!Number.isFinite(tempQuality)) {
@@ -1536,6 +1560,13 @@ function getOptimalQuality() {
           tempQuality = 0;
         } else if (tempQuality > (videoQuality.length - 1)) {
           tempQuality = videoQuality.length - 1;
+        }
+        // Cap quality to avoid 2K/4K in mobile portrait when Save-Data is on
+        if (navigator.connection && saveData && isMobilePortrait()) {
+          var capQuality2 = 5; // 1080p max (avoid 1440p/2160p)
+          if (tempQuality > capQuality2) {
+            tempQuality = capQuality2;
+          }
         }
       }
       const qly = video.getVideoPlaybackQuality();
