@@ -1194,6 +1194,19 @@ p.durationDiv {
     line-height: 1.75em;
 }
 
+/* Selection color for description text (desktop-style pointers) */
+@media (pointer: fine) {
+    #infoContainer .description p::selection {
+        background: #000; /* selection background */
+        color: #ffffff;      /* selection text color */
+    }
+    /* Older Firefox support */
+    #infoContainer .description p::-moz-selection {
+        background: #000;
+        color: #ffffff;
+    }
+}
+
 .wrapper.search .searchPath {
     display: flex;
     margin-top: 1rem;

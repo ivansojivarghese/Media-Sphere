@@ -3254,14 +3254,37 @@ function formatDescription(text) {
     // Set the description with the fully formatted text
     videoInfoElm.description.innerHTML = fullyFormattedText;
 
+    // Allow text selection in description when using a fine pointer (e.g., mouse)
+    try {
+      if (window.matchMedia && window.matchMedia("(pointer: fine)").matches) {
+        videoInfoElm.description.style.userSelect = "text";
+        videoInfoElm.description.style.cursor = "text";
+      }
+    } catch (_) { /* no-op */ }
+
     // Add event listeners to timestamps for interactivity
     const timestamps = videoInfoElm.description.querySelectorAll('.timestamp');
     timestamps.forEach((timestampElem) => {
-      timestampElem.addEventListener('click', () => {
+      timestampElem.addEventListener('click', (e) => {
+        // If user has selected text, do not seek on click
+        const sel = window.getSelection ? window.getSelection() : null;
+        if (sel && sel.toString().length > 0) {
+          return;
+        }
+
         const timeParts = timestampElem.dataset.time.split(':').map(Number);
         const seconds = timeParts.reduce((acc, part) => acc * 60 + part, 0);
         video.currentTime = seconds; // Assuming `videoPlayer` references your video element
         audio.currentTime = seconds;
+      });
+
+      // Prevent accidental drag-select from triggering click on mouseup
+      timestampElem.addEventListener('mousedown', (e) => {
+        // Only adjust behavior for fine pointers (e.g., mouse)
+        if (window.matchMedia && window.matchMedia('(pointer: fine)').matches) {
+          // Allow native selection; avoid interfering with it
+          e.stopPropagation();
+        }
       });
     });
 
