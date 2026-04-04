@@ -754,6 +754,27 @@ const getOverflowLines = (element) => {
   return lines > 1 ? lines : 0; // Returns number of lines if overflow occurs
 };
 
+async function getVideoMeta(videoID) {
+  const API_KEY = "AIzaSyAtcIpyHJI05qb0cIo4wdMVYfuC-Z9bQQI";
+
+  const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoID}&key=${API_KEY}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  const video = data.items[0];
+
+  return {
+    title: video.snippet.title,
+    channel: video.snippet.channelTitle,
+    description: video.snippet.description,
+    thumbnail: video.snippet.thumbnails.high.url,
+    duration: video.contentDetails.duration,
+    views: video.statistics.viewCount,
+    likes: video.statistics.likeCount,
+  };
+}
+
 async function getParams(id, time, a, b) {
 
   if (!networkError) {
@@ -1022,8 +1043,13 @@ async function getParams(id, time, a, b) {
 
       showVideoControls();
 
+      getVideoMeta(videoID).then(meta => {
+        metaDetails = meta;
+      })
+
       // LIKES/VIEWS
       // API: https://rapidapi.com/ytjar/api/yt-api/playground/apiendpoint_73b163c4-7ffa-4ed7-b2cc-0665a3415f0b
+      /*
       const urlMeta = 'https://yt-api.p.rapidapi.com/updated_metadata?id=' + videoID;
       const optionsMeta = {
         method: 'GET',
@@ -1041,6 +1067,7 @@ async function getParams(id, time, a, b) {
       } catch (error) {
         console.error(error);
       }
+        */
       
       // REFERENCE: https://rapidapi.com/ytjar/api/ytstream-download-youtube-videos
 
@@ -2741,11 +2768,14 @@ function abstractVideoInfo() {
   }
   
   // Example usage
-  const likes = Number(metaDetails.likeCount);
-  const views = Number(metaDetails.viewCount);
+  // const likes = Number(metaDetails.likeCount);
+  // const views = Number(metaDetails.viewCount);
+  const likes = Number(metaDetails.likes);
+  const views = Number(metaDetails.views);
   var meta = formatCounts(likes, views);
   var likesTxt = (likes === 1) ? " like" : " likes";
-  var viewsTxt = (metaDetails.viewCountText.indexOf("watching now") !== -1) ? " watching now" : " views";
+  var viewsTxt = (views === 1) ? " view" : " views";
+  // var viewsTxt = (metaDetails.viewCountText.indexOf("watching now") !== -1) ? " watching now" : " views";
 
   videoInfoElm.date.innerHTML = timeAgo(videoDetails.uploadDate, secondsToTimeCode(Number(videoDetails.lengthSeconds)));
   videoInfoElm.duration.innerHTML = secondsToTimeCode(Number(videoDetails.lengthSeconds));

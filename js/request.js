@@ -932,7 +932,7 @@
             'Accept': 'application/json'
           };
 
-          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}${duration}&relevanceLanguage=en${type}${sort}&maxResults=${maxQuery}`;          
+          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;          
           fetch(url, { headers })
           .then(response => response.json())
           .then(async data => {
@@ -1373,15 +1373,17 @@
             var thumbnailNowPlaying = document.createElement("div");
             thumbnailNowPlaying.classList.add("nowPlaying");
             thumbnail.appendChild(thumbnailNowPlaying);
-            if (videoDetails.id === data[i].videoId) {
-              thumbnailNowPlaying.style.display = "block";
-              main.classList.add("active");
-              // prevent event click on thumbnail
-              main.style.pointerEvents = "none";
-            } else { // remove playing icon
-              thumbnailNowPlaying.style.display = "";
-              main.classList.remove("active");
-              main.style.pointerEvents = "";
+            if (videoDetails) {
+              if (videoDetails.id === data[i].videoId) {
+                thumbnailNowPlaying.style.display = "block";
+                main.classList.add("active");
+                // prevent event click on thumbnail
+                main.style.pointerEvents = "none";
+              } else { // remove playing icon
+                thumbnailNowPlaying.style.display = "";
+                main.classList.remove("active");
+                main.style.pointerEvents = "";
+              }
             }
 
             var thumbnailNowPlayingImg = document.createElement("div");
