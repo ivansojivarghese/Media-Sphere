@@ -214,6 +214,8 @@
     }
 
     var queueActive = false;
+
+    // TO TEST URLs: getURL("url link here", true)
     
     function getURL(u, m, q, k, y) { // 
 
