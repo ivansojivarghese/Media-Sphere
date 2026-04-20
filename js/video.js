@@ -2060,6 +2060,7 @@ function getOptimalVideo(time, a, b) {
         localStorage.setItem('videoURL', video.src); // Set URLs to memory state
         localStorage.setItem('audioURL', audio.src); // 
         localStorage.setItem('duration', videoDetails.lengthSeconds);
+        saveQualityPreference(targetQuality, targetVideo ? targetVideo.height : null);
 
         video.load();
         audio.load();
@@ -2934,6 +2935,7 @@ function abstractVideoInfo() {
         event.currentTarget.classList.add("active");
 
         localStorage.setItem('videoURL', video.src); // Set URL to memory state
+        saveQualityPreference(targetQuality, targetVideo ? targetVideo.height : null);
       }
     });
 

@@ -68,15 +68,7 @@
     var audioCtx;
     var syncGraceUntil = 0;
     var frameAnalysisScheduled = false;
-    var syncGraceMs = 1500;
-    var alignViolationCount = 0;
-    var alignViolationLimit = 4;
-    var softAlignCount = 0;
-    var softAlignLimit = 2;
-    var softAlignMinSkew = 0.08;
-    var softAlignMaxSkew = 0.45;
-    var softAlignCooldownUntil = 0;
-    var softAlignCooldownMs = 300;
+    var syncGraceMs = 800;
     // var oscillator;
     var playbackStats;
 
@@ -707,8 +699,6 @@
 
         // Give media a short stabilization window after resume before aggressive rebuffer checks.
         syncGraceUntil = Date.now() + syncGraceMs;
-        alignViolationCount = 0;
-        softAlignCount = 0;
         /*
         oscillator = audioCtx.createOscillator();
         oscillator.connect(audioCtx.destination);
@@ -2816,46 +2806,7 @@
         
         var maxLatency = (typeof audioCtx.playoutStats !== 'undefined') ? audioCtx.playoutStats.maximumLatency : (audioCtx.baseLatency && audioCtx.outputLatency) ? 0 : 100;
 
-        const driftThreshold = (((maxLatency / 100) + (audioCtx.baseLatency * 10) + (audioCtx.outputLatency * 10)) / audioVideoAlignDivisor);
-        const driftAbs = Math.abs(diff);
-        const hardDesync = (checkLatency(audioTimes, audioDiffMax) && !checkLatency(videoTimes, audioDiffMax)) || (driftAbs > driftThreshold) || (video.currentTime - audio.currentTime < 0);
-        const softDesync = !inResumeGrace
-          && !seeking
-          && !seekingLoad
-          && !audioVideoAligning
-          && !audio.paused
-          && !video.paused
-          && !bufferingDetected
-          && !framesStuck
-          && driftAbs >= softAlignMinSkew
-          && driftAbs <= softAlignMaxSkew;
-
-        if (softDesync) {
-          softAlignCount++;
-        } else {
-          softAlignCount = 0;
-        }
-
-        if (softDesync && softAlignCount >= softAlignLimit && Date.now() >= softAlignCooldownUntil) {
-          softAlignCount = 0;
-          softAlignCooldownUntil = Date.now() + softAlignCooldownMs;
-          alignViolationCount = 0;
-
-          if (audio.src && Number.isFinite(vT)) {
-            audio.currentTime = vT;
-          }
-
-          return;
-        }
-
-        if (!inResumeGrace && hardDesync) {
-          alignViolationCount++;
-        } else {
-          alignViolationCount = 0;
-        }
-
-        if (!inResumeGrace && alignViolationCount >= alignViolationLimit) { // only buffer when desync persists
-          alignViolationCount = 0;
+        if (!inResumeGrace && ((checkLatency(audioTimes, audioDiffMax) && !checkLatency(videoTimes, audioDiffMax)) || (Math.abs(video.currentTime - audio.currentTime) > (((maxLatency / 100) + (audioCtx.baseLatency * 10) + (audioCtx.outputLatency * 10)) / audioVideoAlignDivisor)) || (video.currentTime - audio.currentTime < 0))) { // only buffer when audio has stalled
           // bufferCount++;
           bufferStartTime = new Date().getTime();
           bufferMode = true;
@@ -2887,8 +2838,6 @@
       } else if (audioStall && audio.buffered.length) {
         audioStall = false;
         audioVideoAligning = false;
-        alignViolationCount = 0;
-        softAlignCount = 0;
         setTimeout(function() {
           if ((!videoRun || backgroundPlay) && !audioRun) {
 
@@ -4356,6 +4305,10 @@
           videoInfoElm.autoResLive.innerHTML = qualityLabel(targetVideo.qualityLabel);
 
           localStorage.setItem('videoURL', video.src); // Set URL to memory state
+          localStorage.setItem('lastVideoQualityIndex', String(targetQuality));
+          if (targetVideo && Number.isFinite(targetVideo.height)) {
+            localStorage.setItem('lastVideoQualityHeight', String(Math.round(targetVideo.height)));
+          }
 
         } else {
           qualityChange = false;
@@ -4696,6 +4649,10 @@
             videoInfoElm.autoResLive.innerHTML = qualityLabel(targetVideo.qualityLabel);
 
             localStorage.setItem('videoURL', video.src); // Set URL to memory state
+            localStorage.setItem('lastVideoQualityIndex', String(targetQuality));
+            if (targetVideo && Number.isFinite(targetVideo.height)) {
+              localStorage.setItem('lastVideoQualityHeight', String(Math.round(targetVideo.height)));
+            }
 
             // MEASURE TIME TO PLAY
             const playListener = () => {
