@@ -1327,8 +1327,12 @@ div.result_wrapper {
     left: -1.2rem;
     /*opacity: 0;*/
 }
-
+/*
 .wrapper.profile div.result_wrapper {
+    margin-bottom: 4rem;
+}*/
+
+.wrapper.profile div.result_wrapper:last-child {
     margin-bottom: 4rem;
 }
 

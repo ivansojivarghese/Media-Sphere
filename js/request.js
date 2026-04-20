@@ -214,9 +214,9 @@
     }
 
     var queueActive = false;
-
-    // TO TEST URLs: getURL("url link here", true)
     
+    // TO TEST URLs: getURL("url link here", true)
+
     function getURL(u, m, q, k, y) { // 
 
       videoInfoElm.suggestions.innerHTML = "";
