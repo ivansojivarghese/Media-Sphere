@@ -91,6 +91,70 @@ var specialVideoQualityWidth = [];
 var priorityQuality = 0;
 var targetQuality = 0;
 
+const LAST_VIDEO_QUALITY_INDEX_KEY = 'lastVideoQualityIndex';
+const LAST_VIDEO_QUALITY_HEIGHT_KEY = 'lastVideoQualityHeight';
+
+function getStoredQualityPreference() {
+  try {
+    var raw = localStorage.getItem(LAST_VIDEO_QUALITY_INDEX_KEY);
+    if (raw === null) {
+      return null;
+    }
+
+    var parsed = Number.parseInt(raw, 10);
+    if (!Number.isFinite(parsed) || parsed < 0 || parsed > (videoQuality.length - 1)) {
+      return null;
+    }
+
+    return parsed;
+  } catch (err) {
+    return null;
+  }
+}
+
+function getStoredInitialQualityPreference() {
+  var storedIndex = getStoredQualityPreference();
+  if (storedIndex !== null) {
+    return storedIndex;
+  }
+
+  try {
+    var rawHeight = localStorage.getItem(LAST_VIDEO_QUALITY_HEIGHT_KEY);
+    if (rawHeight === null) {
+      return null;
+    }
+
+    var storedHeight = Number.parseInt(rawHeight, 10);
+    if (!Number.isFinite(storedHeight)) {
+      return null;
+    }
+
+    var heightIndex = videoQuality.indexOf(storedHeight);
+    if (heightIndex !== -1) {
+      return heightIndex;
+    }
+  } catch (err) {
+    return null;
+  }
+
+  return null;
+}
+
+function saveQualityPreference(index, height) {
+  try {
+    if (Number.isFinite(index)) {
+      var safeIndex = Math.max(0, Math.min(videoQuality.length - 1, Math.round(index)));
+      localStorage.setItem(LAST_VIDEO_QUALITY_INDEX_KEY, String(safeIndex));
+    }
+
+    if (Number.isFinite(height)) {
+      localStorage.setItem(LAST_VIDEO_QUALITY_HEIGHT_KEY, String(Math.round(height)));
+    }
+  } catch (err) {
+    // Ignore storage failures.
+  }
+}
+
 const videoHDmin = 720; 
 
 var videoQualityArea = [];
@@ -1234,12 +1298,11 @@ async function getParams(id, time, a, b) {
           // failTimes = 0;
 
           videoFetchLoop = setInterval(function() {
-            if (networkSpeed) {
-              clearInterval(videoFetchLoop);
+            clearInterval(videoFetchLoop);
 
-              ////////////////////
+            ////////////////////
 
-              videoReset();
+            videoReset();
 
               /*
               resetVariables();
@@ -1291,8 +1354,7 @@ async function getParams(id, time, a, b) {
               */
               //////////////////
 
-              getOptimalVideo(time, a, b);
-            }
+            getOptimalVideo(time, a, b);
           }, 10);
         }
 
@@ -1562,20 +1624,25 @@ function getOptimalQuality() {
 
       // TARGET QUALITY
       if (initialVideoLoadCount === 0) {
-        targetQuality = Math.round(videoStreamScore * priorityQuality);
-        if (!Number.isFinite(targetQuality)) {
-          targetQuality = 0;
-        }
-        if (targetQuality < 0) {
-          targetQuality = 0;
-        } else if (targetQuality > (videoQuality.length - 1)) {
-          targetQuality = videoQuality.length - 1;
-        }
-        // Cap quality to avoid 2K/4K in mobile portrait when Save-Data is on
-        if (navigator.connection && saveData && isMobilePortrait()) {
-          var capQuality = 5; // 1080p max (avoid 1440p/2160p)
-          if (targetQuality > capQuality) {
-            targetQuality = capQuality;
+        var storedQuality = getStoredInitialQualityPreference();
+        if (storedQuality !== null) {
+          targetQuality = storedQuality;
+        } else {
+          targetQuality = Math.round(videoStreamScore * priorityQuality);
+          if (!Number.isFinite(targetQuality)) {
+            targetQuality = 0;
+          }
+          if (targetQuality < 0) {
+            targetQuality = 0;
+          } else if (targetQuality > (videoQuality.length - 1)) {
+            targetQuality = videoQuality.length - 1;
+          }
+          // Cap quality to avoid 2K/4K in mobile portrait when Save-Data is on
+          if (navigator.connection && saveData && isMobilePortrait()) {
+            var capQuality = 5; // 1080p max (avoid 1440p/2160p)
+            if (targetQuality > capQuality) {
+              targetQuality = capQuality;
+            }
           }
         }
       } else {
