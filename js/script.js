@@ -66,6 +66,17 @@
     var offsetInt = null;
 
     var audioCtx;
+    var syncGraceUntil = 0;
+    var frameAnalysisScheduled = false;
+    var syncGraceMs = 1500;
+    var alignViolationCount = 0;
+    var alignViolationLimit = 4;
+    var softAlignCount = 0;
+    var softAlignLimit = 2;
+    var softAlignMinSkew = 0.08;
+    var softAlignMaxSkew = 0.45;
+    var softAlignCooldownUntil = 0;
+    var softAlignCooldownMs = 300;
     // var oscillator;
     var playbackStats;
 
@@ -688,7 +699,16 @@
           clearInterval(audioVideoAlignInt);
           audioVideoAlignInt = null;
         }
-        audioCtx = new AudioContext();
+        if (!audioCtx || audioCtx.state === 'closed') {
+          audioCtx = new AudioContext();
+        } else if (audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(() => {});
+        }
+
+        // Give media a short stabilization window after resume before aggressive rebuffer checks.
+        syncGraceUntil = Date.now() + syncGraceMs;
+        alignViolationCount = 0;
+        softAlignCount = 0;
         /*
         oscillator = audioCtx.createOscillator();
         oscillator.connect(audioCtx.destination);
@@ -869,6 +889,8 @@
     });
 
     video.addEventListener('pause', function () {
+
+      frameAnalysisScheduled = false;
 
       if (!qualityBestChange && !qualityChange) {
 
@@ -2475,6 +2497,8 @@
       var vT = video.currentTime;
       var diff = vT - aT;
 
+      const inResumeGrace = Date.now() < syncGraceUntil;
+
       if (aVcount === 10) { // 1 sec.
         console.log("video: " + video.currentTime + ", audio: " + audio.currentTime + ", difference: " + (video.currentTime - audio.currentTime));
         aVcount = 0;
@@ -2792,7 +2816,46 @@
         
         var maxLatency = (typeof audioCtx.playoutStats !== 'undefined') ? audioCtx.playoutStats.maximumLatency : (audioCtx.baseLatency && audioCtx.outputLatency) ? 0 : 100;
 
-        if ((checkLatency(audioTimes, audioDiffMax) && !checkLatency(videoTimes, audioDiffMax)) || (Math.abs(video.currentTime - audio.currentTime) > (((maxLatency / 100) + (audioCtx.baseLatency * 10) + (audioCtx.outputLatency * 10)) / audioVideoAlignDivisor)) || (video.currentTime - audio.currentTime < 0)) { // only buffer when audio has stalled
+        const driftThreshold = (((maxLatency / 100) + (audioCtx.baseLatency * 10) + (audioCtx.outputLatency * 10)) / audioVideoAlignDivisor);
+        const driftAbs = Math.abs(diff);
+        const hardDesync = (checkLatency(audioTimes, audioDiffMax) && !checkLatency(videoTimes, audioDiffMax)) || (driftAbs > driftThreshold) || (video.currentTime - audio.currentTime < 0);
+        const softDesync = !inResumeGrace
+          && !seeking
+          && !seekingLoad
+          && !audioVideoAligning
+          && !audio.paused
+          && !video.paused
+          && !bufferingDetected
+          && !framesStuck
+          && driftAbs >= softAlignMinSkew
+          && driftAbs <= softAlignMaxSkew;
+
+        if (softDesync) {
+          softAlignCount++;
+        } else {
+          softAlignCount = 0;
+        }
+
+        if (softDesync && softAlignCount >= softAlignLimit && Date.now() >= softAlignCooldownUntil) {
+          softAlignCount = 0;
+          softAlignCooldownUntil = Date.now() + softAlignCooldownMs;
+          alignViolationCount = 0;
+
+          if (audio.src && Number.isFinite(vT)) {
+            audio.currentTime = vT;
+          }
+
+          return;
+        }
+
+        if (!inResumeGrace && hardDesync) {
+          alignViolationCount++;
+        } else {
+          alignViolationCount = 0;
+        }
+
+        if (!inResumeGrace && alignViolationCount >= alignViolationLimit) { // only buffer when desync persists
+          alignViolationCount = 0;
           // bufferCount++;
           bufferStartTime = new Date().getTime();
           bufferMode = true;
@@ -2824,6 +2887,8 @@
       } else if (audioStall && audio.buffered.length) {
         audioStall = false;
         audioVideoAligning = false;
+        alignViolationCount = 0;
+        softAlignCount = 0;
         setTimeout(function() {
           if ((!videoRun || backgroundPlay) && !audioRun) {
 
@@ -6512,6 +6577,11 @@
 
     // Analyze each frame
     function analyzeFrame(now, metadata) {
+      if (video.paused || video.ended || !video.src) {
+        frameAnalysisScheduled = false;
+        return;
+      }
+
         if (lastMetadata) {
             // Calculate the time difference between frames
             const timeDiff = metadata.presentationTime - lastMetadata.presentationTime;
@@ -6552,6 +6622,7 @@
         lastMetadata = metadata;
 
         // Request the next frame analysis
+        frameAnalysisScheduled = true;
         video.requestVideoFrameCallback(analyzeFrame);
     }
 
@@ -6572,5 +6643,8 @@
 
     // Start frame analysis when the video is playing
     video.addEventListener('play', () => {
+      if (!frameAnalysisScheduled) {
+        frameAnalysisScheduled = true;
         video.requestVideoFrameCallback(analyzeFrame);
+      }
     });
