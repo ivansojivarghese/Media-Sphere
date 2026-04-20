@@ -163,6 +163,45 @@
     // Cooldown for best-quality switching to avoid aggressive jumps
     const bestSwitchCooldownMs = 60000; // 1 minute
     let lastBestSwitchTime = 0;
+    const resumeQualityGraceMs = 3000;
+    let resumeQualityGraceUntil = 0;
+
+    function getBestTargetVideoIndexForQuality(qualityIndex) {
+      if (!Array.isArray(targetVideoSources) || !targetVideoSources.length || !Array.isArray(videoQuality)) {
+        return -1;
+      }
+
+      var resolvedQualityIndex = Number.isFinite(qualityIndex) ? Math.max(0, Math.min(videoQuality.length - 1, Math.round(qualityIndex))) : 0;
+      var targetHeight = videoQuality[resolvedQualityIndex];
+      var bestIndex = -1;
+      var bestBitrate = -1;
+
+      for (var sourceIndex = 0; sourceIndex < targetVideoSources.length; sourceIndex++) {
+        var source = targetVideoSources[sourceIndex];
+        if (!source || source.height !== targetHeight) {
+          continue;
+        }
+
+        var bitrate = Number.isFinite(source.bitrate) ? source.bitrate : 0;
+        if (bitrate > bestBitrate) {
+          bestBitrate = bitrate;
+          bestIndex = sourceIndex;
+        }
+      }
+
+      if (bestIndex !== -1) {
+        return bestIndex;
+      }
+
+      for (var fallbackIndex = 0; fallbackIndex < targetVideoSources.length; fallbackIndex++) {
+        var fallbackSource = targetVideoSources[fallbackIndex];
+        if (fallbackSource && fallbackSource.height <= targetHeight) {
+          return fallbackIndex;
+        }
+      }
+
+      return targetVideoSources.length ? 0 : -1;
+    }
 
     /*
     // videoSec.addEventListener('enterpictureinpicture', (event) => {
@@ -699,6 +738,7 @@
 
         // Give media a short stabilization window after resume before aggressive rebuffer checks.
         syncGraceUntil = Date.now() + syncGraceMs;
+        resumeQualityGraceUntil = Date.now() + resumeQualityGraceMs;
         /*
         oscillator = audioCtx.createOscillator();
         oscillator.connect(audioCtx.destination);
@@ -4204,10 +4244,13 @@
     function getVideoFromBuffer() {
 
       var preventRefetch = false;
-
-      var index = 0;
-      var mod = 1;
       var newTargetQuality = getOptimalQuality();
+
+      // Buffer-triggered switching is downgrade-only.
+      
+      if (newTargetQuality > targetQuality) {
+        newTargetQuality = targetQuality;
+      }
 
       // newTargetQuality = targetQuality; FOR TESTING
       
@@ -4215,40 +4258,17 @@
 
       if ((video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && autoRes && autoResInt) {
 
-        if (newTargetQuality === targetQuality) { // if same quality rating as previous
+        var bufferQualityIndex = newTargetQuality === targetQuality ? targetQuality : Math.max(0, newTargetQuality - 1);
+        var bufferVideoIndex = getBestTargetVideoIndexForQuality(bufferQualityIndex);
 
-          // console.log(targetVideoIndex);
-
-          //preventQualityChange = true
-          //setTimeout(() => { preventQualityChange = false; }, avgInt);
-          //return;
-
-          do { // ensure that same res. is not picked again
-            index = targetVideoSources[targetVideoIndex + mod] ? (targetVideoIndex + mod) : (targetVideoIndex); // potential need to change/downgrade video quality (by 1 each time)
-            if (targetVideoSources[index]) { // if available
-
-              // console.log(targetVideo);
-
-              targetVideo = targetVideoSources[index];
-
-              // console.log(targetVideo);
-            }
-            mod++;
-          } while ((targetVideoSources[targetVideoIndex].height === targetVideo.height) && targetVideoSources[index + mod]);
-
-          targetVideoIndex = index;
-
-          // console.log(targetVideoIndex);
-
-        } else { // otherwise, if different quality rating
-
+        if (bufferVideoIndex !== -1) {
+          targetQuality = bufferQualityIndex;
+          targetVideoIndex = bufferVideoIndex;
+          targetVideo = targetVideoSources[bufferVideoIndex];
+        } else {
           targetVideo = null;
-
-          // console.log("get video again");
-
-          targetQuality = newTargetQuality;
+          targetQuality = bufferQualityIndex;
           getVideoFromIndex(false); // loop qualities to get video again
-
         }
 
         const quality = video.getVideoPlaybackQuality();
@@ -4358,6 +4378,10 @@
 
     async function getBestVideo() { // fetch best video according to network conditions - continuous
 
+      if (Date.now() < resumeQualityGraceUntil) {
+        return;
+      }
+
       var p = getLoadedPercent();
 
       var preventRefetch = false;
@@ -4418,6 +4442,25 @@
         newTargetQuality = 0;
       } else if (newTargetQuality > 8) {
         newTargetQuality = 8;
+      }
+
+      if (typeof applyAutoQualityCaps === 'function') {
+        const decodeAvg = decodeDurations.length
+          ? decodeDurations.reduce((a, b) => a + b) / decodeDurations.length
+          : 0;
+        const droppedFramesNow = playbackStats && Number.isFinite(playbackStats.droppedVideoFrames)
+          ? playbackStats.droppedVideoFrames
+          : 0;
+        newTargetQuality = applyAutoQualityCaps(newTargetQuality, {
+          avgDecode: decodeAvg,
+          droppedFrames: droppedFramesNow
+        });
+      }
+
+      // Continuous auto-switch should never downgrade;
+      // downgrades are handled only in getVideoFromBuffer() on buffering events.
+      if (newTargetQuality < targetQuality) {
+        newTargetQuality = targetQuality;
       }
 
       var newIndex = getVideoFromIndex(true, newTargetQuality);
@@ -4584,9 +4627,12 @@
 
           if (newTargetQuality === targetQuality) {
 
-            targetVideo = targetVideoSources[newIndex];
-            targetVideoIndex = newIndex;
             targetQuality = newTargetQuality;
+            var resolvedUpgradeIndex = getBestTargetVideoIndexForQuality(targetQuality);
+            if (resolvedUpgradeIndex !== -1) {
+              targetVideoIndex = resolvedUpgradeIndex;
+              targetVideo = targetVideoSources[resolvedUpgradeIndex];
+            }
 
           } else {
 

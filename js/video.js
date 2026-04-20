@@ -419,6 +419,80 @@ function isMobilePortrait() {
   }
 }
 
+function getDisplayRenderHeight() {
+  try {
+    var shortEdge = Math.min(window.screen.width || 0, window.screen.height || 0);
+    var safeDpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+    return Math.max(144, shortEdge * safeDpr);
+  } catch (e) {
+    return 720;
+  }
+}
+
+function getMaxQualityIndexForHeight(heightPx) {
+  var limitIndex = 0;
+  for (var i = 0; i < videoQuality.length; i++) {
+    if (videoQuality[i] <= heightPx) {
+      limitIndex = i;
+    } else {
+      break;
+    }
+  }
+  return limitIndex;
+}
+
+function applyAutoQualityCaps(qualityIndex, metrics) {
+  var q = Number.isFinite(qualityIndex) ? Math.round(qualityIndex) : 0;
+  if (q < 0) {
+    q = 0;
+  } else if (q > (videoQuality.length - 1)) {
+    q = videoQuality.length - 1;
+  }
+
+  // Do not choose a stream significantly above the device renderable height.
+  var displayCap = getMaxQualityIndexForHeight(getDisplayRenderHeight() * 1.1);
+  if (q > displayCap) {
+    q = displayCap;
+  }
+
+  var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  var effType = conn && conn.effectiveType ? conn.effectiveType : (typeof effectiveType !== 'undefined' ? effectiveType : '');
+  var connType = conn && conn.type ? conn.type : '';
+  var saveDataEnabled = !!(conn && conn.saveData);
+  var mobileLikeDevice = isMobilePortrait() || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  var likelyCellular = connType === 'cellular' || effType === '3g' || effType === '2g' || effType === 'slow-2g';
+
+  if (effType === 'slow-2g' || effType === '2g') {
+    q = Math.min(q, 2); // 360p max
+  } else if (effType === '3g') {
+    q = Math.min(q, 3); // 480p max
+  }
+
+  if (saveDataEnabled) {
+    q = Math.min(q, mobileLikeDevice ? 4 : 5); // 720p mobile, 1080p desktop/tablet
+  }
+
+  if (mobileLikeDevice && likelyCellular) {
+    q = Math.min(q, 5); // Avoid 2K/4K auto-switch on mobile cellular
+  }
+
+  var lp = (typeof livePerformance !== 'undefined' && Number.isFinite(livePerformance)) ? livePerformance : 1;
+  if (lp < 0.4) {
+    q = Math.min(q, 3);
+  } else if (lp < 0.7) {
+    q = Math.min(q, 4);
+  }
+
+  var m = metrics || {};
+  var avgDecode = Number.isFinite(m.avgDecode) ? m.avgDecode : 0;
+  var droppedFrames = Number.isFinite(m.droppedFrames) ? m.droppedFrames : 0;
+  if (avgDecode > 45 || droppedFrames > 8) {
+    q = Math.min(q, mobileLikeDevice ? 4 : 5);
+  }
+
+  return q;
+}
+
 // Keep only one source per height, prefer highest bitrate
 function dedupeByHeightKeepBest(sources) {
   const bestByHeight = new Map();
@@ -1637,13 +1711,6 @@ function getOptimalQuality() {
           } else if (targetQuality > (videoQuality.length - 1)) {
             targetQuality = videoQuality.length - 1;
           }
-          // Cap quality to avoid 2K/4K in mobile portrait when Save-Data is on
-          if (navigator.connection && saveData && isMobilePortrait()) {
-            var capQuality = 5; // 1080p max (avoid 1440p/2160p)
-            if (targetQuality > capQuality) {
-              targetQuality = capQuality;
-            }
-          }
         }
       } else {
         tempQuality = Math.round(videoStreamScore * priorityQuality);
@@ -1655,19 +1722,17 @@ function getOptimalQuality() {
         } else if (tempQuality > (videoQuality.length - 1)) {
           tempQuality = videoQuality.length - 1;
         }
-        // Cap quality to avoid 2K/4K in mobile portrait when Save-Data is on
-        if (navigator.connection && saveData && isMobilePortrait()) {
-          var capQuality2 = 5; // 1080p max (avoid 1440p/2160p)
-          if (tempQuality > capQuality2) {
-            tempQuality = capQuality2;
-          }
-        }
       }
       const qly = video.getVideoPlaybackQuality();
       let avgDecode = decodeDurations.length
         ? decodeDurations.reduce((a, b) => a + b) / decodeDurations.length
         : 0;
       if (initialVideoLoadCount === 0) {
+        
+        targetQuality = applyAutoQualityCaps(targetQuality, {
+          avgDecode: avgDecode,
+          droppedFrames: qly && Number.isFinite(qly.droppedVideoFrames) ? qly.droppedVideoFrames : 0
+        });
         // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
         let decodePressure = performance.now() - decodeStartTime;
         if (avgDecode > 50 && targetQuality >= 6 && qly.droppedVideoFrames > 5) { // 1440p+
@@ -1675,6 +1740,11 @@ function getOptimalQuality() {
         }
         return targetQuality;
       } else {
+        
+        tempQuality = applyAutoQualityCaps(tempQuality, {
+          avgDecode: avgDecode,
+          droppedFrames: qly && Number.isFinite(qly.droppedVideoFrames) ? qly.droppedVideoFrames : 0
+        });
         // Example proxy: if video decode time is high and resolution is high, simulate "overheat"
         let decodePressure = performance.now() - decodeStartTime;
         if (avgDecode > 50 && tempQuality >= 6 && qly.droppedVideoFrames > 5) { // 1440p+
