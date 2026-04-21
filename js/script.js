@@ -4553,6 +4553,13 @@
           shouldSwitch = prediction.shouldSwitch;
           const telemNote = (prediction.reason && prediction.reason.includes('low-confidence')) ? ' | collecting telemetry' : '';
           console.log(`🧠 ML Model: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)${telemNote}`);
+          /*
+          window.videoQualityTelemetry.completeQualitySwitch({
+            rebuffered: false, 
+            rebufferDuration: 0,
+            droppedFramesAfter: 0
+          });
+          */
         } else {
           shouldSwitch = prediction.shouldSwitch;
           console.log(`📊 Heuristic: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} - ${prediction.reason || 'checks passed'}`);
@@ -4598,6 +4605,12 @@
         
         const allPass = Object.values(conditions).every(v => v);
         console.log('🔍 Switch conditions:', conditions, 'All pass:', allPass);
+
+        // START TELEMETRY
+        /*
+        if (window.videoQualityTelemetry) {
+          window.videoQualityTelemetry.startQualitySwitch(featureData);
+        }*/
 
         // if (((p >= 0.00 && (typeof downlinkVariability.standardDeviation === undefined || (typeof downlinkVariability.standardDeviation !== undefined && downlinkVariability.standardDeviation < 4)) && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex))) || (p >= 0.00 && ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex)))) && (((newTargetQuality !== targetQuality) || ((newTargetQuality === targetQuality) && (newIndex !== -1) && (targetVideoIndex !== newIndex))) || ((newTargetQuality >= targetQuality) || (newIndex <= targetVideoIndex))) && !video.paused && !audio.paused && (video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && !backgroundPlay && !qualityBestChange && !qualityChange && !preventQualityChange && autoRes && autoResInt) { // if same quality rating as previous
         
@@ -4704,7 +4717,7 @@
             const playListener = () => {
               const switchEndTime = performance.now();
               const timeToPlay = switchEndTime - switchStartTime;
-              const fast = timeToPlay < 1000;
+              const fast = timeToPlay < 2000;
 
               console.log(`Switch time: ${timeToPlay.toFixed(0)}ms - ${fast ? 'FAST' : 'SLOW'}`);
 
