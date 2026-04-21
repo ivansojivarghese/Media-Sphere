@@ -1434,6 +1434,62 @@
     var decoded, user, youtube, token, expiryTime;
     var likedVideos = [];
     var playlistsVideos = [];
+    var profileThumbnailValidationAttempts = 0;
+
+    function extractYouTubeVideoId(url) {
+      if (!url) return "";
+      try {
+        const parsed = new URL(url, window.location.origin);
+        return parsed.searchParams.get("v") || "";
+      } catch (error) {
+        return "";
+      }
+    }
+
+    function extractThumbnailVideoIdFromStyle(styleValue) {
+      if (!styleValue) return "";
+      const match = styleValue.match(/i\.ytimg\.com\/vi\/([^/"'?]+)/i);
+      return match ? match[1] : "";
+    }
+
+    function validateLikedThumbnailIdsAndRefreshIfNeeded() {
+      const likedCards = document.querySelectorAll(".wrapper.profile .liked .result_wrapper");
+      if (!likedCards.length) return;
+
+      for (const card of likedCards) {
+        const dataUrl = card.getAttribute("data-url") || "";
+        const expectedId = extractYouTubeVideoId(dataUrl);
+        if (!expectedId) {
+          continue;
+        }
+
+        const thumbnailEl = card.querySelector(".thumbnail");
+        if (!thumbnailEl) {
+          continue;
+        }
+
+        const bgImage = thumbnailEl.style.backgroundImage || "";
+        const thumbId = extractThumbnailVideoIdFromStyle(bgImage);
+        if (!thumbId) {
+          continue;
+        }
+
+        if (thumbId !== expectedId) {
+          if (profileThumbnailValidationAttempts < 1) {
+            profileThumbnailValidationAttempts += 1;
+            console.warn("Liked thumbnail/video mismatch detected. Refreshing profile lists.", {
+              expectedId,
+              thumbId,
+              dataUrl,
+            });
+            refreshProfileLists();
+          }
+          return;
+        }
+      }
+
+      profileThumbnailValidationAttempts = 0;
+    }
 
     function clearProfileLists() {
       thumbnailImages = [];
@@ -1468,6 +1524,7 @@
         console.log("Liked Videos:", data.items);
         likedVideos = data.items || [];
         showPlaylist(likedVideos, likedWrap);
+        setTimeout(validateLikedThumbnailIdsAndRefreshIfNeeded, 700);
       })
       .catch(error => {
         console.error("Error fetching liked videos:", error);
