@@ -4721,27 +4721,27 @@
 
               console.log(`Switch time: ${timeToPlay.toFixed(0)}ms - ${fast ? 'FAST' : 'SLOW'}`);
 
-              // COMPLETE TELEMETRY
+              // COMPLETE TELEMETRY (success based only on fast threshold)
               if (window.videoQualityTelemetry) {
                 window.videoQualityTelemetry.completeQualitySwitch({
-                  rebuffered: !fast, // Fast switch (< 1s) = no rebuffer, slow = rebuffered
+                  rebuffered: !fast,
                   rebufferDuration: fast ? 0 : timeToPlay / 1000,
                   droppedFramesAfter: 0
                 });
               }
 
-              clearTimeout(timeoutId); // Cancel timeout when play completes
+              clearTimeout(timeoutId);
               video.removeEventListener('playing', playListener);
             };
 
             video.addEventListener('playing', playListener, { once: true });
 
-            // Timeout fallback (3 seconds for slow switches)
+            // Timeout fallback for switches that never reach playing.
             const timeoutId = setTimeout(() => {
               video.removeEventListener('playing', playListener);
               if (window.videoQualityTelemetry) {
                 window.videoQualityTelemetry.completeQualitySwitch({
-                  rebuffered: true, // timeout = rebuffer
+                  rebuffered: true,
                   rebufferDuration: (performance.now() - switchStartTime) / 1000,
                   droppedFramesAfter: 0
                 });

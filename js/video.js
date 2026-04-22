@@ -69,6 +69,7 @@ var videoSubmit;
 
 var subDetails;
 var metaDetails;
+var activeVideoLoadToken = 0;
 
 var videoSizeRatio = 0;
 
@@ -441,6 +442,28 @@ function getMaxQualityIndexForHeight(heightPx) {
   return limitIndex;
 }
 
+function getDisplayRenderArea() {
+  try {
+    var shortEdge = Math.min(window.screen.width || 0, window.screen.height || 0);
+    var safeDpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+    return Math.max(144 * 144, shortEdge * shortEdge * safeDpr * safeDpr);
+  } catch (e) {
+    return 720 * 720;
+  }
+}
+
+function getMaxQualityIndexForArea(areaPx) {
+  var limitIndex = 0;
+  for (var i = 0; i < videoQualityArea.length; i++) {
+    if (videoQualityArea[i] <= areaPx) {
+      limitIndex = i;
+    } else {
+      break;
+    }
+  }
+  return limitIndex;
+}
+
 function applyAutoQualityCaps(qualityIndex, metrics) {
   var q = Number.isFinite(qualityIndex) ? Math.round(qualityIndex) : 0;
   if (q < 0) {
@@ -448,9 +471,21 @@ function applyAutoQualityCaps(qualityIndex, metrics) {
   } else if (q > (videoQuality.length - 1)) {
     q = videoQuality.length - 1;
   }
-
+  /*
   // Do not choose a stream significantly above the device renderable height.
-  var displayCap = getMaxQualityIndexForHeight(getDisplayRenderHeight() * 1.1);
+  var displayCap = getMaxQualityIndexForHeight(getDisplayRenderHeight() * 1.5);
+  if (q > displayCap) {
+    q = displayCap;
+  }*/
+
+  var displayAreaCap = getMaxQualityIndexForArea(getDisplayRenderArea() * 1.1);
+  var displayHeightCap = getMaxQualityIndexForHeight(getDisplayRenderHeight() * 1.5);
+
+  var displayCap = Math.max(displayAreaCap, displayHeightCap);
+  if (!Number.isFinite(displayCap)) {
+    displayCap = displayHeightCap;
+  }
+
   if (q > displayCap) {
     q = displayCap;
   }
@@ -1181,9 +1216,22 @@ async function getParams(id, time, a, b) {
 
       showVideoControls();
 
+      var loadToken = ++activeVideoLoadToken;
+      metaDetails = null;
       getVideoMeta(videoID).then(meta => {
-        metaDetails = meta;
-      })
+        if (loadToken === activeVideoLoadToken) {
+          metaDetails = meta;
+
+          if (videoDetails && !videoErr && !audioErr) {
+            abstractVideoInfo();
+          }
+        }
+      }).catch((error) => {
+        if (loadToken === activeVideoLoadToken) {
+          metaDetails = null;
+        }
+        console.error(error);
+      });
 
       // LIKES/VIEWS
       // API: https://rapidapi.com/ytjar/api/yt-api/playground/apiendpoint_73b163c4-7ffa-4ed7-b2cc-0665a3415f0b
@@ -2838,6 +2886,21 @@ function resetVideoInfo() {
 }
 
 function abstractVideoInfo() {
+  if (!videoDetails) {
+    return;
+  }
+
+  var safeMetaDetails = (metaDetails && typeof metaDetails === "object") ? metaDetails : {};
+  var fallbackLikes = Number(videoDetails.likeCount);
+  var fallbackViews = Number(videoDetails.viewCount);
+  var likesValue = Number(safeMetaDetails.likes);
+  var viewsValue = Number(safeMetaDetails.views);
+  var likes = Number.isFinite(likesValue) ? likesValue : (Number.isFinite(fallbackLikes) ? fallbackLikes : NaN);
+  var views = Number.isFinite(viewsValue) ? viewsValue : (Number.isFinite(fallbackViews) ? fallbackViews : NaN);
+  var safeLengthSeconds = Number(videoDetails.lengthSeconds);
+  var safeDuration = Number.isFinite(safeLengthSeconds) ? secondsToTimeCode(safeLengthSeconds) : "";
+  var safeTargetUrl = (targetVideo && targetVideo.url) ? targetVideo.url : "";
+
   videoInfoElm.replay.style.display = "block";
   videoInfoElm.audio.style.display = "block";
   // videoInfoElm.radio.style.display = "block";
@@ -2908,16 +2971,14 @@ function abstractVideoInfo() {
   // Example usage
   // const likes = Number(metaDetails.likeCount);
   // const views = Number(metaDetails.viewCount);
-  const likes = Number(metaDetails.likes);
-  const views = Number(metaDetails.views);
   var meta = formatCounts(likes, views);
   var likesTxt = (likes === 1) ? " like" : " likes";
   var viewsTxt = (views === 1) ? " view" : " views";
   // var viewsTxt = (metaDetails.viewCountText.indexOf("watching now") !== -1) ? " watching now" : " views";
 
-  videoInfoElm.date.innerHTML = timeAgo(videoDetails.uploadDate, secondsToTimeCode(Number(videoDetails.lengthSeconds)));
-  videoInfoElm.duration.innerHTML = secondsToTimeCode(Number(videoDetails.lengthSeconds));
-  videoInfoElm.expires.innerHTML = getReadableRemainingTime(targetVideo.url);
+  videoInfoElm.date.innerHTML = timeAgo(videoDetails.uploadDate, safeDuration);
+  videoInfoElm.duration.innerHTML = safeDuration;
+  videoInfoElm.expires.innerHTML = safeTargetUrl ? getReadableRemainingTime(safeTargetUrl) : "N.A.";
 
   if (meta.likes !== 'NaN') {
     videoInfoElm.likes.innerHTML = meta.likes + likesTxt;
@@ -2933,7 +2994,7 @@ function abstractVideoInfo() {
   if (!videoInfoElm.autoResBtn.classList.contains("active")) {
     videoInfoElm.autoResBtn.classList.add("active");
   }
-  videoInfoElm.autoResLive.innerHTML = qualityLabel(targetVideo.qualityLabel);
+  videoInfoElm.autoResLive.innerHTML = (targetVideo && targetVideo.qualityLabel) ? qualityLabel(targetVideo.qualityLabel) : "";
 
   videoLoop = false;
   videoInfoElm.replay.classList.remove("active");
@@ -2948,6 +3009,9 @@ function abstractVideoInfo() {
   videoInfoElm.main.setAttribute("onclick", "openVideoInfo()");
 
   // Sort by height descending (highest to lowest)
+  if (!Array.isArray(supportedVideoSources)) {
+    supportedVideoSources = [];
+  }
   supportedVideoSources.sort((a, b) => b.height - a.height);
 
   for (var j = 0; j < supportedVideoSources.length; j++) {
@@ -3241,7 +3305,7 @@ function formatURLsToGenericLink(text) {
     const displayTitle = title || '';
     const faviconURL = favicon || socialFavicon.url || youtubeFavicon || `../svg/globe.svg`;
 
-    el = `<a href="${clickableURL}" target="_blank" id='${id}' class="url trs trsButtons ${youtubeClass} ${imgClass}">
+    el = `<a href="${clickableURL}" title="${clickableURL}" target="_blank" id='${id}' class="url trs trsButtons ${youtubeClass} ${imgClass}">
                   <div class="img" style="background-image: url('${faviconURL}')"></div>
                   <div class="img link"></div>
                   <span style="display: none;">${displayTitle}</span>
