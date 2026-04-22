@@ -18,7 +18,7 @@ Model is automatically loaded by `tf_js/ml-model.js` on page load.
 ### 1. Upload Telemetry Data
 
 - Open the `MediaSphere_QualitySwitchModelling.ipynb` notebook on Colab.
-- Upload `train_model.py` and `telemetry.json` files.
+- Upload `train_model.py` and `telemetry.json` (obtain from Neon serverless PostgreSQL database) files.
 
 ### 2. Run Cells
 
