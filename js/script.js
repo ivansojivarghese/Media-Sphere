@@ -4724,6 +4724,7 @@
               // COMPLETE TELEMETRY (success based only on fast threshold)
               if (window.videoQualityTelemetry) {
                 window.videoQualityTelemetry.completeQualitySwitch({
+                  success: fast,
                   rebuffered: !fast,
                   rebufferDuration: fast ? 0 : timeToPlay / 1000,
                   droppedFramesAfter: 0
@@ -4741,6 +4742,7 @@
               video.removeEventListener('playing', playListener);
               if (window.videoQualityTelemetry) {
                 window.videoQualityTelemetry.completeQualitySwitch({
+                  success: false,
                   rebuffered: true,
                   rebufferDuration: (performance.now() - switchStartTime) / 1000,
                   droppedFramesAfter: 0

@@ -105,11 +105,13 @@ class VideoQualityTelemetry {
     this.currentSwitch.timeToPlay = this.currentSwitch.switchEndTime - this.currentSwitch.switchStartTime;
     // this.currentSwitch.fast = this.currentSwitch.timeToPlay < 1000; // REMOVED: derived from timeToPlay
     
-    console.log('📊 Telemetry: Completing switch -', outcome.rebuffered ? 'REBUFFERED' : 'SUCCESS', `(${this.currentSwitch.timeToPlay.toFixed(2)}ms)`);
+    const explicitSuccess = typeof outcome.success === 'boolean' ? outcome.success : null;
+    const resolvedSuccess = explicitSuccess !== null ? explicitSuccess : !outcome.rebuffered;
+    console.log('📊 Telemetry: Completing switch -', resolvedSuccess ? 'SUCCESS' : 'REBUFFERED', `(${this.currentSwitch.timeToPlay.toFixed(2)}ms)`);
     
     // Outcome metrics
     this.currentSwitch.rebuffered = outcome.rebuffered || false;
-    this.currentSwitch.success = !outcome.rebuffered; // Derived: success = !rebuffered
+    this.currentSwitch.success = resolvedSuccess;
     this.currentSwitch.rebufferDuration = outcome.rebufferDuration || 0;
     this.currentSwitch.droppedFramesAfter = outcome.droppedFramesAfter || 0;
     // this.currentSwitch.switchBackQuality = outcome.switchBackQuality || null; // REMOVED: usually null
