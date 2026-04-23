@@ -12,6 +12,8 @@
     const videoSec = document.querySelector('video.secondary');
     const audio = document.querySelector('audio.primary');
     const track = document.querySelector('track');
+    let freezeFrameCanvas = null;
+    let freezeFrameCtx = null;
 
     // videoSec.disablePictureInPicture = true;
     
@@ -203,6 +205,110 @@
       return targetVideoSources.length ? 0 : -1;
     }
 
+    function ensureFreezeFrameCanvas() {
+      if (freezeFrameCanvas || !videoContainer) {
+        return freezeFrameCanvas;
+      }
+
+      freezeFrameCanvas = document.createElement("canvas");
+      freezeFrameCanvas.id = "videoFreezeFrame";
+      freezeFrameCanvas.setAttribute("aria-hidden", "true");
+      freezeFrameCtx = freezeFrameCanvas.getContext("2d", { alpha: false });
+      videoContainer.appendChild(freezeFrameCanvas);
+      syncVideoFreezeFrameSize();
+      return freezeFrameCanvas;
+    }
+
+    function syncVideoFreezeFrameSize() {
+      if (!freezeFrameCanvas || !videoContainer) {
+        return false;
+      }
+
+      var sourceWidth = (targetVideo && Number.isFinite(targetVideo.width) && targetVideo.width > 0)
+        ? Math.round(targetVideo.width)
+        : Math.max(0, Math.floor(video.videoWidth || 0));
+      var sourceHeight = (targetVideo && Number.isFinite(targetVideo.height) && targetVideo.height > 0)
+        ? Math.round(targetVideo.height)
+        : Math.max(0, Math.floor(video.videoHeight || 0));
+
+      if (!sourceWidth || !sourceHeight) {
+        return false;
+      }
+
+      if (freezeFrameCanvas.width !== sourceWidth || freezeFrameCanvas.height !== sourceHeight) {
+        freezeFrameCanvas.width = sourceWidth;
+        freezeFrameCanvas.height = sourceHeight;
+      }
+
+      var isSideBySide = videoControls && videoControls.classList.contains('side-by-side');
+      var renderWidth, renderHeight;
+
+      if (isSideBySide) {
+        // When side-by-side is active, use CSS-calculated width and derive height from aspect ratio
+        var computedStyle = window.getComputedStyle(freezeFrameCanvas);
+        var cssWidth = computedStyle.width;
+        if (cssWidth && cssWidth !== '0px') {
+          renderWidth = Math.max(1, Math.floor(parseFloat(cssWidth)));
+        } else {
+          // Fallback calculation if CSS width is not yet applied
+          var insetLeft = parseFloat(computedStyle.getPropertyValue('--safe-area-inset-left')) || 0;
+          var insetRight = parseFloat(computedStyle.getPropertyValue('--safe-area-inset-right')) || 0;
+          var containerWidth = Math.max(1, Math.floor(videoContainer.clientWidth || sourceWidth));
+          renderWidth = Math.max(1, Math.floor(containerWidth - 21 * 16 - insetLeft - insetRight)); // 21rem = 336px at 16px base
+        }
+        // Calculate height from aspect ratio
+        var aspectRatio = sourceHeight / sourceWidth;
+        renderHeight = Math.max(1, Math.floor(renderWidth * aspectRatio));
+      } else {
+        // Normal mode: scale to fit container
+        var containerWidth = Math.max(1, Math.floor(videoContainer.clientWidth || sourceWidth));
+        var containerHeight = Math.max(1, Math.floor(videoContainer.clientHeight || sourceHeight));
+        var scale = Math.min(containerWidth / sourceWidth, containerHeight / sourceHeight);
+        renderWidth = Math.max(1, Math.floor(sourceWidth * scale));
+        renderHeight = Math.max(1, Math.floor(sourceHeight * scale));
+      }
+
+      freezeFrameCanvas.style.width = renderWidth + "px";
+      freezeFrameCanvas.style.height = renderHeight + "px";
+
+      return true;
+    }
+
+    function hideVideoFreezeFrame() {
+      if (!freezeFrameCanvas) {
+        return;
+      }
+      freezeFrameCanvas.classList.remove("visible");
+    }
+
+    function captureVideoFreezeFrame() {
+      if (!video || !video.videoWidth || !video.videoHeight) {
+        return false;
+      }
+
+      var canvas = ensureFreezeFrameCanvas();
+      if (!canvas || !freezeFrameCtx) {
+        return false;
+      }
+
+      syncVideoFreezeFrameSize();
+
+      try {
+        freezeFrameCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.classList.add("visible");
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    window.addEventListener("resize", syncVideoFreezeFrameSize);
+    screen.orientation.addEventListener("change", syncVideoFreezeFrameSize);
+
+    window.captureVideoFreezeFrame = captureVideoFreezeFrame;
+    window.hideVideoFreezeFrame = hideVideoFreezeFrame;
+    window.syncVideoFreezeFrameSize = syncVideoFreezeFrameSize;
+
     /*
     // videoSec.addEventListener('enterpictureinpicture', (event) => {
       console.log('Secondary PiP attempted!');
@@ -227,10 +333,14 @@
             bufferingDetected = true;
             bufferStartTime = new Date().getTime();
 
+            captureVideoFreezeFrame();
+
             // audio.currentTime = video.currentTime;
 
             video.style.transitionDuration = "3s";
-            video.style.background = "";
+            // if (!qualityChange && !qualityBestChange) {
+              //video.style.background = "";
+            // }
 
             statusIndicator.classList.remove("error");
             statusIndicator.classList.remove("smooth");
@@ -709,7 +819,9 @@
         }
 
         video.style.transitionDuration = "3s";
-        video.style.background = "";
+        // if (!qualityChange && !qualityBestChange) {
+          //video.style.background = "";
+        // }
 
         videoErr = false;
 
@@ -2625,7 +2737,9 @@
         var output = generateGradientRGB(imagePrimary, imagePalette);
 
         if ((!loading && !bufferLoad && !seekingLoad && !bufferingDetected && !imageAmbientChange) || (imageAmbientChange && output !== 'No colors provided!' && output !== "")) {
-          video.style.background = "transparent";
+          // if (!qualityChange && !qualityBestChange) {
+            video.style.background = "transparent";
+          // }
         }
 
         if ((imageAmbientChange && imagePrimary !== oldImagePrimary && imagePalette !== oldImagePalette && imagePrimary && imagePalette)) {
@@ -2639,7 +2753,9 @@
           if (imageAmbientChange && output !== 'No colors provided!' && output !== "") {
             imageAmbientChange = false;
             setTimeout(function() {
-              video.style.background = "transparent";
+              // if (!qualityChange && !qualityBestChange) {
+                video.style.background = "transparent";
+              // }
             }, 100);
           } 
         }
@@ -3276,7 +3392,9 @@
           videoRun = true;
 
           video.style.transitionDuration = "3s";
-          video.style.background = "";
+          // if (!qualityChange && !qualityBestChange) {
+            //video.style.background = "";
+          // }
 
           if (!networkError) {
             clearInterval(networkSpeedInt);
@@ -3319,7 +3437,9 @@
         // hideVideoControls();
 
         video.style.transitionDuration = "3s";
-        video.style.background = "";
+        // if (!qualityChange && !qualityBestChange) {
+          //video.style.background = "";
+        // }
 
         if (resumeInterval === null && !userPaused) {
           resumeInterval = setInterval(() => {
@@ -3829,6 +3949,8 @@
 
       if ((!isMusic || (isMusic && CVactivityScore > 0.2)) && !audioMode) {
 
+        captureVideoFreezeFrame();
+
         offset = (checkInterval - 20) / 1000;
 
         if (!networkError) {
@@ -3878,6 +4000,8 @@
     video.addEventListener('stalled', function () { // trying to fetch media data, but data is unexpectedly not forthcoming
 
       if ((!isMusic || (isMusic && CVactivityScore > 0.2)) && !audioMode) {
+
+        captureVideoFreezeFrame();
 
         offset = (checkInterval - 20) / 1000;
 
@@ -4300,6 +4424,7 @@
 
         if ((!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !preventRefetch && video.src !== targetVideo.url) {
           // console.log("load again");
+          captureVideoFreezeFrame();
           video.src = targetVideo.url; // 'loadstart'
           // videoSec.src = targetVideo.url; 
 
@@ -4683,6 +4808,7 @@
             audio.pause(); // pause content
 
             console.log("load again");
+            captureVideoFreezeFrame();
             video.src = targetVideo.url; // 'loadstart'
             // videoSec.src = targetVideo.url; 
 
@@ -4898,11 +5024,15 @@
     video.addEventListener('playing', function () { // fired when playback resumes after having been paused or delayed due to lack of data
       // Reset userPaused on actual playback start
       userPaused = false;
+
+      hideVideoFreezeFrame();
       
       // videoSec.currentTime = video.currentTime;
 
       video.style.transitionDuration = "3s";
-      video.style.background = "";
+      // if (!qualityChange && !qualityBestChange) {
+        //video.style.background = "";
+      // }
 
       clearTimeout(offsetInt);
       offsetInt = null;
@@ -5282,8 +5412,12 @@
       
       videoRun = false;
 
+      hideVideoFreezeFrame();
+
       video.style.transitionDuration = "3s";
-      video.style.background = "";
+      if (!qualityChange && !qualityBestChange) {
+        //video.style.background = "";
+      }
 
       if (!autoLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad))))) {
 
@@ -5325,17 +5459,9 @@
                     }
 
                     resetVariables();
-
-                    // bufferAllow = true;
-
-                  } 
-
-                  if (!loading && !bufferingDetected && !framesStuck) {
-
-                    statusIndicator.classList.remove("buffer");
-                    statusIndicator.classList.remove("error");
-                    statusIndicator.classList.add("smooth");
-
+          // if (!qualityChange && !qualityBestChange) {
+            //video.style.background = "";
+          // }
                     endLoad();
                     
                     setTimeout(function() {

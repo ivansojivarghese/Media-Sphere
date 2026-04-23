@@ -2129,7 +2129,7 @@ function getOptimalVideo(time, a, b) {
         // targetVideo = targetVideoSources[0];  // FOR TESTING
         // getMediaSources(targetVideoSources);
 
-        video.style.background = "";
+        //video.style.background = "";
         imageAmbientChange = true;
         
         if (!casted) {
@@ -3051,6 +3051,9 @@ function abstractVideoInfo() {
         audio.pause(); // pause content
 
         console.log("load set");
+        if (typeof window.captureVideoFreezeFrame === "function") {
+          window.captureVideoFreezeFrame();
+        }
         video.src = targetVideo.url; // 'loadstart'
 
         if ('serviceWorker' in navigator) {

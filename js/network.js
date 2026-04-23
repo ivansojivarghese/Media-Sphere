@@ -135,6 +135,9 @@ const estimateNetworkSpeed = async() => { // estimate network speed
                             console.log("load again");
                             
                             refSeekTime = timeToSeconds(videoCurrentTime.textContent);
+                            if (typeof window.captureVideoFreezeFrame === "function") {
+                                window.captureVideoFreezeFrame();
+                            }
                             video.src = targetVideo.url;
                             // videoSec.src = targetVideo.url; 
                         }
