@@ -5767,11 +5767,9 @@
 
     video.addEventListener('timeupdate', function() {
 
-        video.addEventListener('timeupdate', function() {
-          if (!video.paused && !video.ended) {
-            hideVideoFreezeFrame();
-          }
-        });
+        if (!video.paused && !video.ended) {
+          hideVideoFreezeFrame();
+        }
 
         // if (!searchQueried && !video.paused && inp.value.trim() === "" && !videoInfoOpen) { 
         if (!searchQueried && (!loading && !bufferingDetected && !framesStuck && !seeking && !video.paused && video.buffered.length)) { 
