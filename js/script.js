@@ -146,7 +146,7 @@
     var bufferAllow = true;
     var bufferLoad = false;
 
-    var bufferLimits = [100, 250, 1000]; // ms. limits for buffering [successive 3 times, single time]
+    var bufferLimits = [100, 100, 1000]; // ms. limits for buffering [successive 3 times, single time]
     var bufferLimitC = 3;
 
     var bufferStartTime = 0;
@@ -3689,15 +3689,38 @@
         // UI
 
         if (audio.error.code /*&& failTimes < maxFailTimes && backgroundPlay*/) {
-          audio.load();
-          audio.currentTime = video.currentTime;
-
           failTimes++;
 
-          if (failTimes === maxFailTimes && !playbackErr) {
+          // Try resolution fallback if available
+          if (failTimes >= maxFailTimes && !allResolutionsFailed) {
+            console.log(`Audio at resolution ${videoQuality[targetQuality]}p failed, attempting fallback...`);
+            if (!tryNextResolutionFallback()) {
+              // All resolutions exhausted
+              allResolutionsFailed = true;
+            }
+          } else {
+            audio.load();
+            audio.currentTime = video.currentTime;
+          }
+
+          if (failTimes === maxFailTimes && !playbackErr && allResolutionsFailed) {
             playbackErr = true;
-            inp.value = videoURL || localStorage.getItem("mediaURL");
-            getURL();
+            
+            // Stop loading and show error notification
+            endLoad();
+            setTimeout(function() {
+              console.log("Audio playback failed for all resolutions - showing error");
+              loadingRing.style.display = "none";
+              playPauseButton.style.display = "block";
+              playPauseButton.classList.remove('playing');
+              playPauseButton.classList.add('repeat');
+              playPauseButton.title = "Replay";
+              
+              // reset the loader
+              setTimeout(function() {
+                resetLoad();
+              }, 10);
+            }, 1000);
           }
 
         } else {
@@ -3717,34 +3740,48 @@
           }, 1000);
         }
 
-        // Notifications
+        // Show notification only when all resolutions have failed
+        if (allResolutionsFailed && !playbackErr) {
+          // Notifications
 
-        switch (audio.error.code) {
-          case 1: // MEDIA_ERR_ABORTED
-            ntfTitle = "Aborted";
-            ntfBody = "Fetching of the associated resource(s) was/were aborted at your request.";
-          break;
-          case 2: // MEDIA_ERR_NETWORK
-            ntfTitle = "Network error";
-            ntfBody = "An unexpected network error occurred - preventing further fetching of the associated resource(s).";
-          break;
-          case 3: // MEDIA_ERR_DECODE
-            ntfTitle = "Decode error";
-            ntfBody = "An unexpected error occurred while trying to decode the associated resource(s).";
-          break;
-          case 4: // MEDIA_ERR_SRC_NOT_SUPPORTED	
-            ntfTitle = "Unsupported playback";
-            ntfBody = "The associated resource(s) has/have been found unusable.";
-          break;
-          default: // OTHER
-            ntfTitle = "Unknown error";
-            ntfBody = "Something went wrong.";
-        }
+          switch (audio.error.code) {
+            case 1: // MEDIA_ERR_ABORTED
+              ntfTitle = "Audio Playback Aborted";
+              ntfBody = "Audio playback was aborted. All resolution attempts failed.";
+            break;
+            case 2: // MEDIA_ERR_NETWORK
+              ntfTitle = "Network Error";
+              ntfBody = "Network error occurred. Could not load audio at any resolution.";
+            break;
+            case 3: // MEDIA_ERR_DECODE
+              ntfTitle = "Audio Decode Error";
+              ntfBody = "Audio decode error. Tried all available resolutions but none could be decoded.";
+            break;
+            case 4: // MEDIA_ERR_SRC_NOT_SUPPORTED	
+              ntfTitle = "Audio Format Unsupported";
+              ntfBody = "The audio format is not supported on this device/browser. Tried all available resolutions.";
+            break;
+            default: // OTHER
+              ntfTitle = "Audio Playback Failed";
+              ntfBody = "Audio playback failed at all resolutions. Please try again.";
+          }
 
-        if (pms.ntf) {
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.ready.then(registration => {
-              registration.showNotification(ntfTitle, {
+          if (pms.ntf) {
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(ntfTitle, {
+                  body: ntfBody,
+                  badge: ntfBadge,
+                  icon: ntfIcon,
+                  tag: "playbackError",
+                  requireInteraction: false, // Dismiss after default timeout
+                  data : {
+                    url :  ""
+                  }
+                });
+              });
+            } else {
+              const notification = new Notification(ntfTitle, {
                 body: ntfBody,
                 badge: ntfBadge,
                 icon: ntfIcon,
@@ -3754,33 +3791,22 @@
                   url :  ""
                 }
               });
-            });
-          } else {
-            const notification = new Notification(ntfTitle, {
-              body: ntfBody,
-              badge: ntfBadge,
-              icon: ntfIcon,
-              tag: "playbackError",
-              requireInteraction: false, // Dismiss after default timeout
-              data : {
-                url :  ""
-              }
-            });
 
-            notification.onclick = (event) => {
-              event.preventDefault(); // Prevent the default action (usually focusing the notification)
-              
-              // Focus on the tab or open a new one
-              if (document.hasFocus()) {
-                  console.log("App is already in focus.");
-              } else if (window.opener) {
-                  window.opener.focus();
-              } else {
-                  window.focus();
-              }
-            };
+              notification.onclick = (event) => {
+                event.preventDefault(); // Prevent the default action (usually focusing the notification)
+                
+                // Focus on the tab or open a new one
+                if (document.hasFocus()) {
+                    console.log("App is already in focus.");
+                } else if (window.opener) {
+                    window.opener.focus();
+                } else {
+                    window.focus();
+                }
+              };
+            }
+
           }
-
         }
       }
 
@@ -3804,14 +3830,37 @@
         if (video.error.code && !backgroundPlay /*&& failTimes < maxFailTimes*/) {
           failTimes++;
 
-          video.load();
-          video.currentTime = refSeekTime;
-          // videoSec.currentTime = refSeekTime;
+          // Try resolution fallback if available
+          if (failTimes >= maxFailTimes && !allResolutionsFailed) {
+            console.log(`Resolution ${videoQuality[targetQuality]}p failed, attempting fallback...`);
+            if (!tryNextResolutionFallback()) {
+              // All resolutions exhausted
+              allResolutionsFailed = true;
+            }
+          } else {
+            video.load();
+            video.currentTime = refSeekTime;
+            // videoSec.currentTime = refSeekTime;
+          }
 
-          if (failTimes === maxFailTimes && !playbackErr) {
+          if (failTimes === maxFailTimes && !playbackErr && allResolutionsFailed) {
             playbackErr = true;
-            inp.value = videoURL || localStorage.getItem("mediaURL");
-            getURL();
+            
+            // Stop loading and show error notification
+            endLoad();
+            setTimeout(function() {
+              console.log("Playback failed for all resolutions - showing error");
+              loadingRing.style.display = "none";
+              playPauseButton.style.display = "block";
+              playPauseButton.classList.remove('playing');
+              playPauseButton.classList.add('repeat');
+              playPauseButton.title = "Replay";
+              
+              // reset the loader
+              setTimeout(function() {
+                resetLoad();
+              }, 10);
+            }, 1000);
           }
 
         } else if (!audioMode) { 
@@ -3831,34 +3880,48 @@
           }, 1000);
         }
 
-        // Notifications
+        // Show notification only when all resolutions have failed
+        if (allResolutionsFailed && !playbackErr) {
+          // Notifications
 
-        switch (video.error.code) {
-          case 1: // MEDIA_ERR_ABORTED
-            ntfTitle = "Aborted";
-            ntfBody = "Fetching of the associated resource(s) was/were aborted at your request.";
-          break;
-          case 2: // MEDIA_ERR_NETWORK
-            ntfTitle = "Network error";
-            ntfBody = "An unexpected network error occurred - preventing further fetching of the associated resource(s).";
-          break;
-          case 3: // MEDIA_ERR_DECODE
-            ntfTitle = "Decode error";
-            ntfBody = "An unexpected error occurred while trying to decode the associated resource(s).";
-          break;
-          case 4: // MEDIA_ERR_SRC_NOT_SUPPORTED	
-            ntfTitle = "Unsupported playback";
-            ntfBody = "The associated resource(s) has/have been found unusable.";
-          break;
-          default: // OTHER
-            ntfTitle = "Unknown error";
-            ntfBody = "Something went wrong.";
-        }
+          switch (video.error.code) {
+            case 1: // MEDIA_ERR_ABORTED
+              ntfTitle = "Playback Aborted";
+              ntfBody = "Video playback was aborted. All resolution attempts failed.";
+            break;
+            case 2: // MEDIA_ERR_NETWORK
+              ntfTitle = "Network Error";
+              ntfBody = "Network error occurred. Could not load video at any resolution.";
+            break;
+            case 3: // MEDIA_ERR_DECODE
+              ntfTitle = "Decode Error";
+              ntfBody = "Video decode error. Tried all available resolutions but none could be decoded.";
+            break;
+            case 4: // MEDIA_ERR_SRC_NOT_SUPPORTED	
+              ntfTitle = "Video Format Unsupported";
+              ntfBody = "The video format is not supported on this device/browser. Tried all available resolutions.";
+            break;
+            default: // OTHER
+              ntfTitle = "Playback Failed";
+              ntfBody = "Video playback failed at all resolutions. Please try again.";
+          }
 
-        if (pms.ntf) {
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.ready.then(registration => {
-              registration.showNotification(ntfTitle, {
+          if (pms.ntf) {
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(ntfTitle, {
+                  body: ntfBody,
+                  badge: ntfBadge,
+                  icon: ntfIcon,
+                  tag: "playbackError",
+                  requireInteraction: false, // Dismiss after default timeout
+                  data : {
+                    url :  ""
+                  }
+                });
+              });
+            } else {
+              const notification = new Notification(ntfTitle, {
                 body: ntfBody,
                 badge: ntfBadge,
                 icon: ntfIcon,
@@ -3868,33 +3931,22 @@
                   url :  ""
                 }
               });
-            });
-          } else {
-            const notification = new Notification(ntfTitle, {
-              body: ntfBody,
-              badge: ntfBadge,
-              icon: ntfIcon,
-              tag: "playbackError",
-              requireInteraction: false, // Dismiss after default timeout
-              data : {
-                url :  ""
-              }
-            });
 
-            notification.onclick = (event) => {
-              event.preventDefault(); // Prevent the default action (usually focusing the notification)
-              
-              // Focus on the tab or open a new one
-              if (document.hasFocus()) {
-                  console.log("App is already in focus.");
-              } else if (window.opener) {
-                  window.opener.focus();
-              } else {
-                  window.focus();
-              }
-            };
+              notification.onclick = (event) => {
+                event.preventDefault(); // Prevent the default action (usually focusing the notification)
+                
+                // Focus on the tab or open a new one
+                if (document.hasFocus()) {
+                    console.log("App is already in focus.");
+                } else if (window.opener) {
+                    window.opener.focus();
+                } else {
+                    window.focus();
+                }
+              };
+            }
+
           }
-
         }
 
       }
@@ -4368,22 +4420,28 @@
     function getVideoFromBuffer() {
 
       var preventRefetch = false;
-      var newTargetQuality = getOptimalQuality();
-
-      // Buffer-triggered switching is downgrade-only.
       
-      if (newTargetQuality > targetQuality) {
-        newTargetQuality = targetQuality;
-      }
-
-      // newTargetQuality = targetQuality; FOR TESTING
-      
-      console.log("tQ : " + targetQuality + ", nTQ: " + newTargetQuality);
+      // Buffer-triggered switching: degrade by 1 resolution only
+      console.log("tQ : " + targetQuality + ", degrading by 1");
 
       if ((video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && autoRes && autoResInt) {
 
-        var bufferQualityIndex = newTargetQuality === targetQuality ? targetQuality : Math.max(0, newTargetQuality - 1);
+        var bufferQualityIndex = Math.max(0, targetQuality - 1);
         var bufferVideoIndex = getBestTargetVideoIndexForQuality(bufferQualityIndex);
+
+        if (bufferVideoIndex !== -1 && networkSpeed > 0) {
+          const bufferVideo = targetVideoSources[bufferVideoIndex];
+          const bufferLoadTime = ((bufferVideo.bitrate * 5) / (networkSpeed * 1000));
+
+          if (bufferLoadTime > 1) {
+            bufferQualityIndex = getOptimalQuality();
+            if (bufferQualityIndex > targetQuality) {
+              bufferQualityIndex = targetQuality;
+            }
+            bufferVideoIndex = getBestTargetVideoIndexForQuality(bufferQualityIndex);
+            console.log("degraded tier is still slow, using optimal-quality fallback");
+          }
+        }
 
         if (bufferVideoIndex !== -1) {
           targetQuality = bufferQualityIndex;
@@ -5709,6 +5767,12 @@
 
     video.addEventListener('timeupdate', function() {
 
+        video.addEventListener('timeupdate', function() {
+          if (!video.paused && !video.ended) {
+            hideVideoFreezeFrame();
+          }
+        });
+
         // if (!searchQueried && !video.paused && inp.value.trim() === "" && !videoInfoOpen) { 
         if (!searchQueried && (!loading && !bufferingDetected && !framesStuck && !seeking && !video.paused && video.buffered.length)) { 
           loadingSpace.style.display = "";
@@ -6218,6 +6282,13 @@
             }, pingsInt);
 
             // measureJitter(pingsCount, 1000);
+            /*
+            video.addEventListener('timeupdate', function() {
+              if (!video.paused && !video.ended) {
+                hideVideoFreezeFrame();
+              }
+            });
+            */
             // measurePacketLoss(pingFileUrl);
           }
 

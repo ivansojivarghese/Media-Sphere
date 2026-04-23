@@ -1266,6 +1266,7 @@
       });
 
       getUserData();
+      setupSearchValidation();
     };
 
     function showPlaylist(ar, el, m) {
@@ -1435,6 +1436,7 @@
     var likedVideos = [];
     var playlistsVideos = [];
     var profileThumbnailValidationAttempts = 0;
+    var searchThumbnailValidationAttempts = 0;
 
     function extractYouTubeVideoId(url) {
       if (!url) return "";
@@ -1546,6 +1548,98 @@
       });
 
       await Promise.all([likedPromise, playlistsPromise]);
+    }
+
+    function clearSearchResults() {
+      thumbnailImages = [];
+      thumbnailURLs = [];
+
+      const searchWrap = document.querySelector(".wrapper.search");
+      if (searchWrap) {
+        searchWrap.querySelectorAll(".result_wrapper").forEach((node) => node.remove());
+      }
+    }
+
+    function refreshSearchResults() {
+      if (!inp || !inp.value.trim()) {
+        console.warn("No search query to refresh");
+        return;
+      }
+
+      clearSearchResults();
+      
+      const queryText = inp.value.trim();
+      searchThumbnailValidationAttempts = 0;
+
+      console.log("Refreshing search results for query:", queryText);
+      
+      // Call searchQuery from request.js with the current search value
+      // This will trigger API fetch and displaySearchResults
+      if (typeof searchQuery !== 'function') {
+        // If searchQuery is not available, warn
+        console.error("searchQuery function not available");
+        return;
+      }
+      
+      searchQuery(queryText);
+    }
+
+    function validateSearchThumbnailIdsAndRefreshIfNeeded() {
+      const searchCards = document.querySelectorAll(".wrapper.search .result_wrapper");
+      if (!searchCards.length) return;
+
+      for (const card of searchCards) {
+        const dataUrl = card.getAttribute("data-url") || "";
+        const expectedId = extractYouTubeVideoId(dataUrl);
+        if (!expectedId) {
+          continue;
+        }
+
+        const thumbnailEl = card.querySelector(".thumbnail");
+        if (!thumbnailEl) {
+          continue;
+        }
+
+        const bgImage = thumbnailEl.style.backgroundImage || "";
+        const thumbId = extractThumbnailVideoIdFromStyle(bgImage);
+        if (!thumbId) {
+          continue;
+        }
+
+        if (thumbId !== expectedId) {
+          if (searchThumbnailValidationAttempts < 1) {
+            searchThumbnailValidationAttempts += 1;
+            console.warn("Search result thumbnail/video mismatch detected. Refreshing search results.", {
+              expectedId,
+              thumbId,
+              dataUrl,
+            });
+            refreshSearchResults();
+          }
+          return;
+        }
+      }
+
+      searchThumbnailValidationAttempts = 0;
+    }
+
+    function setupSearchValidation() {
+      const searchWrapper = document.querySelector(".wrapper.search");
+      if (!searchWrapper) return;
+
+      const observer = new MutationObserver(() => {
+        // Check if result_wrapper elements were added
+        const resultWrappers = searchWrapper.querySelectorAll(".result_wrapper");
+        if (resultWrappers.length > 0) {
+          // Wait for thumbnails to load
+          setTimeout(validateSearchThumbnailIdsAndRefreshIfNeeded, 800);
+        }
+      });
+
+      observer.observe(searchWrapper, {
+        childList: true,
+        subtree: false
+      });
     }
 
     async function getUserData() {

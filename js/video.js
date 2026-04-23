@@ -85,6 +85,11 @@ var targetVideoSources = [];
 var targetVideo = null;
 var targetVideoIndex = 0;
 
+// Resolution fallback tracking
+var resolutionFallbackAttempts = [];
+var currentResolutionAttemptIndex = 0;
+var allResolutionsFailed = false;
+
 const videoQuality = [144, 240, 360, 480, 720, 1080, 1440, 2160, 4320]; // supports up to 8K video (for normal dimensions)
 const videoQualityWidth = [256, 426, 640, 854, 1280, 1920, 2560, 3840, 7680]; // widths for above (for normal dim.)
 var specialVideoQuality = []; 
@@ -799,6 +804,11 @@ function videoReset() {
     targetQuality = 0;
     targetVideoIndex = 0;
     videoStreamScore = 0;
+
+    // Reset resolution fallback tracking
+    resolutionFallbackAttempts = [];
+    currentResolutionAttemptIndex = 0;
+    allResolutionsFailed = false;
 }
 
 // Call Vercel endpoint to fetch search suggestions
@@ -955,7 +965,7 @@ async function getParams(id, time, a, b) {
     // videoInfoElm.main.style.opacity = 0;
 
     let params = new URLSearchParams(document.location.search);
-    var link = params.get("description"); 
+    var link = params.get("link") || params.get("description");
 
     if (localStorage.getItem("mediaURL") !== null && link === null && videoURL === "" && !autoLoad) {
       link = localStorage.getItem("mediaURL");
@@ -1554,6 +1564,100 @@ function getDeviceResolution() {
     width: width,
     height: height
   };
+}
+
+/**
+ * Generates a list of resolution fallback indices to try when playback fails
+ * Tries 2 alternative resolutions: if not at extremes, tries higher and lower
+ * If at highest/lowest, tries 2 lower/higher respectively
+ * @returns {Array} Array of resolution indices to try in order
+ */
+function generateResolutionFallbackList() {
+  const fallbackList = [];
+  const currentIndex = targetQuality;
+  const maxIndex = videoQuality.length - 1;
+  
+  // Add current resolution first (will already be tried, but included for completeness)
+  fallbackList.push(currentIndex);
+  
+  // Determine if we're at the extremes
+  const atLowest = currentIndex === 0;
+  const atHighest = currentIndex === maxIndex;
+  
+  if (!atLowest && !atHighest) {
+    // Normal case: try higher and lower resolutions
+    const higherIndex = Math.min(currentIndex + 1, maxIndex);
+    const lowerIndex = Math.max(currentIndex - 1, 0);
+    fallbackList.push(higherIndex);
+    fallbackList.push(lowerIndex);
+  } else if (atHighest) {
+    // At highest: try 2 lower resolutions
+    const lower1 = Math.max(currentIndex - 1, 0);
+    const lower2 = Math.max(currentIndex - 2, 0);
+    fallbackList.push(lower1);
+    if (lower1 !== lower2) {
+      fallbackList.push(lower2);
+    }
+  } else if (atLowest) {
+    // At lowest: try 2 higher resolutions
+    const higher1 = Math.min(currentIndex + 1, maxIndex);
+    const higher2 = Math.min(currentIndex + 2, maxIndex);
+    fallbackList.push(higher1);
+    if (higher1 !== higher2) {
+      fallbackList.push(higher2);
+    }
+  }
+  
+  return fallbackList;
+}
+
+/**
+ * Attempts to switch to next resolution in fallback chain
+ * @returns {Boolean} true if a new resolution was attempted, false if all resolutions exhausted
+ */
+function tryNextResolutionFallback() {
+  // Initialize fallback list if not already done
+  if (resolutionFallbackAttempts.length === 0) {
+    resolutionFallbackAttempts = generateResolutionFallbackList();
+    currentResolutionAttemptIndex = 1; // Start from second element (first was already tried)
+  } else {
+    currentResolutionAttemptIndex++;
+  }
+  
+  // Check if we have more resolutions to try
+  if (currentResolutionAttemptIndex >= resolutionFallbackAttempts.length) {
+    allResolutionsFailed = true;
+    return false;
+  }
+  
+  // Get the next resolution to try
+  const nextResolutionIndex = resolutionFallbackAttempts[currentResolutionAttemptIndex];
+  targetQuality = nextResolutionIndex;
+  
+  // Reset fail counter for new resolution attempt
+  failTimes = 0;
+  
+  // Get and apply the new video source
+  getOptimalQuality();
+  getVideoFromIndex(false, null, true);
+  
+  if (targetVideo && !audioMode) {
+    // Capture freeze frame before switching
+    if (typeof window.captureVideoFreezeFrame === 'function') {
+      window.captureVideoFreezeFrame();
+    }
+    
+    video.src = targetVideo.url;
+    video.load();
+    
+    // Try to resume playback
+    const currentTime = video.currentTime;
+    video.play().catch((err) => {
+      console.log('Fallback playback attempt:', err);
+    });
+  }
+  
+  return true;
 }
 
 function getOptimalQuality() {
