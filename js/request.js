@@ -70,6 +70,19 @@
       inputError.innerHTML = "";
     }
 
+    function keepInputEndVisible() {
+      if (!inp) {
+        return;
+      }
+
+      const end = inp.value.length;
+
+      requestAnimationFrame(function() {
+        inp.setSelectionRange(end, end);
+        inp.scrollLeft = inp.scrollWidth;
+      });
+    }
+
     function setSuggestionsDisplay(displayValue) {
       if (!videoInfoElm || !videoInfoElm.suggestions) {
         return;
@@ -78,7 +91,8 @@
       videoInfoElm.suggestions.style.display = displayValue;
 
       if (videoInfoElm.results) {
-        videoInfoElm.results.style.opacity = displayValue === "block" ? "0.1" : "";
+        const hasSuggestionItems = videoInfoElm.suggestions.children.length > 0;
+        videoInfoElm.results.style.opacity = (displayValue === "block" && hasSuggestionItems) ? "0.1" : "";
       }
     }
 
@@ -1908,6 +1922,7 @@
     }*/
 
     inp.addEventListener('input', () => {
+      keepInputEndVisible();
       clearBtn.style.display = inp.value ? "" : "none";
 
       if (searchPath === "query") {
@@ -1946,6 +1961,7 @@
     });
 
     inp.addEventListener("input", () => {
+      keepInputEndVisible();
       inpBlock = false;
 
       if (inp.value.trim() === "") {
@@ -1959,3 +1975,7 @@
         // }, 1000);
       }
      });
+
+    inp.addEventListener("focus", function() {
+      keepInputEndVisible();
+    });

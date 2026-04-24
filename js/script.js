@@ -4671,8 +4671,8 @@
 
       // REFER TO GITHUB COPILOT CHAT - STEP 5 FOR FURTHER DETAILS
       
-      // Build feature vector for ML model
-      const featureData = {
+      // Build feature vector inputs for multiple nearby candidate qualities
+      const sharedFeatureData = {
         // Network (6 features - high signal)
         networkSpeed: networkSpeed,
         networkBandwidth: networkBandwidth,
@@ -4723,30 +4723,94 @@
         // autoRes: autoRes
       };
 
+      const candidateQualityIndices = Array.from(new Set([
+        Math.max(0, newTargetQuality - 1),
+        newTargetQuality,
+        Math.min(8, newTargetQuality + 1)
+      ])).filter((qualityIndex) => Number.isFinite(qualityIndex));
+
+      let featureData = sharedFeatureData;
+
       // Ask ML model if switch is safe
       let shouldSwitch = false;
       
       if (window.videoQualityTelemetry && window.qualitySwitchPredictor) {
-        const features = window.videoQualityTelemetry.buildFeatureVector(featureData);
-        const prediction = await window.qualitySwitchPredictor.predictSwitchSuccess(features);
+        const candidatePredictions = [];
 
-        console.log('Quality Switch Prediction:', prediction);
-        
-        if (prediction.usedML) {
-          // shouldSwitch = prediction.shouldSwitch;
-          shouldSwitch = Boolean(prediction.shouldSwitch) && Number(prediction.confidence) >= 0.15;
-          const telemNote = (prediction.reason && prediction.reason.includes('low-confidence')) ? ' | collecting telemetry' : '';
-          console.log(`🧠 ML Model: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)${telemNote}`);
-          /*
-          window.videoQualityTelemetry.completeQualitySwitch({
-            rebuffered: false, 
-            rebufferDuration: 0,
-            droppedFramesAfter: 0
+        for (const candidateQualityIndex of candidateQualityIndices) {
+          const candidateIndex = getVideoFromIndex(true, candidateQualityIndex);
+          const candidateVideo = candidateIndex !== -1 ? targetVideoSources[candidateIndex] : null;
+
+          if (!candidateVideo) {
+            continue;
+          }
+
+          const candidateFeatureData = {
+            ...sharedFeatureData,
+            targetQualityIndex: candidateQualityIndex,
+            targetBitrate: candidateVideo.bitrate,
+            targetResolution: candidateVideo.height,
+            targetVideoIndex: candidateIndex
+          };
+
+          const candidateFeatures = window.videoQualityTelemetry.buildFeatureVector(candidateFeatureData);
+          const candidatePrediction = await window.qualitySwitchPredictor.predictSwitchSuccess(candidateFeatures);
+
+          candidatePredictions.push({
+            qualityIndex: candidateQualityIndex,
+            videoIndex: candidateIndex,
+            bitrate: candidateVideo.bitrate,
+            resolution: candidateVideo.height,
+            label: candidateVideo.qualityLabel || `Q${candidateQualityIndex}`,
+            confidence: Number(candidatePrediction.confidence) || 0,
+            shouldSwitch: Boolean(candidatePrediction.shouldSwitch),
+            usedML: Boolean(candidatePrediction.usedML),
+            reason: candidatePrediction.reason || '',
+            featureData: candidateFeatureData,
+            prediction: candidatePrediction
           });
-          */
+        }
+
+        candidatePredictions.sort((a, b) => b.confidence - a.confidence);
+
+        console.table(candidatePredictions.map((entry) => ({
+          qualityIndex: entry.qualityIndex,
+          label: entry.label,
+          confidencePct: (entry.confidence * 100).toFixed(1),
+          decision: entry.shouldSwitch ? 'SWITCH' : 'STAY',
+          mode: entry.usedML ? 'ML' : 'heuristic',
+          reason: entry.reason
+        })));
+
+        const selectedPrediction = candidatePredictions.find((entry) => entry.qualityIndex === newTargetQuality) || candidatePredictions[0];
+        if (selectedPrediction) {
+          featureData = selectedPrediction.featureData;
+          if (selectedPrediction.usedML) {
+            // shouldSwitch = prediction.shouldSwitch;
+            shouldSwitch = Boolean(selectedPrediction.shouldSwitch) && Number(selectedPrediction.confidence) >= 0.15;
+            const telemNote = (selectedPrediction.reason && selectedPrediction.reason.includes('low-confidence')) ? ' | collecting telemetry' : '';
+            console.log(`🧠 ML Model: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} (confidence: ${(selectedPrediction.confidence * 100).toFixed(1)}%)${telemNote}`);
+
+            if (candidatePredictions.length > 1) {
+              const bestComparison = candidatePredictions[0];
+              if (bestComparison.qualityIndex !== selectedPrediction.qualityIndex) {
+                console.log(`🔎 Best confidence candidate: Q${bestComparison.qualityIndex} (${(bestComparison.confidence * 100).toFixed(1)}%) vs selected Q${selectedPrediction.qualityIndex} (${(selectedPrediction.confidence * 100).toFixed(1)}%)`);
+              }
+            }
+            /*
+            window.videoQualityTelemetry.completeQualitySwitch({
+              rebuffered: false, 
+              rebufferDuration: 0,
+              droppedFramesAfter: 0
+            });
+            */
+          } else {
+            shouldSwitch = selectedPrediction.shouldSwitch;
+            console.log(`📊 Heuristic: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} - ${selectedPrediction.reason || 'checks passed'}`);
+          }
         } else {
-          shouldSwitch = prediction.shouldSwitch;
-          console.log(`📊 Heuristic: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} - ${prediction.reason || 'checks passed'}`);
+          shouldSwitch = false;
+          console.log('📊 No valid candidate predictions were produced.');
         }
       } else {
         // Fallback if predictor not initialized
