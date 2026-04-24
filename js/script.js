@@ -14,6 +14,10 @@
     const track = document.querySelector('track');
     let freezeFrameCanvas = null;
     let freezeFrameCtx = null;
+    let frameGradientCanvas = null;
+    let frameGradientCtx = null;
+    var lastFrameGradientUpdate = 0;
+    var frameGradientIntervalMs = 1200;
 
     // videoSec.disablePictureInPicture = true;
     
@@ -219,6 +223,18 @@
       return freezeFrameCanvas;
     }
 
+    function ensureFrameGradientCanvas() {
+      if (frameGradientCanvas) {
+        return frameGradientCanvas;
+      }
+
+      frameGradientCanvas = document.createElement("canvas");
+      frameGradientCanvas.width = 32;
+      frameGradientCanvas.height = 18;
+      frameGradientCtx = frameGradientCanvas.getContext("2d", { willReadFrequently: true });
+      return frameGradientCanvas;
+    }
+
     function syncVideoFreezeFrameSize() {
       if (!freezeFrameCanvas || !videoContainer) {
         return false;
@@ -268,8 +284,25 @@
         renderHeight = Math.max(1, Math.floor(sourceHeight * scale));
       }
 
-      freezeFrameCanvas.style.width = renderWidth + "px";
-      freezeFrameCanvas.style.height = renderHeight + "px";
+      //freezeFrameCanvas.style.width = renderWidth + "px";
+      //freezeFrameCanvas.style.height = renderHeight + "px";
+
+      // Special handling for videoFitCover
+      if (videoFitCover && !isSideBySide) {
+        freezeFrameCanvas.style.width = "100%";
+        freezeFrameCanvas.style.height = "auto";
+        freezeFrameCanvas.style.transform = ""; // reset
+      } 
+      else if (videoFitCover && isSideBySide) {
+        freezeFrameCanvas.style.setProperty("width", "100%", "important");
+        freezeFrameCanvas.style.height = "auto";
+        freezeFrameCanvas.style.transform = "translate(-25%, -50%)";
+      } 
+      else {
+        freezeFrameCanvas.style.width = renderWidth + "px";
+        freezeFrameCanvas.style.height = renderHeight + "px";
+        freezeFrameCanvas.style.transform = ""; // reset in normal mode
+      }
 
       return true;
     }
@@ -281,7 +314,7 @@
       freezeFrameCanvas.classList.remove("visible");
     }
 
-    function captureVideoFreezeFrame() {
+    function snapshotVideoFrameToFreezeCanvas() {
       if (!video || !video.videoWidth || !video.videoHeight) {
         return false;
       }
@@ -295,11 +328,130 @@
 
       try {
         freezeFrameCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        canvas.classList.add("visible");
         return true;
       } catch (error) {
         return false;
       }
+    }
+
+    function sampleFramePalette() {
+      if (!freezeFrameCanvas || !frameGradientCtx) {
+        return null;
+      }
+
+      try {
+        frameGradientCtx.drawImage(freezeFrameCanvas, 0, 0, frameGradientCanvas.width, frameGradientCanvas.height);
+        var pixels = frameGradientCtx.getImageData(0, 0, frameGradientCanvas.width, frameGradientCanvas.height).data;
+        var buckets = {};
+
+        for (var i = 0; i < pixels.length; i += 4) {
+          var alpha = pixels[i + 3];
+          if (alpha < 180) {
+            continue;
+          }
+
+          var r = pixels[i];
+          var g = pixels[i + 1];
+          var b = pixels[i + 2];
+
+          var luminance = (r * 0.299) + (g * 0.587) + (b * 0.114);
+          if (luminance < 18) {
+            continue;
+          }
+
+          var key = ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4);
+          if (!buckets[key]) {
+            buckets[key] = { count: 0, r: 0, g: 0, b: 0 };
+          }
+
+          buckets[key].count += 1;
+          buckets[key].r += r;
+          buckets[key].g += g;
+          buckets[key].b += b;
+        }
+
+        var topBuckets = Object.values(buckets)
+          .sort(function(a, b) {
+            return b.count - a.count;
+          })
+          .slice(0, 3);
+
+        if (!topBuckets.length) {
+          return null;
+        }
+
+        var palette = topBuckets.map(function(bucket) {
+          return [
+            Math.round(bucket.r / bucket.count),
+            Math.round(bucket.g / bucket.count),
+            Math.round(bucket.b / bucket.count)
+          ];
+        });
+
+        return {
+          primary: palette[0],
+          palette: palette
+        };
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function updateAmbientGradientFromFrame(force) {
+      if (!videoSec || !video || !video.videoWidth || !video.videoHeight || video.readyState < 2) {
+        return false;
+      }
+
+      var now = Date.now();
+      if (!force && (now - lastFrameGradientUpdate) < frameGradientIntervalMs) {
+        return false;
+      }
+      lastFrameGradientUpdate = now;
+
+      ensureFrameGradientCanvas();
+
+      if (!snapshotVideoFrameToFreezeCanvas()) {
+        return false;
+      }
+
+      var sampled = sampleFramePalette();
+      if (!sampled || !sampled.primary || !sampled.palette || !sampled.palette.length) {
+        return false;
+      }
+
+      var output = generateGradientRGB(sampled.primary, sampled.palette);
+      if (!output) {
+        return false;
+      }
+
+      videoSec.style.background = output;
+
+      imagePrimary = sampled.primary;
+      imagePalette = sampled.palette;
+      oldImagePrimary = sampled.primary;
+      oldImagePalette = sampled.palette;
+      imageAmbientChange = false;
+
+      return true;
+    }
+
+    function captureVideoFreezeFrame() {
+      var canvas = ensureFreezeFrameCanvas();
+      if (!canvas) {
+        return false;
+      }
+
+      // 1. Hide first (reset state)
+      // canvas.classList.remove("visible");
+      // 2. Force reflow so browser registers the change
+      // canvas.offsetHeight; 
+
+      if (!snapshotVideoFrameToFreezeCanvas()) {
+        return false;
+      }
+
+      canvas.classList.add("visible");
+      return true;
     }
 
     window.addEventListener("resize", syncVideoFreezeFrameSize);
@@ -604,15 +756,18 @@
       }
     });*/
 
+    let videoFitCover = false;
     fitscreenButton.addEventListener('click', function(event) {
       // event.stopPropagation();
       if (videoControls.classList.contains('visible') && video.src !== "") {
         if (!video.classList.contains("cover")) {
           video.style.objectFit = "cover";
           video.classList.add("cover");
+          videoFitCover = true;
         } else {
           video.style.objectFit = "";
           video.classList.remove("cover");
+          videoFitCover = false;
         }
       }
     });
@@ -795,6 +950,10 @@
     var videoNav = false;
 
     video.addEventListener('play', function () {
+
+      setTimeout(function() {
+        updateAmbientGradientFromFrame(true);
+      }, 120);
 
       videoInfoElm.info.addEventListener("scroll", ch);
 
@@ -2581,7 +2740,9 @@
       video.style.objectFit = "";
       video.classList.remove("cover");
 
-      videoSec.style.background = generateGradientRGB(imagePrimary, imagePalette);
+      if (!updateAmbientGradientFromFrame(true)) {
+        videoSec.style.background = generateGradientRGB(imagePrimary, imagePalette);
+      }
 
       updateSuggestionsList();
 
@@ -2734,6 +2895,10 @@
       }
 
       if (aVcount4 === 30) { // 3 SEC.
+        if (!audioMode && !video.paused && !loading && !bufferLoad && !seekingLoad && !bufferingDetected) {
+          updateAmbientGradientFromFrame(false);
+        }
+
         var output = generateGradientRGB(imagePrimary, imagePalette);
 
         if ((!loading && !bufferLoad && !seekingLoad && !bufferingDetected && !imageAmbientChange) || (imageAmbientChange && output !== 'No colors provided!' && output !== "")) {

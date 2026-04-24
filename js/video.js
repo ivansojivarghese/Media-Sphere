@@ -2165,7 +2165,8 @@ function generateGradientRGB(imagePrimary, imagePalette) {
     .join(', ');
 
   // Construct the CSS linear-gradient value
-  return `linear-gradient(${ori}deg, ${primaryColor}, ${gradientStops})`;
+  // return `linear-gradient(${ori}deg, ${primaryColor}, ${gradientStops})`;
+  return null; // DISABLED GRADIENTS FOR NOW
 }
 
 function generateSimpleGradient(primaryColor) {
