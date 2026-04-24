@@ -4723,11 +4723,7 @@
         // autoRes: autoRes
       };
 
-      const candidateQualityIndices = Array.from(new Set([
-        Math.max(0, newTargetQuality - 1),
-        newTargetQuality,
-        Math.min(8, newTargetQuality + 1)
-      ])).filter((qualityIndex) => Number.isFinite(qualityIndex));
+      const candidateQualityIndices = Array.from({ length: 9 }, (_, qualityIndex) => qualityIndex);
 
       let featureData = sharedFeatureData;
 
