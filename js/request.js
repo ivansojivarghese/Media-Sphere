@@ -70,6 +70,18 @@
       inputError.innerHTML = "";
     }
 
+    function setSuggestionsDisplay(displayValue) {
+      if (!videoInfoElm || !videoInfoElm.suggestions) {
+        return;
+      }
+
+      videoInfoElm.suggestions.style.display = displayValue;
+
+      if (videoInfoElm.results) {
+        videoInfoElm.results.style.opacity = displayValue === "block" ? "0.1" : "";
+      }
+    }
+
     function ch() {
           var thumbnails = document.querySelectorAll(".wrapper.info .result_wrapper .thumbnail");
           for (let j = 0; j < Math.min(thumbnails.length, 20); j++) {
@@ -227,7 +239,7 @@
 
       videoInfoElm.info.addEventListener("scroll", ch);
 
-      videoInfoElm.suggestions.style.display = "";
+      setSuggestionsDisplay("");
 
       inpBlock = false;
 
@@ -604,7 +616,7 @@
       videoInfoElm.suggestions.innerHTML = "";
       searchSuggestions = [];
 
-      videoInfoElm.suggestions.style.display = "";
+      setSuggestionsDisplay("");
 
       inpBlock = false;
     }
@@ -1256,7 +1268,7 @@
     
       videoInfoElm.suggestions.innerHTML = "";
       searchSuggestions = [];
-      videoInfoElm.suggestions.style.display = "";
+      setSuggestionsDisplay("");
       inpBlock = false;
     
       if (!s) {

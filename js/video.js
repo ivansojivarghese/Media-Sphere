@@ -646,7 +646,7 @@ videoInfoElm.info.addEventListener("scroll", function() {
   const currentScrollTop = videoInfoElm.info.scrollTop;
   const scrollDiff = Math.abs(currentScrollTop - lastScrollTop);
 
-  videoInfoElm.suggestions.style.display = "none";
+  setSuggestionsDisplay("none");
 
   if (!searchBtnClick) { // prevent when clicked on search button
 
@@ -848,7 +848,7 @@ const updateSuggestionsList = () => {
         videoInfoElm.suggestions.innerHTML = "";
         searchSuggestions = [];
 
-        videoInfoElm.suggestions.style.display = "";
+        setSuggestionsDisplay("");
 
         inpBlock = false;
 
@@ -922,7 +922,7 @@ const updateSuggestionsList = () => {
 
       // if no search queried and no float active in suggestions
 
-      videoInfoElm.suggestions.style.display = "block"; 
+      setSuggestionsDisplay("block"); 
     }
   }, 1000);
 };

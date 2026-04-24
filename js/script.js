@@ -4733,7 +4733,8 @@
         console.log('Quality Switch Prediction:', prediction);
         
         if (prediction.usedML) {
-          shouldSwitch = prediction.shouldSwitch;
+          // shouldSwitch = prediction.shouldSwitch;
+          shouldSwitch = Boolean(prediction.shouldSwitch) && Number(prediction.confidence) >= 0.15;
           const telemNote = (prediction.reason && prediction.reason.includes('low-confidence')) ? ' | collecting telemetry' : '';
           console.log(`🧠 ML Model: ${shouldSwitch ? '✅ SWITCH' : '❌ STAY'} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)${telemNote}`);
           /*
@@ -4757,7 +4758,7 @@
         );
       }
 
-      if (estimatedLoadTime > 1) {
+      if (estimatedLoadTime > 2) {
         // console.warn(`Skipping switch to Q${newTargetQuality} – estimated load time: ${estimatedLoadTime.toFixed(2)}s`);
         // return;
 
@@ -6545,7 +6546,7 @@
       }
 
       if (inp.value.trim() === "") {
-        videoInfoElm.suggestions.style.display = "";
+        setSuggestionsDisplay("");
       } /*else if (!inpBlock && inp.value.trim() !== "") {
         updateSuggestionsList();
         inpBCount++;
