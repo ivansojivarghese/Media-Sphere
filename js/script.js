@@ -760,6 +760,9 @@
     fitscreenButton.addEventListener('click', function(event) {
       // event.stopPropagation();
       if (videoControls.classList.contains('visible') && video.src !== "") {
+
+        syncVideoFreezeFrameSize();
+        
         if (!video.classList.contains("cover")) {
           video.style.objectFit = "cover";
           video.classList.add("cover");
@@ -2372,6 +2375,8 @@
 
       curTab = "info";
 
+      syncVideoFreezeFrameSize();
+
       if (isLandscape()) {
         video.classList.add("side-by-side");
         videoSec.classList.add("side-by-side");
@@ -2454,6 +2459,8 @@
 
       var preTab = "";
       var preScrollPos = videoInfoElm.info.scrollTop;
+
+      syncVideoFreezeFrameSize();
 
       switch (curTab) {
         case "profile":
