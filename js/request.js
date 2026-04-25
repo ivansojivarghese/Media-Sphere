@@ -744,10 +744,12 @@
 
 
     var searchQueried = false;
+    var lastSearch = "";
 
     async function searchQuery(q, d) {
 
       searchQueried = true;
+      lastSearch = q;
 
       const hashtagRegex = /(?<!https?:\/\/[^\s]*)(#[\p{L}\p{N}_.&\-]+)/gu;
 

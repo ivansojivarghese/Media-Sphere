@@ -1561,14 +1561,15 @@
     }
 
     function refreshSearchResults() {
-      if (!inp || !inp.value.trim()) {
+      if ((!inp || !inp.value.trim()) && !lastSearch) {
         console.warn("No search query to refresh");
         return;
       }
 
       clearSearchResults();
       
-      const queryText = inp.value.trim();
+      const queryText = inp.value.trim() || lastSearch;
+      inp.value = queryText;
       searchThumbnailValidationAttempts = 0;
 
       console.log("Refreshing search results for query:", queryText);
