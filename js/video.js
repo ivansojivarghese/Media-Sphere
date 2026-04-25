@@ -1986,6 +1986,10 @@ function getVideoFromIndex(m, q, r) {
         var quality = normalVid ? q + mod : specialQuality;
         fetchedSources[fetchedSources.length] = normalVid ? q + mod : specialQuality;
 
+        if (!fetchedSources.length || specialQuality === -1 || fetchedSources[fetchedSources.length] === -1 || fetchedSources[fetchedSources.length] === -0) {
+          errCount = 31;
+        }
+
         if ((quality) > 0 && !reverse) {
           mod--;
         } else {
@@ -2952,6 +2956,13 @@ function getReadableRemainingTime(url) {
   }
 }
 
+function fullReset() { // for testing only
+  videoReset();
+  resetVideoInfo();
+  video.src = "";
+  audio.src = "";
+}
+
 var isMusic = false; // 
 
 function resetVideoInfo() {
@@ -3009,7 +3020,7 @@ function abstractVideoInfo() {
   videoInfoElm.replay.style.display = "block";
   videoInfoElm.audio.style.display = "block";
   // videoInfoElm.radio.style.display = "block";
-  videoInfoElm.cast.style.display = "block";
+  // videoInfoElm.cast.style.display = "block"; // CAST DISABLED TEMPORARILY
   videoInfoElm.autoResBtn.style.display = "block";
 
   ///////////
@@ -3715,7 +3726,7 @@ if (localStorage.getItem('audioMode') === "true") {
 
 setInterval(() => {
   if (videoInfoElm.gCast.style.display !== "none") {
-    videoInfoElm.cast.style.display = "";
+    // videoInfoElm.cast.style.display = ""; // CAST DISABLED TEMPORARILY
   } else {
     videoInfoElm.cast.style.display = "none";
   }

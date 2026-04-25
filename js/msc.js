@@ -5,6 +5,8 @@ var liveSfr = 0;
 var liveCPU = 0;
 var livePerformance = 0;
 
+let errCount = 0;
+
 let screenLock;
 
 function isScreenLockSupported() {
@@ -56,6 +58,10 @@ function pL() { // site parameters loop
     liveSfr = mean(op.sfra.slice(-1 * (3000))), // get screen refresh rates from last 3 seconds (mean)
     liveCPU = mean(op.pSpda.slice(-5)), // get live CPU usage values (previous 5)
     livePerformance = devicePerformance(liveCPU, liveSfr, op.pCores);
+
+    if (errCount > 30) {
+        reloadFeedback();
+    }
 }
 
 function devicePerformance(p, r, c) { // estimate device performance using parameters
@@ -103,7 +109,10 @@ function devicePerformance(p, r, c) { // estimate device performance using param
 }
 
 function hardReload() {
-    event.stopPropagation();
+    // event.stopPropagation();
+    if (event) {
+        event.stopPropagation();
+    }
 
     if (videoControls.classList.contains('visible')) {
 

@@ -954,6 +954,8 @@
 
     video.addEventListener('play', function () {
 
+      errCount = 0;
+
       setTimeout(function() {
         updateAmbientGradientFromFrame(true);
       }, 120);
@@ -1271,6 +1273,8 @@
     audio.addEventListener('play', function () {
       // if (!networkError) {
 
+          errCount = 0;
+
           videoInfoElm.info.addEventListener("scroll", ch);
 
           if (audioMode) {
@@ -1292,6 +1296,10 @@
                 closeVideoInfo();
               }
               autoInfoClose = false;
+              if (!searchQueried) { // if not query/url searching
+                loadingSpace.style.display = "";
+                videoInfoElm.info.style.overflow = "";
+              }
             } else if (pipEnabled || clickedWithin5Sec) {
               autoInfoClose = false;
 
@@ -3845,6 +3853,8 @@
 
     var seekAllow = true;
 
+    // let errCount = 0;
+
     audio.addEventListener("error", async () => {
       var ntfTitle = "",
           ntfBody = "",
@@ -3857,6 +3867,7 @@
 
         console.error(`Error loading: ${audio}`);
         audioErr = true;
+        errCount++;
 
         // UI
 
@@ -3984,6 +3995,15 @@
 
     });
 
+    function reloadFeedback() {
+        console.log("Playback error!");
+        let updateBtnP = document.getElementById("updateBtnP");
+        updateBtnP.textContent = "playback error";
+        updateBtn.style.backgroundColor = "#A10000";
+        updateBtn.style.display = "block";
+        showVideoControls();
+    }
+
     video.addEventListener("error", async () => {
       var ntfTitle = "",
           ntfBody = "",
@@ -3996,6 +4016,43 @@
 
         console.error(`Error loading: ${video}`);
         videoErr = true;
+        errCount++;
+
+        // hardReload();
+
+        /*
+        let retryCount = 0;
+        const maxRetries = 10;
+        const intervalTime = 1000; // 10 times in 10 sec = every 1 sec
+
+        const retryInterval = setInterval(() => {
+            if (!videoErr) {
+                clearInterval(retryInterval);
+                return;
+            }
+
+            retryCount++;
+
+            console.log(`Retry attempt ${retryCount} for: ${video}`);
+
+            // 👉 your retry logic here
+            // e.g. reload video / reconnect player
+            // loadVideo(video);
+            video.load();
+            video.currentTime = refSeekTime;
+
+            if (retryCount >= maxRetries) {
+                clearInterval(retryInterval);
+
+                console.error(`Failed after ${maxRetries} attempts: ${video}`);
+
+                // 👉 final condition after retries fail
+                // handle failure (fallback, notify user, etc.)
+                hardReload();
+            }
+
+        }, intervalTime);
+        */
 
         // UI
 
@@ -4119,6 +4176,8 @@
             }
 
           }
+
+          // hardReload();
         }
 
       }
