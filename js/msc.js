@@ -6,6 +6,7 @@ var liveCPU = 0;
 var livePerformance = 0;
 
 let errCount = 0;
+let errShow = false;
 
 let screenLock;
 
@@ -41,6 +42,26 @@ function mean(ar) {
     return (res / ar.length);
 }
 
+// Create a safe play function
+function safePlay(mediaElement) {
+  if (!mediaElement.paused) return; // Already playing
+  
+  const playPromise = mediaElement.play();
+  
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      // Playback started successfully
+    }).catch(error => {
+      if (error.name === 'AbortError') {
+         // Safe to ignore: user scrubbed, paused, or network stalled quickly
+         console.warn("Play interrupted by pause or load.");
+      } else {
+         console.error("Play error:", error);
+      }
+    });
+  }
+}
+
 function pL() { // site parameters loop
     if (!op.iPef && op.pSpd && op.sfr && op.pCores) { // capture initial device performance value, to be used as reference
         op.iPef = devicePerformance(op.pSpd, op.sfr, op.pCores);
@@ -59,8 +80,12 @@ function pL() { // site parameters loop
     liveCPU = mean(op.pSpda.slice(-5)), // get live CPU usage values (previous 5)
     livePerformance = devicePerformance(liveCPU, liveSfr, op.pCores);
 
-    if (errCount > 30) {
-        reloadFeedback();
+    if (errCount > 30 || (videoErr && audioErr)) {
+        reloadFeedback(true);
+        errorShow = true;
+    } else if (!videoErr && !audioErr && !errCount && errorShow) {
+        reloadFeedback(false);
+        errorShow = false;
     }
 }
 

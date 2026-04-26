@@ -896,7 +896,8 @@
               var fileURL = URL.createObjectURL(file)
               video.src = fileURL;
             
-              video.play();
+              // video.play();
+              safePlay(video);
             
               // video.classList.remove("error");
             

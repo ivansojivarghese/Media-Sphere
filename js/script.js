@@ -722,7 +722,8 @@
             }
           } else {
             if (audio.paused) {
-              audio.play();
+              // audio.play();
+              safePlay(audio);
             } else {
               audio.pause();
             }
@@ -1311,7 +1312,8 @@
           }
 
           if (!loading && !bufferLoad && !seekingLoad && !bufferingDetected) {
-            video.play();
+            // video.play();
+            safePlay(video);
           }
 
           audioErr = false;
@@ -1378,7 +1380,8 @@
           if (videoLoop) {
             if (backgroundPlay) {
               audio.currentTime = 0;
-              audio.play();
+              // audio.play();
+              safePlay(audio);
             } else {
               video.currentTime = 0;
               audio.currentTime = 0;
@@ -1442,7 +1445,8 @@
       if (videoLoop) {
         if (backgroundPlay) {
           audio.currentTime = 0;
-          audio.play();
+          // audio.play();
+          safePlay(audio);
         } else {
           video.currentTime = 0;
           audio.currentTime = 0;
@@ -1701,7 +1705,8 @@
           video.currentTime = newTime;
           audio.currentTime = newTime;
 
-          video.play();
+          // video.play();
+          safePlay(video);
         }
       }
     });
@@ -1735,7 +1740,8 @@
           video.currentTime = newTime;
           audio.currentTime = newTime;
 
-          video.play();
+          // video.play();
+          safePlay(video);
         }
       }
     });
@@ -1768,7 +1774,8 @@
           video.currentTime = newTime;
           audio.currentTime = newTime;
 
-          video.play();
+          // video.play();
+          safePlay(video);
         }
       }
     }
@@ -2961,7 +2968,8 @@
         }
 
         if ((peekForward && pipEnabled && video.paused && !audio.paused && video.buffered.length) || (pipEnabled && video.paused && audio.paused && video.buffered.length && audio.buffered.length && (loading || bufferLoad || seekingLoad || bufferingDetected))) {
-          video.play();
+          // video.play();
+          safePlay(video);
           // videoSec.play();
         } else if (video.paused && !audio.paused && audioStalled && video.buffered.length && !backgroundPlay) {
           audio.load();
@@ -3150,7 +3158,8 @@
           console.log("audioVideoAlign: paused");
 
           if ((qualityBestChange || qualityChange) && audio.paused && !seekingLoad && !longTap && !queueOpen && !seeking) {
-            audio.play();
+            // audio.play();
+            safePlay(audio);
             hideVideoControls();
             console.log("hideVC");
           }
@@ -3626,8 +3635,9 @@
             var buffered = video.buffered;
             if (buffered.length > 0 && video.paused && !userPaused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
               console.log("play", seeking, seekingLoad);
-              video.play();
+              // video.play();
               // videoSec.play();
+              safePlay(video);
               clearInterval(resumeInterval);
               resumeInterval = null;
             }
@@ -3773,9 +3783,11 @@
               console.log("play");
               // video.play();
               if (backgroundPlay) {
-                audio.play();
+                // audio.play();
+                safePlay(audio);
               } else {
-                video.play();
+                // video.play();
+                safePlay(video);
                 // videoSec.play();
               }
             } else if (autoLoad) {
@@ -3797,7 +3809,8 @@
                   var buffered = video.buffered;
                   if (buffered.length > 0 && video.paused && !userPaused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
                     console.log("play", seeking, seekingLoad);
-                    video.play();
+                    // video.play();
+                    safePlay(video);
                     // videoSec.play();
                     clearInterval(resumeInterval);
                     resumeInterval = null;
@@ -3816,9 +3829,11 @@
             console.log("play");
             // video.play();
             if (backgroundPlay) {
-              audio.play();
+              // audio.play();
+              safePlay(audio);
             } else if (!backgroundPlayManual) {
-              video.play();
+              // video.play();
+              safePlay(video);
               // videoSec.play();
             }
           } else if (autoLoad) {
@@ -3995,13 +4010,52 @@
 
     });
 
-    function reloadFeedback() {
+    function reloadFeedback(s) {
+      if (s) {
         console.log("Playback error!");
         let updateBtnP = document.getElementById("updateBtnP");
         updateBtnP.textContent = "playback error";
         updateBtn.style.backgroundColor = "#A10000";
         updateBtn.style.display = "block";
         showVideoControls();
+
+        loadingSpace.style.display = "none";
+
+        // show notification
+        if (pms.ntf) {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(registration => {
+              registration.showNotification("Playback Error", {
+                body: "An error occurred during playback. Please try again.",
+                badge: "../play_maskable_monochrome_409.png",
+                icon: "../png/error.png",
+                tag: "playbackError",
+                requireInteraction: false, // Dismiss after default timeout
+                data : {
+                  url :  ""
+                }
+              });
+            });
+          } else {
+            const notification = new Notification("Playback Error", {
+              body: "An error occurred during playback. Please try again.",
+              badge: "../play_maskable_monochrome_409.png",
+              icon: "../png/error.png",
+              tag: "playbackError",
+              requireInteraction: false, // Dismiss after default timeout
+              data : {
+                url :  ""
+              }
+            });
+          }
+        }
+      } else {
+        console.log("Playback error resolved.");
+        let updateBtnP = document.getElementById("updateBtnP");
+        updateBtnP.textContent = "update available";
+        updateBtn.style.backgroundColor = "";
+        updateBtn.style.display = "";
+      }
     }
 
     video.addEventListener("error", async () => {
@@ -5421,7 +5475,8 @@
         estimateNetworkSpeed();
       }
 
-      audio.play();
+      // audio.play();
+      safePlay(audio);
 
       // if (videoPlay && audio.src) {
 
@@ -5672,7 +5727,8 @@
                 clearInterval(checkAudioReady);
                 checkAudioReady = null;
                 // Trigger your play or any other logic
-                audio.play();
+                // audio.play();
+                safePlay(audio);
             }
         }, 100);
       }
@@ -5725,11 +5781,14 @@
               // video.play();
               // audio.play();
               if (backgroundPlay) {
-                audio.play();
+                // audio.play();
+                safePlay(audio);
               } else if (!backgroundPlayManual) {
-                video.play();
+                // video.play();
+                safePlay(video);
                 // videoSec.play();
-                audio.play();
+                // audio.play();
+                safePlay(audio);
               }
             }
           } else {
@@ -5836,12 +5895,15 @@
                     video.play().then(function() {
                       // videoSec.play();
                       if (audio.src) {
-                        audio.play();
+                        // audio.play();
+                        safePlay(audio);
 
                         setInterval(function() {
                           // console.log("video: " + video.currentTime + ", audio: " + audio.currentTime + ", difference: " + (video.currentTime - audio.currentTime));
                         }, 100);
                       }
+                    }).catch((err) => {
+                      console.log(err);
                     });
                   }  
 
@@ -5944,9 +6006,11 @@
               console.log("play");
               // video.play();
               if (backgroundPlay) {
-                audio.play();
+                // audio.play();
+                safePlay(audio);
               } else {
-                video.play();
+                // video.play();
+                safePlay(video);
                 // videoSec.play();
               }
             } else if (autoLoad) {
@@ -5968,7 +6032,8 @@
                   var buffered = video.buffered;
                   if (buffered.length > 0 && video.paused && !userPaused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
                     console.log("play", seeking, seekingLoad);
-                    video.play();
+                    // video.play();
+                    safePlay(video);
                     // videoSec.play();
                     clearInterval(resumeInterval);
                     resumeInterval = null;
@@ -5984,9 +6049,11 @@
             console.log("play");
             // video.play();
             if (backgroundPlay) {
-              audio.play();
+              // audio.play();
+              safePlay(audio);
             } else {
-              video.play();
+              // video.play();
+              safePlay(video);
               // videoSec.play();
             }
           } else if (autoLoad) {
@@ -6008,7 +6075,8 @@
                 var buffered = video.buffered;
                 if (buffered.length > 0 && video.paused && !userPaused && !autoLoad && bufferLoad && (!videoEnd || (videoEnd && (video.currentTime < (video.duration - maxVideoLoad)))) && !initialVideoLoad && !qualityBestChange && !qualityChange && !seekingLoad) {
                   console.log("play", seeking, seekingLoad);
-                  video.play();
+                  // video.play();
+                  safePlay(video);
                   // videoSec.play();
                   clearInterval(resumeInterval);
                   resumeInterval = null;
@@ -6179,7 +6247,8 @@
       }
 
       if (video.paused && video.buffered.length && bufferLoad) {
-        video.play();
+        // video.play();
+        safePlay(video);
       }
 
       if ((audio.currentTime > (audio.duration - 30)) && (audio.currentTime < (audio.duration - 5)) && radioLoop && !videoLoop && backgroundPlay && !readyForNext) {
@@ -6488,7 +6557,8 @@
 
           if (!audioMode && audio.buffered.length && (!videoEnd /*|| (videoEnd && (audio.currentTime < (audio.duration - maxVideoLoad)))*/) && audio.readyState > 2 && !initialVideoLoad && (bufferLoad || loading || seekingLoad || bufferingDetected)) {
             console.log("audio_play in background");
-            audio.play();
+            // audio.play();
+            safePlay(audio);
           }
 
           // clear intervals
@@ -6718,7 +6788,8 @@
         clearInterval(checkAudioReady);
         checkAudioReady = null;
 
-        audio.play();
+        // audio.play();
+        safePlay(audio);
       }
 
     });
@@ -6763,7 +6834,8 @@
               clearInterval(checkAudioReady);
               checkAudioReady = null;
               // Trigger your play or any other logic
-              audio.play();
+              // audio.play();
+              safePlay(audio);
           }
         }, 100);
       } else if (checkAudioReady) {
@@ -6804,7 +6876,8 @@
       if (videoLoop) {
         if (backgroundPlay && audio.currentTime === audio.duration) {
           audio.currentTime = 0;
-          audio.play();
+          // audio.play();
+          safePlay(audio);
         } else if ((video.currentTime === video.duration) || (audio.currentTime === audio.duration && audioMode)) {
           video.currentTime = 0;
           audio.currentTime = 0;
