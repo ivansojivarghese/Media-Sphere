@@ -149,8 +149,12 @@
     var bufferMode = false;
     var bufferAllow = true;
     var bufferLoad = false;
-
+    /*
     var bufferLimits = [100, 100, 1000]; // ms. limits for buffering [successive 3 times, single time]
+    var bufferLimitC = 3;
+    */
+
+    var bufferLimits = [100, 250, 1000];
     var bufferLimitC = 3;
 
     var bufferStartTime = 0;
@@ -4655,6 +4659,19 @@
             var currentTime = new Date().getTime();
             if (bufferStartTime !== 0) {
               var elapsedTime = currentTime - bufferStartTime;
+              /*
+              if (elapsedTime > 250 && !bufferModeExe) {
+                console.log("early buffer trigger");
+                getVideoFromBuffer();
+                return;
+              }
+
+              if (framesStuck && !bufferModeExe) {
+                console.log("frames stuck → downgrade");
+                getVideoFromBuffer();
+                return;
+              }*/
+
               liveBufferVal[liveBufferIndex] = elapsedTime;
               if (elapsedTime >= bufferLimits[0] && !bufferModeExe) {
                 bufferCount++;
@@ -4710,8 +4727,44 @@
       console.log("tQ : " + targetQuality + ", degrading by 1");
 
       if ((video.currentTime > minVideoLoad && (video.currentTime < (video.duration - maxVideoLoad))) && autoRes && autoResInt) {
+        /*
+        var drop = 1;
+        if (liveBufferVal[liveBufferIndex] > 500) {
+          drop = 2; // big stall → drop faster
+        }
+        var bufferQualityIndex = Math.max(0, targetQuality - drop);
+        */
 
         var bufferQualityIndex = Math.max(0, targetQuality - 1);
+        
+        ///
+        //if (bufferQualityIndex === 0) {
+        /*
+          console.log("At lowest quality, testing upward fallback");
+
+          let triedUp = false;
+
+          for (let i = bufferQualityIndex + 1; i < targetVideoSources.length; i++) {
+            let idx = getBestTargetVideoIndexForQuality(i);
+            if (idx !== -1) {
+              let v = targetVideoSources[idx];
+
+              if ((v.bitrate * 1.2) < networkSpeed * 10000) {
+                bufferQualityIndex = i;
+                console.log("Switched UP to", v.qualityLabel);
+                triedUp = true;
+                break;
+              }
+            }
+          }
+
+          if (!triedUp) {
+            console.log("No better option → staying low + waiting buffer");
+          }
+            */
+        //}
+        ///
+
         var bufferVideoIndex = getBestTargetVideoIndexForQuality(bufferQualityIndex);
 
         if (bufferVideoIndex !== -1 && networkSpeed > 0) {
@@ -4780,6 +4833,7 @@
           setTimeout(function() {
             autoResInt = true;
           }, 30000);
+          // }, 30000);
 
           if ('serviceWorker' in navigator) {
             navigator.serviceWorker.ready.then((registration) => {

@@ -852,6 +852,9 @@
             // INPUT ERROR
 
             showInputErrorFeedback("No results found. Try again.");
+
+            loadingSpace.style.display = "none";
+            videoInfoElm.info.style.overflow = "";
           } else {
             
             // if (d) {

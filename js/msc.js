@@ -82,10 +82,10 @@ function pL() { // site parameters loop
 
     if (errCount > 30 || (videoErr && audioErr)) {
         reloadFeedback(true);
-        errorShow = true;
-    } else if (!videoErr && !audioErr && !errCount && errorShow) {
+        errShow = true;
+    } else if (!videoErr && !audioErr && !errCount && errShow) {
         reloadFeedback(false);
-        errorShow = false;
+        errShow = false;
     }
 }
 
