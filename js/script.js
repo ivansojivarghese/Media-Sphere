@@ -957,9 +957,19 @@
 
     var videoNav = false;
 
+    var errCountResetTimeout = null;
+
     video.addEventListener('play', function () {
 
-      errCount = 0;
+      if (errCountResetTimeout !== null) {
+        clearTimeout(errCountResetTimeout);
+        errCountResetTimeout = null;
+      }
+      errCountResetTimeout = setTimeout(function() {
+        errCount = 0;
+        errCountResetTimeout = null;
+      }, 3000);
+      // errCount = 0;
 
       setTimeout(function() {
         updateAmbientGradientFromFrame(true);
@@ -1278,7 +1288,16 @@
     audio.addEventListener('play', function () {
       // if (!networkError) {
 
-          errCount = 0;
+          if (errCountResetTimeout !== null) {
+            clearTimeout(errCountResetTimeout);
+            errCountResetTimeout = null;
+          }
+          errCountResetTimeout = setTimeout(function() {
+            errCount = 0;
+            errCountResetTimeout = null;
+          }, 3000);
+
+          // errCount = 0;
 
           videoInfoElm.info.addEventListener("scroll", ch);
 

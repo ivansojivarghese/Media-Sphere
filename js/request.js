@@ -965,7 +965,11 @@
             'Accept': 'application/json'
           };
 
-          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;          
+          // Append exclusion terms to avoid Shorts/vertical videos
+          const searchTerms = q + " -shorts -#shorts";
+          const encodedQuery = encodeURIComponent(searchTerms);
+
+          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodedQuery}&regionCode=${countryAPIres.country}${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;          
           fetch(url, { headers })
           .then(response => response.json())
           .then(async data => {
