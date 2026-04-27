@@ -80,7 +80,7 @@ function pL() { // site parameters loop
     liveCPU = mean(op.pSpda.slice(-5)), // get live CPU usage values (previous 5)
     livePerformance = devicePerformance(liveCPU, liveSfr, op.pCores);
 
-    if (errCount > 30 || (videoErr && audioErr)) {
+    if (errCount > 5 || (videoErr && audioErr)) {
         reloadFeedback(true);
         errShow = true;
     } else if (!videoErr && !audioErr && !errCount && errShow) {
@@ -180,9 +180,14 @@ async function checkNewDeployment() {
             const latestDeployment = data.deployments[0];
             if (!lastDeployment) {
                 lastDeployment = latestDeployment.uid;
+                localStorage.setItem("deploymentID", lastDeployment);
+                window.dispatchEvent(new CustomEvent("deploymentid-updated", { detail: lastDeployment }));
                 return;
             }
             if (latestDeployment.uid !== lastDeployment) {
+                lastDeployment = latestDeployment.uid;
+                localStorage.setItem("deploymentID", lastDeployment);
+                window.dispatchEvent(new CustomEvent("deploymentid-updated", { detail: lastDeployment }));
                 console.log("New deployment detected!");
                 // window.location.reload(); // Reload to get the latest version
                 updateBtn.style.display = "block";

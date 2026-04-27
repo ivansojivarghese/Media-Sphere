@@ -4283,6 +4283,8 @@
         video.load();
         video.currentTime = refSeekTime;
         // videoSec.currentTime = refSeekTime;
+
+        errCount++;
       }
     });
     
@@ -4482,6 +4484,8 @@
         console.log("audiostalled");
         video.pause();
         // videoSec.pause();
+
+        errCount++;
 
         audioStalled = true;
       }

@@ -798,6 +798,11 @@
               </div>
               <div class="results"></div>
               <div class="keywords"></div>
+              <div class="tech">
+                <p class="userName"></p>
+                <p class="userEmail"></p>
+                <p class="deploymentID"></p>
+              </div>
             </div>
           </div>
         </div>
@@ -1266,6 +1271,7 @@
         redirect_uri: 'https://media-sphere.vercel.app/api/auth/callback',
       });
 
+      updateTechMetadata();
       getUserData();
       setupSearchValidation();
     };
@@ -1438,6 +1444,29 @@
     var playlistsVideos = [];
     var profileThumbnailValidationAttempts = 0;
     var searchThumbnailValidationAttempts = 0;
+
+    function setTechFieldText(selector, label, value) {
+      const el = document.querySelector(selector);
+      if (!el) return;
+
+      const safeValue = (value || "").toString().trim();
+      el.textContent = label + (safeValue || "");
+    }
+
+    function updateTechMetadata(deploymentIdOverride) {
+      const deploymentId =
+        deploymentIdOverride ||
+        localStorage.getItem("deploymentID") ||
+        (typeof lastDeployment !== "undefined" && lastDeployment ? lastDeployment : "");
+
+      setTechFieldText(".tech .userName", "", localStorage.getItem("name"));
+      setTechFieldText(".tech .userEmail", "", localStorage.getItem("email"));
+      setTechFieldText(".tech .deploymentID", "", deploymentId);
+    }
+
+    window.addEventListener("deploymentid-updated", function(event) {
+      updateTechMetadata(event && event.detail ? event.detail : "");
+    });
 
     function extractYouTubeVideoId(url) {
       if (!url) return "";
@@ -1689,6 +1718,8 @@
           profileYouTubeData = youtube;
         }
 
+        updateTechMetadata();
+
         if (Date.now() >= expiryTime) {
           
           await refreshAccessToken();
@@ -1726,6 +1757,8 @@
 
       } else {
         console.error('Missing token or data');
+
+        updateTechMetadata();
 
         showSignInModal(() => {
           client.requestCode();

@@ -1987,7 +1987,7 @@ function getVideoFromIndex(m, q, r) {
         fetchedSources[fetchedSources.length] = normalVid ? q + mod : specialQuality;
 
         if (!fetchedSources.length || specialQuality === -1 || fetchedSources[fetchedSources.length] === -1 || fetchedSources[fetchedSources.length] === -0) {
-          errCount = 31;
+          errCount = 6;
         }
 
         if ((quality) > 0 && !reverse) {
