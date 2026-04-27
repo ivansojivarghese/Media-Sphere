@@ -76,6 +76,22 @@
       }
 
       const end = inp.value.length;
+      const cursorPos = inp.selectionStart;
+
+      requestAnimationFrame(function() {
+        inp.scrollLeft = inp.scrollWidth;
+        if (cursorPos === end) {
+          inp.setSelectionRange(end, end);
+        }
+      });
+    }
+
+    function moveInputCursorToEnd() {
+      if (!inp) {
+        return;
+      }
+
+      const end = inp.value.length;
 
       requestAnimationFrame(function() {
         inp.setSelectionRange(end, end);
@@ -725,6 +741,213 @@
                         [m, String(s).padStart(2, '0')];
       return parts.join(':');
     }
+
+    const MAX_SEMANTIC_CACHE_ENTRIES = 100;
+    const semanticRerankCache = new Map();
+    const semanticDurationCache = new Map();
+    const FAST_STOP_WORDS = new Set([
+      "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "how", "in",
+      "is", "it", "of", "on", "or", "that", "the", "this", "to", "was", "what", "when",
+      "where", "who", "will", "with", "you", "your"
+    ]);
+    const LIGHT_DURATION_LONG_HINTS = new Set([
+      "full", "documentary", "podcast", "interview", "lecture", "course", "walkthrough",
+      "livestream", "stream", "analysis", "deep", "complete", "hour", "hours"
+    ]);
+    const LIGHT_DURATION_MEDIUM_HINTS = new Set([
+      "review", "highlights", "highlight", "recap", "trailer", "news", "update", "explained",
+      "guide", "tour", "vlog", "top", "best", "tips", "preview"
+    ]);
+
+    function setTinyCache(map, key, value) {
+      if (map.has(key)) {
+        map.delete(key);
+      }
+      map.set(key, value);
+      if (map.size > MAX_SEMANTIC_CACHE_ENTRIES) {
+        const oldestKey = map.keys().next().value;
+        map.delete(oldestKey);
+      }
+    }
+
+    function getResultStableId(item) {
+      if (!item) {
+        return "";
+      }
+      if (item.type === "video" && item.videoId) {
+        return `v:${item.videoId}`;
+      }
+      if (item.type === "playlist" && item.playlistId) {
+        return `p:${item.playlistId}`;
+      }
+      if (item.videoId) {
+        return `v:${item.videoId}`;
+      }
+      if (item.playlistId) {
+        return `p:${item.playlistId}`;
+      }
+      return `t:${(item.title || "").slice(0, 120)}`;
+    }
+
+    function buildSemanticText(item) {
+      const title = item && item.title ? item.title : "";
+      const channel = item && item.channelTitle ? item.channelTitle : "";
+      const description = item && item.snippet && item.snippet.description ? item.snippet.description : "";
+      return `${title} ${channel} ${description}`.trim();
+    }
+
+    function tokenizeSemanticText(text) {
+      return (text || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, " ")
+        .split(/\s+/)
+        .filter(token => token.length > 1 && !FAST_STOP_WORDS.has(token));
+    }
+
+    function chooseDurationLightweight(query) {
+      const queryKey = (query || "").trim().toLowerCase();
+      if (!queryKey) {
+        return "&videoDuration=medium";
+      }
+
+      const durationCacheKey = `light-duration||${queryKey}`;
+      if (semanticDurationCache.has(durationCacheKey)) {
+        return semanticDurationCache.get(durationCacheKey);
+      }
+
+      const tokens = tokenizeSemanticText(queryKey);
+      let longScore = 0;
+      let mediumScore = 0;
+
+      tokens.forEach(token => {
+        if (LIGHT_DURATION_LONG_HINTS.has(token)) {
+          longScore += 1;
+        }
+        if (LIGHT_DURATION_MEDIUM_HINTS.has(token)) {
+          mediumScore += 1;
+        }
+      });
+
+      if (/\b\d+\s?(h|hr|hrs|hour|hours)\b/.test(queryKey)) {
+        longScore += 2;
+      }
+      if (/\b(full\s?(movie|episode|interview|podcast|documentary))\b/.test(queryKey)) {
+        longScore += 2;
+      }
+
+      let selected = "&videoDuration=medium";
+      if (longScore >= mediumScore + 1) {
+        selected = "&videoDuration=long";
+      }
+
+      setTinyCache(semanticDurationCache, durationCacheKey, selected);
+      return selected;
+    }
+
+    function rerankResultsLightweight(query, results) {
+      const queryTokens = Array.from(new Set(tokenizeSemanticText(query)));
+      if (!queryTokens.length) {
+        return results;
+      }
+
+      const docTokenSets = [];
+      const titleTokenSets = [];
+      const docFrequency = new Map();
+
+      results.forEach(item => {
+        const docTokens = Array.from(new Set(tokenizeSemanticText(buildSemanticText(item))));
+        const titleTokens = new Set(tokenizeSemanticText(item && item.title ? item.title : ""));
+        const docSet = new Set(docTokens);
+
+        docTokenSets.push(docSet);
+        titleTokenSets.push(titleTokens);
+
+        docTokens.forEach(token => {
+          docFrequency.set(token, (docFrequency.get(token) || 0) + 1);
+        });
+      });
+
+      const docCount = Math.max(1, results.length);
+      const scored = results.map((item, index) => {
+        const docSet = docTokenSets[index];
+        const titleSet = titleTokenSets[index];
+        let score = 0;
+
+        queryTokens.forEach(token => {
+          if (!docSet.has(token)) {
+            return;
+          }
+
+          const df = docFrequency.get(token) || 1;
+          const idf = Math.log(1 + (docCount / df));
+          const titleBoost = titleSet.has(token) ? 1.5 : 1.0;
+          score += idf * titleBoost;
+        });
+
+        const titleLower = (item && item.title ? item.title : "").toLowerCase();
+        const queryLower = (query || "").toLowerCase().trim();
+        if (queryLower && titleLower.includes(queryLower)) {
+          score += 2.0;
+        }
+
+        return { item, score };
+      });
+
+      scored.sort((a, b) => b.score - a.score);
+      return scored.map(entry => entry.item);
+    }
+
+    async function rerankResultsByLiveSemantics(query, results) {
+      if (!Array.isArray(results) || results.length < 2) {
+        return results;
+      }
+
+      const queryKey = (query || "").trim().toLowerCase();
+      const resultIds = results.map(getResultStableId);
+      const rerankCacheKey = `${queryKey}||${resultIds.join(",")}`;
+      const cachedOrder = semanticRerankCache.get(rerankCacheKey);
+      if (cachedOrder && Array.isArray(cachedOrder) && cachedOrder.length) {
+        const orderIndex = new Map(cachedOrder.map((id, idx) => [id, idx]));
+        return [...results].sort((a, b) => {
+          const ai = orderIndex.has(getResultStableId(a)) ? orderIndex.get(getResultStableId(a)) : Number.MAX_SAFE_INTEGER;
+          const bi = orderIndex.has(getResultStableId(b)) ? orderIndex.get(getResultStableId(b)) : Number.MAX_SAFE_INTEGER;
+          return ai - bi;
+        });
+      }
+
+      const ordered = rerankResultsLightweight(query, results);
+      setTinyCache(semanticRerankCache, rerankCacheKey, ordered.map(getResultStableId));
+      return ordered;
+    }
+
+    async function fetchSearchCandidates(query, durationParam, type, sort, headers) {
+      // const searchTerms = query + " -shorts -#shorts";
+      const searchTerms = query;
+      const encodedQuery = encodeURIComponent(searchTerms);
+      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodedQuery}&regionCode=${countryAPIres.country}${durationParam}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
+
+      const response = headers ? await fetch(url, { headers }) : await fetch(url);
+      const data = await response.json();
+
+      const videoIds = [];
+      const playlistIds = [];
+
+      if (Array.isArray(data.items)) {
+        data.items.forEach(item => {
+          if (item.id.kind === 'youtube#video') {
+            videoIds.push(item.id.videoId);
+          } else if (item.id.kind === 'youtube#playlist') {
+            playlistIds.push(item.id.playlistId);
+          }
+        });
+      }
+
+      const results = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+      return {
+        data,
+        results
+      };
+    }
 /*
     function timeAgo(date) {
       const seconds = Math.floor((new Date() - date) / 1000);
@@ -933,7 +1156,7 @@
           }
         };*/
 
-        var url, headers, type, sort, duration;
+        var headers, type, sort;
         const accessToken = localStorage.getItem("access_token");
         if (queryType.value) {
           type = '&type=' + queryType.value;
@@ -946,17 +1169,7 @@
         } else {
           sort = '';
         }
-        /*
-        if (!d) {
-          duration = '&videoDuration=medium';
-        } else {
-          duration = '&videoDuration=long';
-          // and 'long'
-        }*/
-        duration = '';
-
-        const videoIds = [];
-        const playlistIds = [];
+        const liveSemanticDurationProbe = chooseDurationLightweight(q);
       
         if (accessToken) { // with user personalization
 
@@ -964,78 +1177,30 @@
             'Authorization': `Bearer ${accessToken}`,
             'Accept': 'application/json'
           };
+          try {
+            const probe = await fetchSearchCandidates(q, liveSemanticDurationProbe, type, sort, headers);
+            searchResults = probe.results;
 
-          // Append exclusion terms to avoid Shorts/vertical videos
-          const searchTerms = q + " -shorts -#shorts";
-          const encodedQuery = encodeURIComponent(searchTerms);
-
-          url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodedQuery}&regionCode=${countryAPIres.country}${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;          
-          fetch(url, { headers })
-          .then(response => response.json())
-          .then(async data => {
-            // console.log(data.items);
-
-            data.items.forEach(item => {
-              if (item.id.kind === 'youtube#video') {
-                videoIds.push(item.id.videoId);
-              } else if (item.id.kind === 'youtube#playlist') {
-                playlistIds.push(item.id.playlistId);
-              }
-            });
-
-            // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
-
-            /*
-            if (!d) {
-              searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
-              console.log(searchResults);
-            } else {
-              const tempResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
-              // console.log(tempResults);
-              // Combine both arrays
-              searchResults = [...searchResults, ...tempResults];
-
-              // Shuffle the combined array (Fisher–Yates shuffle)
-              for (let i = searchResults.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [searchResults[i], searchResults[j]] = [searchResults[j], searchResults[i]];
-              }
-
-              console.log(searchResults);
-            }
-              */
-
-            searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
+            searchResults = await rerankResultsByLiveSemantics(q, searchResults);
 
             hideInputErrorFeedback();
 
             console.log(searchResults);
 
             if (!searchResults.length) {
-            
+
               // INPUT ERROR
 
               showInputErrorFeedback("No results found. Try again.");
             } else {
-              
-              // if (d) {
-                displaySearchResults(true, null, "div.wrapper.search ");
 
-                loadingSpace.style.display = "none";
-                videoInfoElm.info.style.overflow = "";
-              // }
+              displaySearchResults(true, null, "div.wrapper.search ");
 
-              // perform search for longer videos
-              /*
-              if (!d) {
-                searchQuery(q, true);
-              }*/
+              loadingSpace.style.display = "none";
+              videoInfoElm.info.style.overflow = "";
             }
 
-            
-
-          })
-          .catch((error) => {
+          } catch (error) {
             console.error('Error:', error);
 
             loadingSpace.style.display = "none";
@@ -1046,77 +1211,31 @@
             showInputErrorFeedback("Something went wrong. Try again.");
 
             searchQueried = false;
-          });
+          }
 
         } else { // without user personalization
-          url =  `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&regionCode=${countryAPIres.country}${duration}&relevanceLanguage=en${type}${sort}&key=${API_KEY}&maxResults=${maxQuery}`;
-          fetch(url)
-          .then(response => response.json())
-          .then(async data => {
+          try {
+            const probe = await fetchSearchCandidates(q, liveSemanticDurationProbe, type, sort, null);
+            searchResults = probe.results;
 
-            /*
-            data.items.forEach(item => {
-              console.log({
-                title: item.snippet.title,
-                videoId: item.id.videoId,
-                thumbnail: item.snippet.thumbnails.default.url
-              });
-            });*/
-
-            data.items.forEach(item => {
-              if (item.id.kind === 'youtube#video') {
-                videoIds.push(item.id.videoId);
-              } else if (item.id.kind === 'youtube#playlist') {
-                playlistIds.push(item.id.playlistId);
-              }
-            });
-
-            // console.log(fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data));
-
-            if (!d) {
-              searchResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
-              console.log(searchResults);
-            } else {
-              const tempResults = await fetchYouTubeVideosAndPlaylists(videoIds, playlistIds, headers, data);
-              // console.log(tempResults);
-              // Combine both arrays
-              searchResults = [...searchResults, ...tempResults];
-
-              // Shuffle the combined array (Fisher–Yates shuffle)
-              for (let i = searchResults.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [searchResults[i], searchResults[j]] = [searchResults[j], searchResults[i]];
-              }
-
-              console.log(searchResults);
-            }
+            searchResults = await rerankResultsByLiveSemantics(q, searchResults);
 
             hideInputErrorFeedback();
 
             if (!searchResults.length) {
-            
+
               // INPUT ERROR
 
               showInputErrorFeedback("No results found. Try again.");
             } else {
-              
-              if (d) {
-                displaySearchResults(true, null, "div.wrapper.search ");
 
-                loadingSpace.style.display = "none";
-                videoInfoElm.info.style.overflow = "";
-              }
+              displaySearchResults(true, null, "div.wrapper.search ");
 
-              // perform search for longer videos
-              if (!d) {
-                searchQuery(q, true);
-              }
+              loadingSpace.style.display = "none";
+              videoInfoElm.info.style.overflow = "";
             }
 
-            
-
-          })
-          .catch((error) => {
+          } catch (error) {
             console.error('Error:', error);
 
             loadingSpace.style.display = "none";
@@ -1127,7 +1246,7 @@
             showInputErrorFeedback("Something went wrong. Try again.");
 
             searchQueried = false;
-          });
+          }
         }
 
         /*
@@ -1986,5 +2105,6 @@
      });
 
     inp.addEventListener("focus", function() {
-      keepInputEndVisible();
+      moveInputCursorToEnd();
+      updateSuggestionsVisibility();
     });
