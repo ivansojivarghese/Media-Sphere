@@ -401,6 +401,17 @@ div.themes div.keywordsBtn:last-child {
     margin-right: 3rem;
 }
 
+@media screen and (min-width: 1200px) and (orientation: landscape), screen and (min-height: 800px) and (orientation: landscape) {
+    div.themes {
+        flex-direction: column;
+    }
+
+    div.themes div.keywordsBtn {
+        margin-left: 2rem;
+        width: fit-content;
+    }
+}
+
 .tech {
     margin-bottom: 1rem;
 }
