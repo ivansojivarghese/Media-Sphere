@@ -1,0 +1,9 @@
+{
+  "name": "media-sphere",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "groq-sdk": "1.1.2"
+  }
+}

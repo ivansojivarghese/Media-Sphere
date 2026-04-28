@@ -3198,7 +3198,7 @@ function abstractVideoInfo() {
     videoInfoElm.otherRes.appendChild(d);
   }
 
-  var keywordsBtn = document.querySelectorAll(".keywordsBtn");
+  var keywordsBtn = videoInfoElm.keywords.querySelectorAll(".keywordsBtn");
   if (keywordsBtn.length) {
     for (var k = 0; k < keywordsBtn.length; k++) {
       keywordsBtn[k].remove();

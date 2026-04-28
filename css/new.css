@@ -371,6 +371,36 @@ google-cast-launcher.disabled, .disabled {
     font-size: 1rem;
 }
 
+div.themes {
+    display: flex;
+    margin-bottom: 2rem;
+    flex-direction: row;
+    text-transform: lowercase;
+    overflow-x: scroll;
+    width: 100vw;
+    position: relative;
+    left: -1.2rem;
+}
+
+@media screen and (orientation: landscape) {
+    div.themes {
+        width: calc(45vw + calc(env(safe-area-inset-left)) + calc(env(safe-area-inset-right)));
+    }
+}
+
+div.themes div.keywordsBtn {
+    display: inline-flex;
+    white-space: nowrap;
+}
+
+div.themes div.keywordsBtn:first-child {
+    margin-left: 2rem;
+}
+
+div.themes div.keywordsBtn:last-child {
+    margin-right: 3rem;
+}
+
 .tech {
     margin-bottom: 1rem;
 }

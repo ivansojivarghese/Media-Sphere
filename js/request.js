@@ -974,6 +974,9 @@
       searchQueried = true;
       lastSearch = q;
 
+      // Track search in history
+      historyManager.addSearch(q);
+
       const hashtagRegex = /(?<!https?:\/\/[^\s]*)(#[\p{L}\p{N}_.&\-]+)/gu;
 
       if (hashtagRegex.test(q)) {
@@ -1475,6 +1478,9 @@
               main.setAttribute("data-type", "playlist");
             }
             main.onclick = function(event) {
+              // Track video click in history
+              historyManager.addVideoWatched(data[i].title, data[i].channelTitle || "Unknown");
+              
               videoNav = true;
               getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"));
               
@@ -1838,6 +1844,9 @@
             main.setAttribute("data-url", "https://www.youtube.com/playlist?list=" + data[i].playlistId);
           }
           main.onclick = function(event) {
+            // Track video click in history
+            historyManager.addVideoWatched(data[i].title, data[i].channelTitle || "Unknown");
+            
             getURL(event.currentTarget.getAttribute("data-url"), true);
           };
 
@@ -1941,56 +1950,265 @@
     const urlSearchBtn = document.querySelector(".resBtn.url");
     const querySearchBtn = document.querySelector(".resBtn.query");
 
-    function inputPlaceholder() {
-      var queryWords = ["funny videos", "music", "tutorials", "movie trailers", "tech reviews"];
-      var inputElement = document.querySelector("input");
-      var index = 0; // Track the current word
-      var charIndex = 0; // Track the character position in the word
-      var timeoutId; // Store timeout ID to cancel ongoing effects
-  
+    // ===== DYNAMIC QUERY SUGGESTIONS SYSTEM =====
+    const TOPIC_KEYWORDS = {
+      entertainment: ["comedy", "funny", "hilarious", "humor", "laugh", "prank", "fail"],
+      music: ["music", "song", "artist", "album", "concert", "live performance", "music video"],
+      education: ["tutorial", "how to", "learn", "course", "lesson", "guide", "explained"],
+      movies: ["movie", "film", "trailer", "clip", "scene", "cinema"],
+      technology: ["tech", "gadget", "review", "programming", "software", "hardware", "ai", "code", "coding"],
+      gaming: ["game", "gaming", "gameplay", "esports", "streamer", "twitch"],
+      sports: ["sports", "game", "match", "basketball", "football", "soccer", "nfl", "tennis"],
+      news: ["news", "breaking news", "current events", "update", "report"],
+      cooking: ["cooking", "recipe", "food", "chef", "kitchen", "meal prep", "baking"],
+      fitness: ["workout", "fitness", "exercise", "gym", "training", "yoga"],
+      travel: ["travel", "tour", "destination", "city", "beach", "hotel", "flight", "trip", "adventure", "sydney", "dubai", "paris", "london", "tokyo", "new york"]
+    };
+
+    // Concise topic-level suggestion phrases (1-2 words max) for placeholders
+    const TOPIC_SUGGESTIONS = {
+      entertainment: ["comedy", "standup", "sketches"],
+      music: ["music", "concerts", "artists"],
+      education: ["learning", "tutorials", "courses"],
+      movies: ["movies", "films", "trailers"],
+      technology: ["tech", "gadgets", "coding"],
+      gaming: ["gaming", "esports", "streams"],
+      sports: ["sports", "highlights", "matches"],
+      news: ["news", "updates", "current"],
+      cooking: ["recipes", "cooking", "food"],
+      fitness: ["workouts", "fitness", "yoga"],
+      travel: ["travel", "destinations", "tours"]
+    };
+
+    class HistoryManager {
+      constructor() {
+        this.storageKey = "mediaSphereHistory";
+        this.maxHistoryItems = 100;
+        this.history = this.loadHistory();
+      }
+
+      loadHistory() {
+        try {
+          const stored = localStorage.getItem(this.storageKey);
+          return stored ? JSON.parse(stored) : [];
+        } catch (e) {
+          console.warn("Failed to load history:", e);
+          return [];
+        }
+      }
+
+      saveHistory() {
+        try {
+          localStorage.setItem(this.storageKey, JSON.stringify(this.history.slice(0, this.maxHistoryItems)));
+        } catch (e) {
+          console.warn("Failed to save history:", e);
+        }
+      }
+
+      addSearch(query) {
+        const entry = {
+          type: "search",
+          query: query.toLowerCase().trim(),
+          timestamp: Date.now()
+        };
+        this.history.unshift(entry);
+        if (this.history.length > this.maxHistoryItems) {
+          this.history = this.history.slice(0, this.maxHistoryItems);
+        }
+        this.saveHistory();
+      }
+
+      addVideoWatched(videoTitle, channelTitle) {
+        const entry = {
+          type: "video",
+          title: videoTitle.toLowerCase().trim(),
+          channel: channelTitle.toLowerCase().trim(),
+          timestamp: Date.now()
+        };
+        this.history.unshift(entry);
+        if (this.history.length > this.maxHistoryItems) {
+          this.history = this.history.slice(0, this.maxHistoryItems);
+        }
+        this.saveHistory();
+      }
+
+      classifyTopic(text) {
+        const lowerText = (text || "").toLowerCase();
+        let scores = {};
+        
+        for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
+          scores[topic] = keywords.filter(kw => lowerText.includes(kw)).length;
+        }
+
+        const maxScore = Math.max(...Object.values(scores));
+        if (maxScore === 0) return null;
+        
+        return Object.keys(scores).find(topic => scores[topic] === maxScore);
+      }
+
+      getTopicFrequency() {
+        const topicCounts = {};
+        const recentHistory = this.history.slice(0, 50); // Focus on recent 50 items
+
+        recentHistory.forEach(entry => {
+          let topic;
+          if (entry.type === "search") {
+            topic = this.classifyTopic(entry.query);
+          } else if (entry.type === "video") {
+            topic = this.classifyTopic(entry.title + " " + entry.channel);
+          }
+
+          if (topic) {
+            topicCounts[topic] = (topicCounts[topic] || 0) + 1;
+          }
+        });
+
+        return topicCounts;
+      }
+
+      extractKeywords(n = 5) {
+        const keywords = {};
+        const recentHistory = this.history.slice(0, 50);
+
+        recentHistory.forEach(entry => {
+          if (entry.type === "search") {
+            const fullQuery = entry.query.trim();
+            
+            // If query is short (2-3 words), keep it as a phrase
+            const queryWords = fullQuery.split(/\s+/).filter(w => w.length > 2);
+            if (queryWords.length >= 2 && queryWords.length <= 3 && fullQuery.length < 30) {
+              keywords[fullQuery] = (keywords[fullQuery] || 0) + 2; // Higher weight for phrases
+            }
+            
+            // Also extract individual words as fallback
+            queryWords.forEach(word => {
+              if (word.length > 3) {
+                keywords[word] = (keywords[word] || 0) + 1;
+              }
+            });
+          }
+        });
+
+        // Sort by frequency and return top n
+        return Object.entries(keywords)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, n)
+          .map(([keyword]) => keyword);
+      }
+
+
+
+      generateDynamicSuggestions() {
+        const topicFreq = this.getTopicFrequency();
+        const topTopics = Object.entries(topicFreq)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([topic]) => topic);
+
+        const suggestions = [];
+        const seen = new Set();
+
+        // Return concise 1-2 word topic phrases only
+        topTopics.forEach(topic => {
+          const phr = TOPIC_SUGGESTIONS[topic];
+          if (phr && phr.length) {
+            const pick = phr[Math.floor(Math.random() * phr.length)];
+            if (!seen.has(pick)) {
+              suggestions.push(pick);
+              seen.add(pick);
+            }
+          }
+        });
+
+        // Always return at least one fallback suggestion
+        if (suggestions.length === 0) {
+          const allTopics = Object.keys(TOPIC_SUGGESTIONS);
+          const randomTopic = allTopics[Math.floor(Math.random() * allTopics.length)];
+          const fallbackSuggestions = TOPIC_SUGGESTIONS[randomTopic];
+          if (fallbackSuggestions && fallbackSuggestions.length) {
+            suggestions.push(fallbackSuggestions[0]);
+          }
+        }
+
+        return suggestions.slice(0, 5);
+      }
+    }
+
+    const historyManager = new HistoryManager();
+
+    // ===== DYNAMIC PLACEHOLDER ANIMATOR (DISABLED) =====
+    let placeholderAnimator = null;
+
+    function createPlaceholderAnimator() {
+      let queryWords = historyManager.generateDynamicSuggestions();
+      if (!queryWords || queryWords.length === 0) {
+        queryWords = ["search"];
+      }
+      const inputElement = document.querySelector("input");
+      let index = 0;
+      let charIndex = 0;
+      let timeoutId = null;
+
       function clearPlaceholder() {
-          if (!inputElement) return;
-          inputElement.placeholder = ""; // Clear the placeholder
-          index = 0; // Reset the word index
-          charIndex = 0; // Reset the character index
-          if (timeoutId) clearTimeout(timeoutId); // Cancel any ongoing timeouts
+        if (!inputElement) return;
+        inputElement.placeholder = "";
+        index = 0;
+        charIndex = 0;
+        if (timeoutId) clearTimeout(timeoutId);
       }
-  
+
       function typeEffect() {
-          if (!inputElement) return;
-  
-          // Reset the placeholder for the current word being typed
-          inputElement.placeholder = queryWords[index].slice(0, charIndex + 1);
-          charIndex++;
-  
-          if (charIndex < queryWords[index].length) {
-              timeoutId = setTimeout(typeEffect, 100); // Typing speed
-          } else {
-              timeoutId = setTimeout(eraseEffect, 1000); // Pause before erasing
-          }
+        if (!inputElement || !queryWords || queryWords.length === 0) return;
+        inputElement.placeholder = queryWords[index].slice(0, charIndex + 1);
+        charIndex++;
+
+        if (charIndex < queryWords[index].length) {
+          timeoutId = setTimeout(typeEffect, 100);
+        } else {
+          timeoutId = setTimeout(eraseEffect, 1000);
+        }
       }
-  
+
       function eraseEffect() {
-          if (!inputElement) return;
-  
-          // Remove the last character from the placeholder
-          inputElement.placeholder = queryWords[index].slice(0, charIndex - 1);
-          charIndex--;
-  
-          if (charIndex > 0) {
-              timeoutId = setTimeout(eraseEffect, 50); // Erasing speed
-          } else {
-              index = (index + 1) % queryWords.length; // Move to the next word
-              timeoutId = setTimeout(typeEffect, 500); // Pause before typing the next word
-          }
+        if (!inputElement) return;
+        inputElement.placeholder = queryWords[index].slice(0, charIndex - 1);
+        charIndex--;
+
+        if (charIndex > 0) {
+          timeoutId = setTimeout(eraseEffect, 50);
+        } else {
+          index = (index + 1) % queryWords.length;
+          timeoutId = setTimeout(typeEffect, 500);
+        }
       }
-  
-      // Start the typing effect
-          typeEffect();
+
+      function start() {
+        if (timeoutId) clearTimeout(timeoutId);
+        clearPlaceholder();
+        typeEffect();
       }
-      
-      // Initialize the function
-      inputPlaceholder();
+
+      function refresh() {
+        queryWords = historyManager.generateDynamicSuggestions();
+        index = 0;
+        charIndex = 0;
+        start();
+      }
+
+      start();
+
+      return { start, refresh, clear: clearPlaceholder };
+    }
+
+    // DISABLED: placeholderAnimator = createPlaceholderAnimator();
+    
+    // Empty placeholder
+    const inputElement = document.querySelector("input");
+    if (inputElement) {
+      inputElement.placeholder = "";
+    }
+
+    function inputPlaceholder() {}
   
 
     function setSearchPath(e) {
@@ -2048,6 +2266,15 @@
             return [];
         }
     }*/
+
+    function updateSuggestionsVisibility() {
+      if (inp.value.trim() !== "" && searchPath === "query") {
+        updateSuggestionsList();
+      } else if (inp.value.trim() === "") {
+        videoInfoElm.suggestions.innerHTML = "";
+        setSuggestionsDisplay("");
+      }
+    }
 
     inp.addEventListener('input', () => {
       keepInputEndVisible();

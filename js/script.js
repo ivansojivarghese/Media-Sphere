@@ -97,6 +97,119 @@
 
     var appUnload = false;
 
+    const GROQ_THEMES_ENDPOINT = "/api/themes";
+
+    function loadMediaSphereActivityHistory() {
+      try {
+        const stored = localStorage.getItem("mediaSphereHistory");
+        if (!stored) {
+          return [];
+        }
+
+        const parsed = JSON.parse(stored);
+        return Array.isArray(parsed) ? parsed.slice(0, 50) : [];
+      } catch (error) {
+        console.warn("Failed to load media history for Groq themes:", error);
+        return [];
+      }
+    }
+
+    async function requestFiveThemesFromGroq(history = null) {
+      const activityHistory = Array.isArray(history) ? history : loadMediaSphereActivityHistory();
+
+      if (!activityHistory.length) {
+        return { themes: [] };
+      }
+
+      const response = await fetch(GROQ_THEMES_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ history: activityHistory })
+      });
+
+      if (!response.ok) {
+        const responseText = await response.text().catch(() => "");
+        throw new Error(`Groq themes request failed (${response.status}): ${responseText}`);
+      }
+
+      return await response.json();
+    }
+
+    function renderGroqThemes(themes) {
+      const themesContainer = document.querySelector("div.themes");
+      if (!themesContainer) {
+        return;
+      }
+
+      themesContainer.innerHTML = "";
+
+      if (!Array.isArray(themes) || !themes.length) {
+        return;
+      }
+
+      themes.slice(0, 5).forEach((theme) => {
+        if (!theme || !theme.title) {
+          return;
+        }
+
+        const themeTitle = theme.title.toLowerCase();
+
+        const themeButton = document.createElement("div");
+        themeButton.classList.add("keywordsBtn", "resBtn", "trs");
+
+        const themeText = document.createElement("p");
+        themeText.textContent = themeTitle;
+
+        themeButton.addEventListener("click", function (event) {
+          openSearch(event.currentTarget.children[0].innerHTML);
+        });
+
+        themeButton.appendChild(themeText);
+        themesContainer.appendChild(themeButton);
+      });
+    }
+
+    async function loadGroqThemesIntoSearch() {
+      try {
+        const response = await requestFiveThemesFromGroq();
+        renderGroqThemes(response && Array.isArray(response.themes) ? response.themes : []);
+      } catch (error) {
+        console.warn("Failed to load Groq themes into search:", error);
+        renderGroqThemes([]);
+      }
+    }
+
+    var groqThemesReloadPromise = null;
+
+    async function ensureGroqThemesVisible() {
+      const themesContainer = document.querySelector("div.themes");
+      if (!themesContainer) {
+        return;
+      }
+
+      if (themesContainer.querySelector(".keywordsBtn")) {
+        return;
+      }
+
+      if (groqThemesReloadPromise) {
+        await groqThemesReloadPromise;
+        return;
+      }
+
+      groqThemesReloadPromise = loadGroqThemesIntoSearch().finally(function () {
+        groqThemesReloadPromise = null;
+      });
+
+      await groqThemesReloadPromise;
+    }
+
+    window.loadMediaSphereActivityHistory = loadMediaSphereActivityHistory;
+    window.requestFiveThemesFromGroq = requestFiveThemesFromGroq;
+    window.loadGroqThemesIntoSearch = loadGroqThemesIntoSearch;
+    window.ensureGroqThemesVisible = ensureGroqThemesVisible;
+
     var autoLoad = false;
     var peekForward = false;
 
@@ -1235,8 +1348,8 @@
           console.log("audio_pause");
 
         } else {
-          backgroundPlay = true;
-          backgroundPlayInit = true;
+          backgroundPlay = audioMode || pipEnabled;
+          backgroundPlayInit = audioMode || pipEnabled;
         }
         if (!audioVideoAligning && !bufferLoad) {
           playPauseButton.classList.remove('playing');
@@ -2086,6 +2199,8 @@
           window.videoQualityTelemetry.uploadTelemetry();
         });
       }
+
+      await loadGroqThemesIntoSearch();
     });
 
     var videoInfoOpen = false;
@@ -2341,6 +2456,7 @@
 
       const searchWrapper = document.querySelector("#infoContainer .wrapper.search");
       searchWrapper.style.display = "block";
+      ensureGroqThemesVisible();
 
       if (i) {
         setSearchPath("query");
@@ -6632,7 +6748,7 @@
             audio.load();
           }
 
-          if (!audioMode && audio.buffered.length && (!videoEnd /*|| (videoEnd && (audio.currentTime < (audio.duration - maxVideoLoad)))*/) && audio.readyState > 2 && !initialVideoLoad && (bufferLoad || loading || seekingLoad || bufferingDetected)) {
+          if ((audioMode || pipEnabled) && audio.buffered.length && (!videoEnd /*|| (videoEnd && (audio.currentTime < (audio.duration - maxVideoLoad)))*/) && audio.readyState > 2 && !initialVideoLoad && (bufferLoad || loading || seekingLoad || bufferingDetected)) {
             console.log("audio_play in background");
             // audio.play();
             safePlay(audio);
@@ -6888,8 +7004,8 @@
             backgroundPlayManual = true;
           }
         }
-        if (document.visibilityState === "hidden" && !pipEnabled) {
-          backgroundPlay = true;
+        if (document.visibilityState === "hidden") {
+          backgroundPlay = audioMode || pipEnabled;
         } else {
           backgroundPlay = false;
         }
