@@ -184,7 +184,7 @@ async function checkNewDeployment() {
                 window.dispatchEvent(new CustomEvent("deploymentid-updated", { detail: lastDeployment }));
                 return;
             }
-            if (latestDeployment.uid !== lastDeployment) {
+            if (latestDeployment.uid !== lastDeployment && !errShow) {
                 lastDeployment = latestDeployment.uid;
                 localStorage.setItem("deploymentID", lastDeployment);
                 window.dispatchEvent(new CustomEvent("deploymentid-updated", { detail: lastDeployment }));
