@@ -191,6 +191,10 @@ video.seeking {
     border-radius: 0.5rem;
 }
 
+.result_wrapper:not(.active):active .thumbnailIconWrap {
+    border-radius: 0.5rem;
+}
+
 /*
 #videoControls .trsButtons {
     cursor: pointer;
@@ -380,6 +384,7 @@ div.themes {
     width: 100vw;
     position: relative;
     left: -1.2rem;
+    height: 21rem;
 }
 
 @media screen and (orientation: landscape) {
@@ -409,6 +414,11 @@ div.themes div.keywordsBtn:last-child {
     div.themes div.keywordsBtn {
         margin-left: 2rem;
         width: fit-content;
+    }
+
+    div.themes.compact {
+        height: 4rem;
+        overflow: hidden;
     }
 }
 

@@ -5,6 +5,26 @@
 
     const searchOptions = document.querySelector(".searchOptions");
 
+    var searchWasExecuted = false;
+
+    inp.addEventListener("focus", function() {
+      const themesContainer = document.querySelector("div.themes");
+      if (themesContainer) {
+        themesContainer.classList.remove("compact");
+      }
+    });
+
+    inp.addEventListener("blur", function() {
+      if (!searchWasExecuted) {
+        return;
+      }
+
+      const themesContainer = document.querySelector("div.themes");
+      if (themesContainer) {
+        themesContainer.classList.add("compact");
+      }
+    });
+
     const pattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)(\/.*)?$/;
 
     var queryType = document.querySelector("#searchType"),
@@ -974,6 +994,12 @@
       searchQueried = true;
       lastSearch = q;
 
+      searchWasExecuted = true;
+      const themesContainer = document.querySelector("div.themes");
+      if (themesContainer) {
+        themesContainer.classList.add("compact");
+      }
+
       // Track search in history
       historyManager.addSearch(q);
 
@@ -1566,7 +1592,7 @@
     
             if (data[i].type === "playlist") {
               var thumbnailIconWrap = document.createElement("div");
-              thumbnailIconWrap.classList.add("thumbnailIconWrap");
+              thumbnailIconWrap.classList.add("thumbnailIconWrap", "trs");
     
               var thumbnailIcon = document.createElement("div");
               thumbnailIcon.classList.add("thumbnailIcon", "img");
@@ -1871,7 +1897,7 @@
 
           if (data[i].type === "playlist") {
             var thumbnailIconWrap = document.createElement("div");
-            thumbnailIconWrap.classList.add("thumbnailIconWrap");
+            thumbnailIconWrap.classList.add("thumbnailIconWrap", "trs");
 
             var thumbnailIcon = document.createElement("div");
             thumbnailIcon.classList.add("thumbnailIcon", "img");
