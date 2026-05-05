@@ -384,7 +384,6 @@ div.themes {
     width: 100vw;
     position: relative;
     left: -1.2rem;
-    height: 21rem;
 }
 
 @media screen and (orientation: landscape) {
@@ -409,6 +408,8 @@ div.themes div.keywordsBtn:last-child {
 @media screen and (min-width: 1200px) and (orientation: landscape), screen and (min-height: 800px) and (orientation: landscape) {
     div.themes {
         flex-direction: column;
+        height: 21rem;
+        overflow: hidden;
     }
 
     div.themes div.keywordsBtn {
