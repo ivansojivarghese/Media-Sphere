@@ -424,11 +424,22 @@ div.themes div.keywordsBtn:last-child {
 }
 
 .tech {
-    margin-bottom: 1rem;
+    margin-bottom: 10rem;
+    background: #3f3f3f;
+    padding: 1rem;
+    border-radius: 2rem;
+    font-weight: bold;
+    /*
+    user-select: text;
+    cursor: text;*/
 }
 
 .tech p {
     font-size: 0.8rem;
+}
+
+.tech p:last-child {
+    padding-bottom: 0;
 }
 
 a.url {
