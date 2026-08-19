@@ -2,7 +2,9 @@ import { Groq } from "groq-sdk";
 
 // const GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"; // DEPRECATED: replaced with below for better performance and cost
 
-const GROQ_MODEL = "llama-3.1-8b-instant";
+// const GROQ_MODEL = "llama-3.1-8b-instant"; // DEPRECATED 
+
+const GROQ_MODEL = "openai/gpt-oss-20b";
 
 const THEME_PROMPT = `You are given a user's mixed media activity history (search queries and video titles).
 
