@@ -18,6 +18,7 @@ Rules:
 - Do not copy a specific historical entity into a broad query unless the current query already names it or clearly asks for it.
 - Example: if the current query is "Singapore" and history contains Emirates or airport videos, use "Singapore travel" or "Singapore tourism", never "Singapore Emirates".
 - Example: if the current query is "camera" and history centers on filmmaking, use "camera filmmaking" rather than copying a specific camera model.
+- Example: if the current query is "iphone duo" after travel searches, return "iphone duo" unchanged. Do not append travel, tourism, or any unrelated historical category.
 - Treat brands, creators, products, cities, airlines, and individual videos as evidence of an interest category, not automatic query terms.
 - Do not invent people, products, locations, or facts.
 - Do not rewrite hashtags, URLs, quoted phrases, or already-specific queries.

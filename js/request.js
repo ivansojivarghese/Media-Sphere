@@ -677,9 +677,9 @@
             if (v.length) {
               var videoRes;
               if (headers) {
-                videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${v.join(',')}`, { headers });
+                videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${v.join(',')}`, { headers });
               } else {
-                videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${v.join(',')}&key=${API_KEY}`);
+                videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${v.join(',')}&key=${API_KEY}`);
               }
               const videoData = await videoRes.json();
               videoData.items.forEach(video => {
@@ -711,6 +711,8 @@
                   channelTitle: video.snippet.channelTitle,
                   duration: parseDuration(video.contentDetails.duration),
                   uploadText: timeAgo(new Date(video.snippet.publishedAt)),
+                  publishedAt: video.snippet.publishedAt,
+                  viewCount: Number(video.statistics?.viewCount || 0),
                   thumbnail: bestThumb.url,
                   badges,
                   type: 'video'
@@ -766,6 +768,7 @@
     const MAX_SEMANTIC_CACHE_ENTRIES = 100;
     const semanticRerankCache = new Map();
     const semanticDurationCache = new Map();
+    const personalizationSignalCache = new Map();
     const FAST_STOP_WORDS = new Set([
       "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "how", "in",
       "is", "it", "of", "on", "or", "that", "the", "this", "to", "was", "what", "when",
@@ -918,6 +921,236 @@
       return scored.map(entry => entry.item);
     }
 
+    function getTokenOverlapScore(leftTokens, rightTokens) {
+      if (!leftTokens.size || !rightTokens.size) {
+        return 0;
+      }
+
+      let overlap = 0;
+      leftTokens.forEach(token => {
+        if (rightTokens.has(token)) {
+          overlap += 1;
+        }
+      });
+
+      return overlap / Math.max(leftTokens.size, rightTokens.size);
+    }
+
+    function personalizeSearchResults(query, orderedResults) {
+      if (!Array.isArray(orderedResults) || orderedResults.length < 2 ||
+          typeof historyManager === "undefined" || !Array.isArray(historyManager.history)) {
+        return orderedResults;
+      }
+
+      const describeResults = results => results.map((item, index) => ({
+        position: index + 1,
+        id: getResultStableId(item),
+        title: item && item.title ? item.title : "",
+        channel: item && item.channelTitle ? item.channelTitle : ""
+      }));
+
+      console.groupCollapsed("[MediaSphere personalization]", query);
+      console.log("Original result list", describeResults(orderedResults));
+
+      const historyEntries = historyManager.history
+        .filter(entry => entry && entry.type === "search" || entry && entry.type === "video")
+        .slice(0, 50);
+      if (!historyEntries.length) {
+        console.log("Changed result list", describeResults(orderedResults));
+        console.groupEnd();
+        return orderedResults;
+      }
+
+      const interestWeights = new Map();
+      const channelCounts = new Map();
+      const watchedTitleSets = [];
+      let maxChannelCount = 1;
+      const maxViewCount = Math.max(1, ...orderedResults.map(item => Number(item && item.viewCount || 0)));
+
+      historyEntries.forEach((entry, index) => {
+        const recencyWeight = Math.max(0.35, 1 - (index / historyEntries.length) * 0.65);
+        const text = entry.type === "search"
+          ? entry.query || ""
+          : `${entry.title || ""} ${entry.channel || ""}`;
+
+        new Set(tokenizeSemanticText(text)).forEach(token => {
+          interestWeights.set(token, (interestWeights.get(token) || 0) + recencyWeight);
+        });
+
+        if (entry.type === "video") {
+          const channel = (entry.channel || "").trim().toLowerCase();
+          if (channel) {
+            const count = (channelCounts.get(channel) || 0) + recencyWeight;
+            channelCounts.set(channel, count);
+            maxChannelCount = Math.max(maxChannelCount, count);
+          }
+
+          const titleTokens = new Set(tokenizeSemanticText(entry.title || ""));
+          if (titleTokens.size) {
+            watchedTitleSets.push(titleTokens);
+          }
+        }
+      });
+
+      const scored = orderedResults.map((item, index) => {
+        const title = item && item.title ? item.title : "";
+        const channel = item && item.channelTitle ? item.channelTitle.trim().toLowerCase() : "";
+        const itemTokens = new Set(tokenizeSemanticText(buildSemanticText(item)));
+        const titleTokens = new Set(tokenizeSemanticText(title));
+        let interestMatch = 0;
+        let matchedTokenCount = 0;
+
+        itemTokens.forEach(token => {
+          const weight = interestWeights.get(token) || 0;
+          if (weight) {
+            interestMatch += weight;
+            matchedTokenCount += 1;
+          }
+        });
+
+        const interestScore = matchedTokenCount
+          ? Math.min(1, (interestMatch / matchedTokenCount) / 2)
+          : 0;
+        const channelAffinity = Math.min(1, (channelCounts.get(channel) || 0) / maxChannelCount);
+        const baseRelevance = 1 - (index / Math.max(1, orderedResults.length - 1));
+        const publishedAt = item && item.publishedAt ? new Date(item.publishedAt).getTime() : 0;
+        const ageDays = publishedAt && Number.isFinite(publishedAt)
+          ? Math.max(0, (Date.now() - publishedAt) / (1000 * 60 * 60 * 24))
+          : 3650;
+        const freshness = 1 / (1 + (ageDays / 365));
+        const popularity = Math.log1p(Number(item && item.viewCount || 0)) /
+          Math.log1p(maxViewCount);
+        const watchedSimilarity = watchedTitleSets.reduce((highest, watchedTitle) =>
+          Math.max(highest, getTokenOverlapScore(titleTokens, watchedTitle)), 0);
+
+        personalizationSignalCache.set(getResultStableId(item), {
+          interestMatch: interestScore,
+          channelAffinity,
+          freshness,
+          popularity,
+          watchedSimilarity
+        });
+
+        return {
+          item,
+          index,
+          watchedSimilarity,
+          score: (baseRelevance * 0.3) + (interestScore * 0.35) +
+            (channelAffinity * 0.2) + (freshness * 0.1) + (popularity * 0.05)
+        };
+      });
+
+      // Remove exact or near-duplicate watched videos when enough alternatives exist.
+      const unseen = scored.filter(entry => entry.watchedSimilarity < 0.8);
+      const candidates = unseen.length >= Math.ceil(scored.length * 0.7) ? unseen : scored;
+      candidates.sort((a, b) => b.score - a.score || a.index - b.index);
+
+      const personalizedResults = candidates.map(entry => entry.item);
+      console.log("Local fallback result list", describeResults(personalizedResults));
+      console.groupEnd();
+      return personalizedResults;
+    }
+
+    async function rerankResultsWithLLM(query, results, fallbackResults) {
+      if (!Array.isArray(results) || results.length < 2 ||
+          typeof historyManager === "undefined" || !Array.isArray(historyManager.history) ||
+          !historyManager.history.length) {
+        console.log("LLM ranking skipped", {
+          reason: "not enough results or history",
+          resultCount: Array.isArray(results) ? results.length : 0,
+          historyCount: typeof historyManager !== "undefined" && Array.isArray(historyManager.history)
+            ? historyManager.history.length
+            : 0
+        });
+        return fallbackResults || results;
+      }
+
+      const candidateIds = results.map(getResultStableId);
+
+      console.log("LLM ranking request", {
+        query: query.trim(),
+        historyCount: historyManager.history.length,
+        candidateCount: candidateIds.length,
+        candidateIds
+      });
+
+      try {
+        const response = await fetch("/api/rank-results", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: query.trim(),
+            history: historyManager.history.slice(0, 40),
+            results: results.map((item, index) => ({
+              id: candidateIds[index],
+              title: item && item.title ? item.title : "",
+              channel: item && item.channelTitle ? item.channelTitle : "",
+              description: item && item.snippet ? item.snippet.description || "" : "",
+              position: index + 1,
+              viewCount: Number(item && item.viewCount || 0),
+              publishedAt: item && item.publishedAt ? item.publishedAt : "",
+              duration: item && item.duration ? item.duration : "",
+              ...(personalizationSignalCache.get(candidateIds[index]) || {
+                interestMatch: 0,
+                channelAffinity: 0,
+                freshness: 0,
+                popularity: 0,
+                watchedSimilarity: 0
+              })
+            }))
+          })
+        });
+
+        console.log("LLM ranking HTTP response", {
+          status: response.status,
+          ok: response.ok
+        });
+
+        if (!response.ok) {
+          throw new Error(`LLM result ranking failed (${response.status})`);
+        }
+
+        const ranking = await response.json();
+        console.log("LLM ranking prompt and raw output", ranking.debug || {
+          message: "Debug payload was not returned by the ranking endpoint"
+        });
+        const rankedIds = Array.isArray(ranking.rankedIds) ? ranking.rankedIds : [];
+        const confidence = Number(ranking.confidence);
+        const candidateSet = new Set(candidateIds);
+        const validRanking = rankedIds.length === candidateIds.length &&
+          new Set(rankedIds).size === candidateIds.length &&
+          rankedIds.every(id => candidateSet.has(id));
+
+        console.log("LLM ranking output", {
+          rankedIds,
+          confidence,
+          validRanking,
+          accepted: validRanking && confidence >= 0.65,
+          orderChanged: rankedIds.some((id, index) => id !== candidateIds[index])
+        });
+
+        if (validRanking && confidence >= 0.65) {
+          const resultById = new Map(results.map(item => [getResultStableId(item), item]));
+          const llmResults = rankedIds.map(id => resultById.get(id)).filter(Boolean);
+          console.log("LLM personalized result list", llmResults.map((item, index) => ({
+            position: index + 1,
+            id: getResultStableId(item),
+            title: item.title,
+            channel: item.channelTitle || ""
+          })));
+          return llmResults;
+        }
+
+        console.log("LLM ranking rejected; using local personalized ranking", {
+          reason: !validRanking ? "invalid or incomplete IDs" : "confidence below 0.55"
+        });
+      } catch (error) {
+        console.error("LLM ranking error; using local personalized ranking", error);
+      }
+
+      return fallbackResults || results;
+    }
+
     async function rerankResultsByLiveSemantics(query, results) {
       if (!Array.isArray(results) || results.length < 2) {
         return results;
@@ -929,16 +1162,19 @@
       const cachedOrder = semanticRerankCache.get(rerankCacheKey);
       if (cachedOrder && Array.isArray(cachedOrder) && cachedOrder.length) {
         const orderIndex = new Map(cachedOrder.map((id, idx) => [id, idx]));
-        return [...results].sort((a, b) => {
+        const cachedResults = [...results].sort((a, b) => {
           const ai = orderIndex.has(getResultStableId(a)) ? orderIndex.get(getResultStableId(a)) : Number.MAX_SAFE_INTEGER;
           const bi = orderIndex.has(getResultStableId(b)) ? orderIndex.get(getResultStableId(b)) : Number.MAX_SAFE_INTEGER;
           return ai - bi;
         });
+        const personalizedResults = personalizeSearchResults(query, cachedResults);
+        return await rerankResultsWithLLM(query, cachedResults, personalizedResults);
       }
 
       const ordered = rerankResultsLightweight(query, results);
       setTinyCache(semanticRerankCache, rerankCacheKey, ordered.map(getResultStableId));
-      return ordered;
+      const personalizedResults = personalizeSearchResults(query, ordered);
+      return await rerankResultsWithLLM(query, ordered, personalizedResults);
     }
 
     async function fetchSearchCandidates(query, durationParam, type, sort, headers) {
@@ -2208,8 +2444,26 @@
 
     const historyManager = new HistoryManager();
 
+    function hasExplicitTopicOrTaskSignal(query) {
+      const queryTokens = new Set(tokenizeSemanticText(query));
+      const topicSignal = Object.values(TOPIC_KEYWORDS).some(keywords =>
+        keywords.some(keyword => tokenizeSemanticText(keyword).some(token => queryTokens.has(token)))
+      );
+      const taskSignal = /\b(how|tutorial|guide|review|best|top|vs|versus|comparison|tips|learn|recommend)\b/i.test(query);
+      return topicSignal || taskSignal;
+    }
+
+    function shouldPreserveSpecificQuery(query) {
+      const queryTokens = tokenizeSemanticText(query);
+      return queryTokens.length >= 2 && !hasExplicitTopicOrTaskSignal(query);
+    }
+
     function improveSearchQueryLocally(query) {
       const originalQuery = query.trim();
+      if (shouldPreserveSpecificQuery(originalQuery)) {
+        return originalQuery;
+      }
+
       const queryTokens = new Set(tokenizeSemanticText(originalQuery));
       const additions = [];
 
@@ -2229,8 +2483,10 @@
       };
 
       const topic = historyManager.classifyTopic(originalQuery) ||
-        Object.entries(historyManager.getTopicFrequency())
-          .sort((a, b) => b[1] - a[1])[0]?.[0];
+        (queryTokens.size === 1
+          ? Object.entries(historyManager.getTopicFrequency())
+              .sort((a, b) => b[1] - a[1])[0]?.[0]
+          : null);
       if (topic) {
         (TOPIC_INTENT_TERMS[topic] || []).forEach(term => addTerm(term));
       }
@@ -2239,6 +2495,10 @@
     }
 
     async function improveSearchQuery(query) {
+      if (shouldPreserveSpecificQuery(query)) {
+        return query.trim();
+      }
+
       const localQuery = improveSearchQueryLocally(query);
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 1200);
