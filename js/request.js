@@ -331,6 +331,7 @@
 
             // 
 
+
             /*
             videoNav = true;
 
@@ -985,14 +986,36 @@
       return 'just now';
     }*/
 
+    function eraseHistory() {
+      try {
+        localStorage.removeItem("mediaSphereHistory");
+      } catch (error) {
+        console.warn("Failed to erase media history from storage:", error);
+      }
+
+      if (typeof historyManager !== "undefined") {
+        historyManager.history = [];
+      }
+
+      if (typeof window.loadGroqThemesIntoSearch === "function") {
+        window.loadGroqThemesIntoSearch().catch(function(error) {
+          console.warn("Failed to refresh themes after erasing history:", error);
+        });
+      }
+
+      return false;
+    }
+
 
     var searchQueried = false;
     var lastSearch = "";
 
     async function searchQuery(q, d) {
 
+      const originalQuery = q.trim();
+
       searchQueried = true;
-      lastSearch = q;
+      lastSearch = originalQuery;
 
       searchWasExecuted = true;
       const themesContainer = document.querySelector("div.themes");
@@ -1001,14 +1024,13 @@
       }
 
       // Track search in history
-      historyManager.addSearch(q);
+      historyManager.addSearch(originalQuery);
 
       const hashtagRegex = /(?<!https?:\/\/[^\s]*)(#[\p{L}\p{N}_.&\-]+)/gu;
 
-      if (hashtagRegex.test(q)) {
-
+      if (hashtagRegex.test(originalQuery)) {
         // Remove the '#' character from the q variable
-        q = q.replace('#', '');
+        q = originalQuery.replace('#', '');
 
         /*
         const url = 'https://yt-api.p.rapidapi.com/hashtag?tag=' + q + '&geo=' + countryAPIres.country + '&lang=en&type=' + queryType.value + '&upload_date=' + queryDate.value + '&sort_by=' + querySort.value;
@@ -1041,7 +1063,6 @@
           // and 'long'
         }*/
         duration = '';
-
         const videoIds = [];
         const playlistIds = [];
 
@@ -1121,6 +1142,7 @@
             if (!d) {
               searchQuery(q, true);
             }*/
+
           }
 
           
@@ -1128,7 +1150,6 @@
         })
         .catch((error) => {
           console.error('Error:', error);
-
           loadingSpace.style.display = "none";
           videoInfoElm.info.style.overflow = "";
 
@@ -1175,6 +1196,12 @@
           */
 
       } else {
+        q = await improveSearchQuery(originalQuery);
+        console.log("[MediaSphere search]", {
+          originalQuery,
+          improvedQuery: q
+        });
+
         /*
         const url = 'https://yt-api.p.rapidapi.com/search?query=' + q + '&geo=' + countryAPIres.country + '&lang=en&type=' + queryType.value + '&upload_date=' + queryDate.value + '&sort_by=' + querySort.value;
         const options = {
@@ -1988,7 +2015,7 @@
       news: ["news", "breaking news", "current events", "update", "report"],
       cooking: ["cooking", "recipe", "food", "chef", "kitchen", "meal prep", "baking"],
       fitness: ["workout", "fitness", "exercise", "gym", "training", "yoga"],
-      travel: ["travel", "tour", "destination", "city", "beach", "hotel", "flight", "trip", "adventure", "sydney", "dubai", "paris", "london", "tokyo", "new york"]
+      travel: ["travel", "tour", "tourism", "sightseeing", "destination", "city", "beach", "hotel", "flight", "airport", "airline", "vacation", "trip", "adventure", "vlog", "emirates", "sydney", "dubai", "paris", "london", "tokyo", "new york"]
     };
 
     // Concise topic-level suggestion phrases (1-2 words max) for placeholders
@@ -2004,6 +2031,20 @@
       cooking: ["recipes", "cooking", "food"],
       fitness: ["workouts", "fitness", "yoga"],
       travel: ["travel", "destinations", "tours"]
+    };
+
+    const TOPIC_INTENT_TERMS = {
+      entertainment: ["entertainment", "comedy"],
+      music: ["music", "songs"],
+      education: ["learning", "tutorial"],
+      movies: ["movie", "film"],
+      technology: ["technology", "how to"],
+      gaming: ["gaming", "gameplay"],
+      sports: ["sports", "highlights"],
+      news: ["news", "updates"],
+      cooking: ["cooking", "recipes"],
+      fitness: ["fitness", "workout"],
+      travel: ["travel", "tourism"]
     };
 
     class HistoryManager {
@@ -2097,8 +2138,13 @@
         const recentHistory = this.history.slice(0, 50);
 
         recentHistory.forEach(entry => {
-          if (entry.type === "search") {
-            const fullQuery = entry.query.trim();
+          const fullQuery = entry.type === "search"
+            ? entry.query.trim()
+            : entry.type === "video"
+              ? `${entry.title || ""} ${entry.channel || ""}`.trim()
+              : "";
+
+          if (fullQuery) {
             
             // If query is short (2-3 words), keep it as a phrase
             const queryWords = fullQuery.split(/\s+/).filter(w => w.length > 2);
@@ -2161,6 +2207,90 @@
     }
 
     const historyManager = new HistoryManager();
+
+    function improveSearchQueryLocally(query) {
+      const originalQuery = query.trim();
+      const queryTokens = new Set(tokenizeSemanticText(originalQuery));
+      const additions = [];
+
+      const addTerm = term => {
+        const normalizedTerm = term.trim().toLowerCase();
+        if (!normalizedTerm || additions.includes(normalizedTerm)) {
+          return;
+        }
+
+        const termTokens = tokenizeSemanticText(normalizedTerm);
+        if (!termTokens.length || termTokens.every(token => queryTokens.has(token))) {
+          return;
+        }
+
+        termTokens.forEach(token => queryTokens.add(token));
+        additions.push(normalizedTerm);
+      };
+
+      const topic = historyManager.classifyTopic(originalQuery) ||
+        Object.entries(historyManager.getTopicFrequency())
+          .sort((a, b) => b[1] - a[1])[0]?.[0];
+      if (topic) {
+        (TOPIC_INTENT_TERMS[topic] || []).forEach(term => addTerm(term));
+      }
+
+      return [originalQuery, ...additions.slice(0, 2)].join(" ");
+    }
+
+    async function improveSearchQuery(query) {
+      const localQuery = improveSearchQueryLocally(query);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+      try {
+        const response = await fetch("/api/rewrite-query", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: query.trim(),
+            history: historyManager.history.slice(0, 40)
+          }),
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(`Query rewrite failed (${response.status})`);
+        }
+
+        const rewrite = await response.json();
+        const rewrittenQuery = typeof rewrite.rewrittenQuery === "string"
+          ? rewrite.rewrittenQuery.trim()
+          : "";
+        const confidence = Number(rewrite.confidence);
+        const queryType = rewrite.queryType;
+
+        if (queryType === "specific_entity" || queryType === "specific") {
+          return query.trim();
+        }
+
+        const originalTokens = new Set(tokenizeSemanticText(query));
+        const rewrittenTokens = new Set(tokenizeSemanticText(rewrittenQuery));
+        const preservesIntent = [...originalTokens].every(token => rewrittenTokens.has(token));
+        const addedTokenCount = [...rewrittenTokens].filter(token => !originalTokens.has(token)).length;
+
+        if (
+          rewrittenQuery &&
+          confidence >= 0.65 &&
+          rewrittenQuery.length <= 240 &&
+          preservesIntent &&
+          addedTokenCount <= 4
+        ) {
+          return rewrittenQuery;
+        }
+      } catch (error) {
+        console.warn("Using local search expansion:", error.message);
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      return localQuery;
+    }
 
     // ===== DYNAMIC PLACEHOLDER ANIMATOR (DISABLED) =====
     let placeholderAnimator = null;

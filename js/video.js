@@ -42,6 +42,10 @@ var videoInfoElm = {
   relatedResults : document.querySelector("#infoContainer div.wrapper.info div.results"),
   refinements : document.querySelector("#infoContainer div.wrapper.search div.refinements")
 };
+
+var homeElm = {
+  main: document.querySelector("#homeContainer")
+}
 /*
 const suggestionsHandler = {
   set(target, property, value) {

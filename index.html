@@ -665,7 +665,7 @@
                 <div id="profileSignIn" class="profileBtn cursor trs trsButtons noimg" onclick="" title="Profile">
                   <div class="img"></div>
                 </div>
-                <div class="homeBtn cursor trs trsButtons noimg" onclick="" title="Home">
+                <div class="homeBtn cursor trs trsButtons noimg" onclick="openHome()" title="Home">
                   <div class="img"></div>
                 </div>
                 <div class="trendingBtn cursor trs trsButtons noimg" style="display: none;" onclick="" title="Trending">
@@ -704,6 +704,11 @@
                 <div class="watchBtn cursor trs trsButtons noimg" title="Watch Later">
                   <div class="img"></div>
                 </div> -->
+              </div>
+            </div>
+            <div class="wrapper home">
+              <div class="nav">
+                <input id="eraseBtn" class="resBtn trs" type="submit" value="Erase History" onclick="return eraseHistory()">
               </div>
             </div>
             <div class="wrapper search">
@@ -751,7 +756,7 @@
                 </div>
               </div>
               <input id="urlSubmit" class="resBtn trs" type="submit" value="Search" onclick="getURL()">
-              <div class="themes trs"></div>
+              <div style="display: none;" class="themes trs"></div>
               <div class="results trs"></div>
               <div class="refinements"></div>
             </div>

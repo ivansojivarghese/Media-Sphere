@@ -863,6 +863,15 @@ div.thumbnailIcon {
     right: 0;
 }
 
+.wrapper.home .nav {
+    height: 3.5rem !important;
+}
+
+#eraseBtn {
+    margin: 0;
+    width: fit-content;
+}
+
 @media screen and (orientation: landscape) {
     #infoContainer, #infoContainer .head, #infoContainer .nav {
         width: calc(21rem + calc(env(safe-area-inset-left)) + calc(env(safe-area-inset-right))) !important;

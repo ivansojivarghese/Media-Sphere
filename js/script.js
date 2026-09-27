@@ -2524,6 +2524,91 @@
       }
     }
 
+    function openHome(p) {
+      event.stopPropagation();
+
+      curTab = "home";
+
+      syncVideoFreezeFrameSize();
+
+      if (isLandscape()) {
+        video.classList.add("side-by-side");
+        videoSec.classList.add("side-by-side");
+        videoControls.classList.add("side-by-side");
+        queueElement.classList.add("side-by-side");
+        videoInfoElm.main.classList.add("side");
+        videoInfoElm.textStuff.classList.add("side");
+      }
+
+      // show the navbar, if hidden
+    videoInfoElm.infoHead.style.transform = "none";
+      videoInfoElm.scrollToTop.classList.remove("grow");
+
+      inp.classList.remove("op");
+      inp.classList.remove("op2");
+      clearBtn.classList.remove("float");
+      setTimeout(function() {
+        if (!searchBtnClick) {
+          inp.classList.remove("float");
+          videoInfoElm.infoHeadSec.classList.remove("ext");
+          videoInfoElm.suggestions.classList.remove("float");
+          // clearBtn.classList.remove("float");
+        }
+      }, 210);
+
+      const b = document.querySelector("#infoContainer .head .infoBtn");
+      /*
+      if (b.classList.contains("active")) {
+        videoInfoElm.info.scrollTo(0,0);
+      }*/
+
+      const allBtn = document.querySelectorAll("#infoContainer .head .cursor");
+      // Remove 'active' class from all elements
+      allBtn.forEach(btn => btn.classList.remove('active'));
+
+      const wrappers = document.querySelectorAll("#infoContainer .wrapper");
+      wrappers.forEach(wrapper => wrapper.style.display = "");
+
+      const homeBtn = document.querySelector("#infoContainer .head .homeBtn");
+      homeBtn.classList.add("active");
+
+      const homeWrapper = document.querySelector("#infoContainer .wrapper.home");
+      homeWrapper.style.display = "block";
+
+      var ori = screen.orientation.type;
+
+      if (((!loading || loading) || initialVideoLoad) ) {
+        videoInfoElm.info.style.transform = "none";
+        videoInfoOpen = true;
+
+        videoInfoElm.info.classList.add("openInfo");
+
+        if (ori === "landscape-primary" || ori === "landscape-secondary") {
+          // mainContent.style.backgroundColor = "#000";
+          // videoContainer.style.opacity = 0.5;
+        }
+
+        setTimeout(function() {
+          if (p) {
+            videoInfoElm.info.scrollTo(
+              {
+                top: p,
+                behavior: 'smooth'
+              }
+            );
+          }
+        }, 10);  
+
+        if (!videoEnd && !video.paused && (!isMusic || (isMusic && CVactivityScore > 0.2)) && (ori === "portrait-primary" || ori === "portrait-secondary")) {
+          video.requestPictureInPicture().then(function() {
+            getScreenLock();
+            pipEnabled = true;
+            backgroundPlayManual = false;
+          });
+        }
+      }
+    }
+
     function openVideoInfo(p) {
       event.stopPropagation();
 
@@ -2619,6 +2704,9 @@
       switch (curTab) {
         case "profile":
           preTab = "openProfile(" + preScrollPos + ")";
+        break;
+        case "home":
+          preTab = "openHome(" + preScrollPos + ")";
         break;
         case "search":
           preTab = "openSearch(false, true, event, " + preScrollPos +")";
