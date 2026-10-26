@@ -4,6 +4,10 @@ A fast and intuitive media player built for seamless playback and enhanced user 
 
 More details coming soon...
 
+## Notes
+
+Review ```models``` folder to update relevant model weights if needed.
+
 ## Issues & Contributions
 
 Found a bug or want to improve the app? Feel free to open an issue or submit a pull request!
