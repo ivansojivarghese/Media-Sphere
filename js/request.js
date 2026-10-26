@@ -1111,8 +1111,17 @@
         }
 
         const ranking = await response.json();
-        console.log("LLM ranking prompt and raw output", ranking.debug || {
+        const provider = ranking.debug && ranking.debug.provider
+          ? ranking.debug.provider
+          : "unknown";
+        console.log(`LLM ranking prompt and raw output (${provider})`, ranking.debug || {
           message: "Debug payload was not returned by the ranking endpoint"
+        });
+        console.log("LLM ranking provider status", {
+          provider,
+          groqAttempted: ranking.debug?.groqAttempted ??
+            (provider === "groq" || provider === "gemini"),
+          geminiAttempted: ranking.debug?.geminiAttempted ?? provider === "gemini"
         });
         const rankedIds = Array.isArray(ranking.rankedIds) ? ranking.rankedIds : [];
         const confidence = Number(ranking.confidence);
@@ -1231,12 +1240,6 @@
 
       if (typeof historyManager !== "undefined") {
         historyManager.history = [];
-      }
-
-      if (typeof window.loadGroqThemesIntoSearch === "function") {
-        window.loadGroqThemesIntoSearch().catch(function(error) {
-          console.warn("Failed to refresh themes after erasing history:", error);
-        });
       }
 
       return false;

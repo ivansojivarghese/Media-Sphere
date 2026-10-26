@@ -1,6 +1,8 @@
 import { Groq } from "groq-sdk";
 
 const GROQ_MODEL = "openai/gpt-oss-20b";
+const GEMINI_MODEL = "gemini-2.5-flash";
+// const GEMINI_MODEL = "gemini-3.5-flash-lite";
 // const GROQ_MODEL = "qwen/qwen3.8-27b";
 const MAX_HISTORY_ITEMS = 40;
 const MAX_RESULTS = 20;
@@ -32,7 +34,9 @@ Return valid JSON only:
 {
   "rankedIds": ["candidate-id-1", "candidate-id-2"],
   "confidence": a number between 0.0 and 1.0
-}`;
+}
+
+Do not include markdown, explanations, or any text outside the JSON object.`;
 
 function cleanText(value) {
   return String(value || "").slice(0, MAX_TEXT_LENGTH);
@@ -154,6 +158,54 @@ function compactHistory(history) {
     .filter(entry => entry.query || entry.title || entry.channel);
 }
 
+async function requestRankFromGemini(userPayload) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not configured");
+  }
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: RANK_RESULTS_PROMPT }]
+        },
+        contents: [{
+          role: "user",
+          parts: [{ text: JSON.stringify(userPayload) }]
+        }],
+        generationConfig: {
+          temperature: 0.1,
+          maxOutputTokens: 4096,
+          thinkingConfig: {
+            thinkingBudget: 0
+          },
+          responseMimeType: "application/json"
+        }
+      })
+    }
+  );
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Gemini request failed (${response.status}): ${errorBody}`);
+  }
+
+  const result = await response.json();
+  const candidate = result?.candidates?.[0];
+  console.log("Gemini ranking metadata:", {
+    finishReason: candidate?.finishReason,
+    usageMetadata: result?.usageMetadata
+  });
+
+  return candidate?.content?.parts
+    ?.map(part => part?.text || "")
+    .join("") || "";
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
@@ -195,47 +247,77 @@ export default async function handler(req, res) {
       user: userPayload
     });
 
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const chatCompletion = await groq.chat.completions.create({
-      model: GROQ_MODEL,
-      reasoning_effort: "low",
-      messages: [
-        { role: "system", content: RANK_RESULTS_PROMPT },
-        {
-          role: "user",
-          content: JSON.stringify(userPayload)
+    const buildResponse = (rawContent, provider) => {
+      console.log(`${provider} ranking output:`, rawContent);
+      const parsedRanking = parseRankResponse(rawContent, candidateIds);
+      return {
+        ...parsedRanking,
+        debug: {
+          provider,
+          systemPrompt: RANK_RESULTS_PROMPT,
+          userPayload,
+          rawOutput: rawContent,
+          parsedRanking
         }
-      ],
-      temperature: 0.1,
-      max_completion_tokens: 1024,
-      top_p: 1,
-      stream: false
-    });
+      };
+    };
 
-    const message = chatCompletion?.choices?.[0]?.message || {};
+    try {
+      const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+      const chatCompletion = await groq.chat.completions.create({
+        model: GROQ_MODEL,
+        reasoning_effort: "low",
+        messages: [
+          { role: "system", content: RANK_RESULTS_PROMPT },
+          {
+            role: "user",
+            content: JSON.stringify(userPayload)
+          }
+        ],
+        temperature: 0.1,
+        max_completion_tokens: 1024,
+        top_p: 1,
+        stream: false
+      });
 
-    console.log("Full Groq message:", message);
+      const message = chatCompletion?.choices?.[0]?.message || {};
+      const rawContent =
+        message.content ||
+        message.reasoning_content ||
+        message.reasoning ||
+        "";
+      return res.status(200).json(buildResponse(rawContent, "groq"));
+    } catch (groqError) {
+      console.error("Groq result ranking error; trying Gemini:", groqError);
 
-    const rawContent =
-    message.content ||
-    message.reasoning_content ||
-    message.reasoning ||
-    "";
-
-    // const rawContent = chatCompletion?.choices?.[0]?.message?.content ?? "";
-    console.log("Raw Groq ranking output:", rawContent);
-    const parsedRanking = parseRankResponse(rawContent, candidateIds);
+      try {
+        const rawContent = await requestRankFromGemini(userPayload);
+        return res.status(200).json(buildResponse(rawContent, "gemini"));
+      } catch (geminiError) {
+        console.error("Gemini result ranking fallback error:", geminiError);
+        return res.status(200).json({
+          rankedIds: [],
+          confidence: 0,
+          debug: {
+            provider: "fallback",
+            groqAttempted: true,
+            geminiAttempted: true,
+            message: "Both ranking providers failed"
+          }
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Ranking request error:", error);
     return res.status(200).json({
-      ...parsedRanking,
+      rankedIds: [],
+      confidence: 0,
       debug: {
-        systemPrompt: RANK_RESULTS_PROMPT,
-        userPayload,
-        rawOutput: rawContent,
-        parsedRanking
+        provider: "fallback",
+        groqAttempted: false,
+        geminiAttempted: false,
+        message: "Ranking request failed before provider selection"
       }
     });
-  } catch (error) {
-    console.error("Groq result ranking error:", error);
-    return res.status(200).json({ rankedIds: [], confidence: 0 });
   }
 }

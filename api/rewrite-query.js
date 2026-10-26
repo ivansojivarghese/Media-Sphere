@@ -1,6 +1,8 @@
 import { Groq } from "groq-sdk";
 
 const GROQ_MODEL = "openai/gpt-oss-20b";
+const GEMINI_MODEL = "gemini-2.5-flash";
+// const GEMINI_MODEL = "gemini-3.5-flash-lite";
 const MAX_HISTORY_ITEMS = 40;
 const MAX_TEXT_LENGTH = 240;
 
@@ -85,6 +87,47 @@ function compactHistory(history) {
     .filter(entry => entry.query || entry.title || entry.channel);
 }
 
+async function requestRewriteFromGemini(originalQuery, history) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not configured");
+  }
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: QUERY_REWRITE_PROMPT }]
+        },
+        contents: [{
+          role: "user",
+          parts: [{
+            text: JSON.stringify({ query: originalQuery, recentActivity: history })
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 300,
+          responseMimeType: "application/json"
+        }
+      })
+    }
+  );
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Gemini request failed (${response.status}): ${errorBody}`);
+  }
+
+  const result = await response.json();
+  return result?.candidates?.[0]?.content?.parts
+    ?.map(part => part?.text || "")
+    .join("") || "";
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
@@ -103,26 +146,43 @@ export default async function handler(req, res) {
       return res.status(200).json({ rewrittenQuery: originalQuery, addedConcepts: [], queryType: "unknown", confidence: 0 });
     }
 
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const chatCompletion = await groq.chat.completions.create({
-      model: GROQ_MODEL,
-      messages: [
-        { role: "system", content: QUERY_REWRITE_PROMPT },
-        {
-          role: "user",
-          content: JSON.stringify({ query: originalQuery, recentActivity: history })
-        }
-      ],
-      temperature: 0.2,
-      max_completion_tokens: 300,
-      top_p: 1,
-      stream: false
-    });
+    try {
+      const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+      const chatCompletion = await groq.chat.completions.create({
+        model: GROQ_MODEL,
+        messages: [
+          { role: "system", content: QUERY_REWRITE_PROMPT },
+          {
+            role: "user",
+            content: JSON.stringify({ query: originalQuery, recentActivity: history })
+          }
+        ],
+        temperature: 0.2,
+        max_completion_tokens: 300,
+        top_p: 1,
+        stream: false
+      });
 
-    const rawContent = chatCompletion?.choices?.[0]?.message?.content ?? "";
-    return res.status(200).json(parseRewriteResponse(rawContent, originalQuery));
+      const rawContent = chatCompletion?.choices?.[0]?.message?.content ?? "";
+      return res.status(200).json(parseRewriteResponse(rawContent, originalQuery));
+    } catch (groqError) {
+      console.error("Groq query rewrite error; trying Gemini:", groqError);
+
+      try {
+        const rawContent = await requestRewriteFromGemini(originalQuery, history);
+        return res.status(200).json(parseRewriteResponse(rawContent, originalQuery));
+      } catch (geminiError) {
+        console.error("Gemini query rewrite fallback error:", geminiError);
+        return res.status(200).json({
+          rewrittenQuery: "",
+          addedConcepts: [],
+          queryType: "unknown",
+          confidence: 0
+        });
+      }
+    }
   } catch (error) {
-    console.error("Groq query rewrite error:", error);
+    console.error("Query rewrite request error:", error);
     return res.status(200).json({ rewrittenQuery: "", addedConcepts: [], queryType: "unknown", confidence: 0 });
   }
 }

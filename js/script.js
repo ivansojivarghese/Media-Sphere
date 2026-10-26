@@ -2200,7 +2200,6 @@
         });
       }
 
-      await loadGroqThemesIntoSearch();
     });
 
     var videoInfoOpen = false;
@@ -2456,7 +2455,6 @@
 
       const searchWrapper = document.querySelector("#infoContainer .wrapper.search");
       searchWrapper.style.display = "block";
-      ensureGroqThemesVisible();
 
       if (i) {
         setSearchPath("query");
