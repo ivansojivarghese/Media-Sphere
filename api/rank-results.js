@@ -1,6 +1,7 @@
 import { Groq } from "groq-sdk";
 
 const GROQ_MODEL = "openai/gpt-oss-20b";
+// const GROQ_MODEL = "qwen/qwen3.8-27b";
 const MAX_HISTORY_ITEMS = 40;
 const MAX_RESULTS = 20;
 const MAX_TEXT_LENGTH = 240;
@@ -66,7 +67,7 @@ function parseRankResponse(rawContent, candidateIds) {
         ? 0.7
         : 0.55;
 
-    if (!Number.isFinite(confidence) || uniqueIds.length < Math.ceil(candidateIds.length * 0.7)) {
+    if (!Number.isFinite(confidence) || uniqueIds.length < Math.ceil(candidateIds.length * 0.5)) {
       return { rankedIds: candidateIds, confidence: 0 };
     }
 
