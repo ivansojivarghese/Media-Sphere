@@ -2375,6 +2375,8 @@ function getOptimalVideo(time, a, b) {
           videoInfoElm.title.innerHTML = videoDetails.title;
           videoInfoElm.channelTitle.innerHTML = videoDetails.channelTitle;
 
+          document.title = videoDetails.title + " - Media Sphere";
+
           // abstract other info
           abstractVideoInfo();
         }
@@ -2982,6 +2984,8 @@ function resetVideoInfo() {
   videoInfoElm.title.innerHTML = "";
   videoInfoElm.channelTitle.innerHTML = "";
 
+  document.title = "Media Sphere";
+
   videoInfoElm.videoTitle.classList.add("textReset");
   videoInfoElm.channelTitle2.classList.add("textReset");
   videoInfoElm.category.classList.add("textReset");
@@ -3051,6 +3055,8 @@ function abstractVideoInfo() {
 
   videoInfoElm.title.innerHTML = videoDetails.title;
   videoInfoElm.channelTitle.innerHTML = videoDetails.channelTitle;
+
+  document.title = videoDetails.title + " - Media Sphere";
 
   videoInfoElm.videoTitle.innerHTML = '<a class="trs noUnderline" href="' + videoURL + '" target="_blank">' + videoDetails.title + '</a>';
   videoInfoElm.channelTitle2.innerHTML = '<a class="trs noUnderline" href="https://www.youtube.com/channel/' + videoDetails.channelId + '" target="_blank">' + videoDetails.channelTitle + '</a>';
