@@ -1453,6 +1453,10 @@ div.result_wrapper {
     margin-bottom: 4rem;
 }*/
 
+#historyNullMessage p {
+    width: calc(100% - 2em);
+}
+
 .wrapper.profile div.result_wrapper:last-child {
     margin-bottom: 10rem;
 }
@@ -1494,6 +1498,17 @@ div.thumbnail {
     font-size: 1.2rem !important;
     line-height: 1.25em;
     white-space: unset;
+}
+
+.historySearchIcon {
+    display: inline-block;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-right: 0.5rem;
+    vertical-align: -0.15rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 .resultChannelTitle {

@@ -1243,6 +1243,20 @@
       }
 
       renderWatchHistory();
+
+      const eraseButton = document.getElementById("eraseBtn");
+      if (eraseButton) {
+        clearTimeout(eraseButton.clearStateTimeout);
+        eraseButton.style.backgroundColor = "#007000";
+        eraseButton.value = "Cleared!";
+        eraseButton.disabled = true;
+        eraseButton.clearStateTimeout = setTimeout(() => {
+          eraseButton.style.backgroundColor = "";
+          eraseButton.value = "Erase History";
+          eraseButton.disabled = false;
+        }, 3000);
+      }
+
       return false;
     }
 
@@ -2064,11 +2078,44 @@
 
       historyWrap.querySelectorAll(".historyResult").forEach(result => result.remove());
 
-      const entries = historyManager.history.filter(entry =>
+      const historyEntries = Array.isArray(historyManager.history) ? historyManager.history : [];
+      const recentSearches = historyEntries.filter(entry =>
+        entry && entry.type === "search" && entry.query
+      ).slice(0, 5);
+      const videoEntries = historyEntries.filter(entry =>
         entry && entry.type === "video" && entry.title
       );
+      const historyNullMessage = document.getElementById("historyNullMessage");
+      if (historyNullMessage) {
+        historyNullMessage.style.display =
+          recentSearches.length || videoEntries.length ? "none" : "block";
+      }
 
-      entries.forEach(entry => {
+      recentSearches.forEach(entry => {
+        const result = document.createElement("div");
+        result.classList.add("result_wrapper", "historyResult", "trs", "cursor", "trsButtons", "noimg");
+        result.addEventListener("click", event => {
+          inp.value = entry.query;
+          openSearch(inp.value, true, event);
+        });
+
+        const title = document.createElement("h5");
+        title.classList.add("overflow", "resultTitle");
+
+        const searchIcon = document.createElement("span");
+        searchIcon.classList.add("historySearchIcon", "img");
+        searchIcon.style.backgroundImage = "url('svg/search.svg')";
+        title.append(searchIcon, document.createTextNode(entry.query));
+
+        const searchDate = document.createElement("p");
+        searchDate.classList.add("resultDate");
+        searchDate.textContent = entry.timestamp ? timeAgo(new Date(entry.timestamp)) : "";
+
+        result.append(title, searchDate);
+        historyWrap.appendChild(result);
+      });
+
+      videoEntries.forEach(entry => {
         const result = document.createElement("div");
         result.classList.add("result_wrapper", "historyResult", "trs", "cursor", "trsButtons", "noimg");
         result.setAttribute("data-url", entry.url || "");
@@ -2403,6 +2450,7 @@
           this.history = this.history.slice(0, this.maxHistoryItems);
         }
         this.saveHistory();
+        renderWatchHistory();
       }
 
       addVideoWatched(video) {
