@@ -1242,6 +1242,7 @@
         historyManager.history = [];
       }
 
+      renderWatchHistory();
       return false;
     }
 
@@ -1770,8 +1771,9 @@
               main.setAttribute("data-type", "playlist");
             }
             main.onclick = function(event) {
-              // Track video click in history
-              historyManager.addVideoWatched(data[i].title, data[i].channelTitle || "Unknown");
+              if (data[i].type === "video") {
+                historyManager.addVideoWatched(data[i]);
+              }
               
               videoNav = true;
               getURL(event.currentTarget.getAttribute("data-url"), true, event.currentTarget.getAttribute("data-queue"), event.currentTarget.getAttribute("data-type"));
@@ -2044,7 +2046,85 @@
         btn.classList.add("active");
 
         wrap.style.display = "block";
+      } else if (t === "history") {
+        var btn = document.querySelector(".wrapper.profile .nav .historyBtn");
+        var wrap = document.querySelector(".wrapper.profile .history");
+        btn.classList.add("active");
+
+        wrap.style.display = "block";
+        renderWatchHistory();
       }
+    }
+
+    function renderWatchHistory() {
+      const historyWrap = document.querySelector(".wrapper.profile .history");
+      if (!historyWrap || typeof historyManager === "undefined") {
+        return;
+      }
+
+      historyWrap.querySelectorAll(".historyResult").forEach(result => result.remove());
+
+      const entries = historyManager.history.filter(entry =>
+        entry && entry.type === "video" && entry.title
+      );
+
+      entries.forEach(entry => {
+        const result = document.createElement("div");
+        result.classList.add("result_wrapper", "historyResult", "trs", "cursor", "trsButtons", "noimg");
+        result.setAttribute("data-url", entry.url || "");
+
+        result.addEventListener("click", () => {
+          if (entry.url) {
+            getURL(entry.url, true);
+          }
+        });
+
+        const thumbnail = document.createElement("div");
+        thumbnail.classList.add("thumbnail", "img", "trs");
+        if (entry.thumbnail) {
+          thumbnail.style.backgroundImage = `url("${entry.thumbnail}")`;
+        } else {
+          thumbnail.style.backgroundColor = "#3f3f3f";
+        }
+
+        const thumbnailNowPlaying = document.createElement("div");
+        thumbnailNowPlaying.classList.add("nowPlaying");
+
+        const thumbnailNowPlayingImg = document.createElement("div");
+        thumbnailNowPlayingImg.classList.add("play", "img");
+        thumbnailNowPlaying.appendChild(thumbnailNowPlayingImg);
+        thumbnail.appendChild(thumbnailNowPlaying);
+
+        const videoIdMatch = (entry.url || "").match(/[?&]v=([^&]+)/);
+        if (videoDetails && videoIdMatch && videoDetails.id === videoIdMatch[1]) {
+          thumbnailNowPlaying.style.display = "block";
+          result.classList.add("active");
+          result.style.pointerEvents = "none";
+        }
+
+        const title = document.createElement("h5");
+        title.classList.add("overflow", "resultTitle");
+        title.textContent = entry.title;
+
+        const channel = document.createElement("p");
+        channel.classList.add("overflow", "resultChannelTitle");
+        channel.textContent = entry.channel || "Unknown";
+
+        const duration = document.createElement("p");
+        duration.classList.add("resultDuration");
+        duration.textContent = entry.duration || "";
+
+        const uploadDate = document.createElement("p");
+        uploadDate.classList.add("resultDate");
+        uploadDate.textContent = entry.uploadDate || "";
+
+        const resultText = document.createElement("div");
+        resultText.classList.add("resultText");
+        resultText.append(duration, uploadDate);
+
+        result.append(thumbnail, title, channel, resultText);
+        historyWrap.appendChild(result);
+      });
     }
 
     /*
@@ -2136,8 +2216,9 @@
             main.setAttribute("data-url", "https://www.youtube.com/playlist?list=" + data[i].playlistId);
           }
           main.onclick = function(event) {
-            // Track video click in history
-            historyManager.addVideoWatched(data[i].title, data[i].channelTitle || "Unknown");
+            if (data[i].type === "video") {
+              historyManager.addVideoWatched(data[i]);
+            }
             
             getURL(event.currentTarget.getAttribute("data-url"), true);
           };
@@ -2324,18 +2405,28 @@
         this.saveHistory();
       }
 
-      addVideoWatched(videoTitle, channelTitle) {
+      addVideoWatched(video) {
+        const videoId = video.videoId || "";
         const entry = {
           type: "video",
-          title: videoTitle.toLowerCase().trim(),
-          channel: channelTitle.toLowerCase().trim(),
+          title: video.title || "",
+          channel: video.channelTitle || "Unknown",
+          duration: video.duration || video.lengthText || "",
+          uploadDate: timeAgo(video.publishedAt, video.duration || video.lengthText || ""),
+          url: videoId ? `https://www.youtube.com/watch?v=${videoId}` : "",
+          thumbnail: video.thumbnail || "",
           timestamp: Date.now()
         };
+
+        this.history = this.history.filter(existingEntry =>
+          existingEntry.type !== "video" || !entry.url || existingEntry.url !== entry.url
+        );
         this.history.unshift(entry);
         if (this.history.length > this.maxHistoryItems) {
           this.history = this.history.slice(0, this.maxHistoryItems);
         }
         this.saveHistory();
+        renderWatchHistory();
       }
 
       classifyTopic(text) {

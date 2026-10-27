@@ -7500,6 +7500,10 @@
 
     // Start frame analysis when the video is playing
     video.addEventListener('play', () => {
+      if (typeof renderWatchHistory === "function") {
+        renderWatchHistory();
+      }
+
       if (!frameAnalysisScheduled) {
         frameAnalysisScheduled = true;
         video.requestVideoFrameCallback(analyzeFrame);

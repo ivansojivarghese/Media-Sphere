@@ -1049,6 +1049,10 @@ div.nowPlaying {
     background-image: url("../svg/playlists.svg");
 }
 
+.historyBtn .img {
+    background-image: url("../svg/history.svg");
+}
+
 .scrollToTop {
     width: 4rem;
     height: 4rem;
@@ -1450,7 +1454,7 @@ div.result_wrapper {
 }*/
 
 .wrapper.profile div.result_wrapper:last-child {
-    margin-bottom: 4rem;
+    margin-bottom: 10rem;
 }
 
 .wrapper.profile h3 {
