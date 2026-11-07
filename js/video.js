@@ -2520,6 +2520,9 @@ function timeAgo(dateString, durationString) { // ISO8601 date string to human-r
   }
 
   if (seconds < 60) {
+      if (seconds === 0) {
+          return "now";
+      }
       return `${seconds} ${seconds === 1 ? 'second' : 'seconds'} ago`;
   }
 
